@@ -1,0 +1,3715 @@
+{
+  "dataset": {
+    "name": "Big Kink Survey (Public Sample)",
+    "sourcePath": "/Users/austin/dev/kink/data/BKSPublic.parquet",
+    "generatedAt": "2026-02-12T21:53:36.219Z",
+    "rowCount": 15503,
+    "columnCount": 365
+  },
+  "columns": [
+    {
+      "name": "\"Engaging with or fantasizing about what arouses me feels therapeutic or healing to me\" (vmq8jqw)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I am aroused by being dominant in sexual interactions\" (6w3xquw)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0333,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I am aroused by being submissive in sexual interactions\" (xem7hbu)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0333,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I am ashamed or embarrassed about at least some of what arouses me\" (7cw1ziu)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I can get aroused by a partner doing what I like, even if I know they aren't aroused by it themselves\" (aw1a1ss)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find {bodypartsmost}:\" (xw7vr7a)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6457,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find age-related things (beyond \"normal\" stuff like being attracted to people your own age) to be:\" (92qqx0)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7276,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "\"I find anal sex (with a penis or penile toy):\" (jhvha2f)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0002,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find blowjobs:\" (yuc275j)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find cunnilingus:\" (jn2b355)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find dirtytalking erotic\" (947wne3)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find it erotic when two people of the opposite gender to me sexually interact with each other\" (fbqcymm)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0003,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find it most erotic when the subject of my genderplay interest is:\"",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8238,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find personal freeuse dynamics, arrangements where one partner can sexually \"use\" the other without asking or negotiating, to be erotic\" (kspot4h)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5832,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find primal play to be:\" (9rncgqc)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4361,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find psychological pain/torture to be:\" (9hy7wy3)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6697,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I find scenarios where I eagerly beg others to be:\" (jvrbyep)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2497,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "\"I find scenarios where others eagerly beg me to be:\" (stmm5eg)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2497,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "\"I find situations erotic where transformations are ___\" (d14kddh)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8883,
+      "approxCardinality": 134,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find the thought of existing (in *nonsexual* situations) as a biological *female* to be erotic\" (6w84yry)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.1762,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find the thought of existing (in *nonsexual* situations) as a biological *male* to be erotic\" (l7vpprx)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.1762,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find the thought of masturbating alone as a biological female, to be erotic\" (sgdpy8l)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.1762,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I find the thought of masturbating alone as a biological male, to be erotic\" (guwym9g)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.1762,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I sometimes find people who have clearly reached sexual maturity, but are not yet adults (e.g., ages 13-17), to be sexually attractive\" (kbpolw9)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"I usually don't leave romantic relationships unless there's a very serious violation\" (b7gzhvz)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8295,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "\"I've acted upon or experimented with all the things that arouse me\" (41kpfir)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"I've experienced a lot of sexual harrassment\" (3knd12d)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5109,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"If my partner is aroused by something, I can also be aroused by it, even if I don't normally find it erotic\" (j5yb5lu)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"In general, casual sexual hookups have been a ___ experience for me\" (ytp3gfm)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8295,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"In general, I prefer scenarios where receiver of the pain is:\" (8r5zld8)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6698,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"In general, I prefer scenarios where the intensity of the pain is:\" (m73c3q1)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6698,
+      "approxCardinality": 7,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"In general, on average, the optimal amount of consent in my preferred erotic scenarios is:\" (b0ukpvo)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0004,
+      "approxCardinality": 5,
+      "tags": [
+        "demographic",
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "\"In general, when my romantic relationships end, who initiates the breakup?\" (y33ksrt)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8296,
+      "approxCardinality": 4,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "\"It's most erotic when the altered body is\" (wdflfgk)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8902,
+      "approxCardinality": 127,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "\"Scenarios where pain is given to genitals are arousing to me\" (bobe874)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6698,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "\"To what extent do you agree with this statement: I am a narcissist. (1bqtk47)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.916,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "abnormalbody",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8478,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "age",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 5,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "agegap",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7329,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "agreeablenessvariable",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 13,
+      "tags": [
+        "ocean",
+        "derived"
+      ]
+    },
+    {
+      "name": "allrollidentity",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2995,
+      "approxCardinality": 3,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "animals2",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9708,
+      "approxCardinality": 180,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "animated",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0847,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "appearance",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.3414,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Are you currently experiencing PMS symptoms? (g953661)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9518,
+      "approxCardinality": 3,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Are you on hormonal birth control? This is the pill or any hormonal implant (pbj1u8c)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9005,
+      "approxCardinality": 3,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "As an adult, have you been the victim of sexual assault? (ld0srat)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0002,
+      "approxCardinality": 2,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "ascore",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.3528,
+      "approxCardinality": 12,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "At what age did you begin watching porn or reading erotic content at least semiregularly? (ugf1hyy)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0853,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "At what age did you first begin (at least semiregularly) masturbating?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0003,
+      "approxCardinality": 7,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "badends",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9478,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "bestiality",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.902,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "biomale",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "bmi",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "bondageaverage",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.4388,
+      "approxCardinality": 15,
+      "tags": [
+        "demographic",
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "bondagemost",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4586,
+      "approxCardinality": 21,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "brutality",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9452,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Can you have vaginal orgasms *without* clitoral stimulation? (hy7nsai)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8444,
+      "approxCardinality": 3,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "cgl",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.733,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Check all that apply: Scenarios you find erotic tend to involve *the other person/people/creatures* feeling",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.0224,
+      "approxCardinality": 4060,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Check all that apply: Scenarios you find erotic tend to involve *you* feeling",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.0079,
+      "approxCardinality": 5333,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "childhood_adversity",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "childhood_gender_tolerance",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0007,
+      "approxCardinality": 3,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "clothing",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4673,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Common things: Check all the following categories that contain a thing that arouses you.",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.011,
+      "approxCardinality": 7225,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Compared to other people of your same gender and age range, you are (yh6d44s)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0002,
+      "approxCardinality": 7,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "consciensiousnessvariable",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 13,
+      "tags": [
+        "ocean",
+        "derived"
+      ]
+    },
+    {
+      "name": "creepy",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9557,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "cunnilingus",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "dirty",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9686,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Do you feel as though you've \"induced\" new fetishes into yourself through the use of porn or erotic content, that otherwise would not have existed for you?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Do you get mood-based PMS symptoms during your menstrual cycle?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7829,
+      "approxCardinality": 4,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Do you have baby fever? (9stu9yy)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9897,
+      "approxCardinality": 3,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "eagerness",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2415,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "exhibitionother",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5663,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "exhibitionself",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5663,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "extremebondage",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4388,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "extroversionvariable",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 13,
+      "tags": [
+        "ocean",
+        "derived"
+      ]
+    },
+    {
+      "name": "For animal transformations, which of the following are the most erotic to you?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9574,
+      "approxCardinality": 374,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "For animal transformations, you prefer when the final result is ____? (yta91wx)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9561,
+      "approxCardinality": 134,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "For aunt/uncle, niece/nephew incest fantasies, which is your preferred pairing",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9198,
+      "approxCardinality": 15,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "For blood (menstrual), which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9821,
+      "approxCardinality": 104,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For blood (normal), which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9638,
+      "approxCardinality": 136,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For breast milk, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9327,
+      "approxCardinality": 204,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For general body transformation, which of the following is erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.936,
+      "approxCardinality": 55,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "For grandparent/grandchild incest fantasies, which is your preferred pairing",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9846,
+      "approxCardinality": 48,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "For male ejaculate, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8965,
+      "approxCardinality": 304,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "For parent/child incest fantasies, which are your preferred pairings",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8992,
+      "approxCardinality": 130,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "For precum, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9169,
+      "approxCardinality": 251,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For saliva, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9053,
+      "approxCardinality": 323,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For scat (poop), which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9855,
+      "approxCardinality": 125,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For sibling incest fantasies, which is your preferred pairing",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8765,
+      "approxCardinality": 46,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "For smegma, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.993,
+      "approxCardinality": 75,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For squirt, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8479,
+      "approxCardinality": 333,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For sweat, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9382,
+      "approxCardinality": 141,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For urine, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9146,
+      "approxCardinality": 278,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For vomit, which of the following do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9923,
+      "approxCardinality": 66,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For Which of the following categories of abnormal body states do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8926,
+      "approxCardinality": 965,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "For Which of the following categories of genderswapped body states do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.943,
+      "approxCardinality": 53,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0005,
+      "approxCardinality": 3,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "frustration",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.2496,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "fulltimepower",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.436,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "futa",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8238,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "genderplay",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8176,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "genderswapped",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8902,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "gentleness",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.43,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "gentleness2most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4581,
+      "approxCardinality": 9,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Getting catcalled on the street (or the thought of getting catcalled) feels more: (3qh0yh8)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6363,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "givepain",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6697,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "gratification",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9478,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Have you ever had a sexual experience with someone else who did not want the experience? (2zafc2j)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0002,
+      "approxCardinality": 4,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Have you paid for porn/erotic content? (pnltks8)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 4,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "highenergy",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0261,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How \"sexually liberated\" was your upbringing? (fs700v2)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0005,
+      "approxCardinality": 3,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "How honest were you when answering this survey? (g1vao1y)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0002,
+      "approxCardinality": 2,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How horny are you right now? (1jtj2nx)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8247,
+      "approxCardinality": 4,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How horny have you been in the last 24 hours? (2hyrmvh)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8247,
+      "approxCardinality": 4,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How important is it that the pain is also sexually gratifying to the recipient? (b31aufk)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6697,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How much of the porn or erotica you watch is violent? (joz3g52)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0852,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in abnormal body/body part-related things? (si89mua)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8901,
+      "approxCardinality": 10,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in age-related sexual interests? (489pmk6)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7329,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in bestiality/creatures-related sexual interests? (w3xlgsv)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.915,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in brutality-related sexual interests? (5rsjhm2)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9478,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in clothing related sexual interests? (4kl54pc)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4777,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in creepy/horror related sexual interests? (y9cxruq)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9592,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in dirtiness related sexual interests? (l7wbfjh)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.974,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in eagerness related sexual interests? (twg3prj)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.2497,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in genderplay related sexual interests? (3yixh1c)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8238,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in gentleness related sexual interests? (j6jn9rl)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4357,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in humiliation related sexual interests? (jebtk3s)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7791,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in incest? (9f6vg9x)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8453,
+      "approxCardinality": 10,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in pregnancy related sexual interests? (c2yvk62)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8015,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in scenarios involving sex toys? (iob8ewb)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4618,
+      "approxCardinality": 10,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in sensory related sexual interests? (yg5rwaa)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8144,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in specific body parts (not including standard sexual body parts like breasts or genitals)? (71x4a7w)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.5643,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in transformation related sexual interests? (ju7swdc)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8882,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in vore related sexual interests? (58x0gp5)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.967,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced interest in your appearance-based sexual interests? (6qqg60a)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.3529,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in bodily-secretions? (i2kfd9)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8129,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in bondage? (tdxu7cp)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4389,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in exhibitionism or voyeurism? (xwggkkr)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.5665,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in mental alteration? (nesc17f)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8108,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in multiple partners or related scenarios? (hz27wpx)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6003,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in mythical creatures? (xfj2rdq)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7589,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in nonconsent? (bx4o14o)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6472,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in power dynamics? (enrhyeb)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4362,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in sadomasochism? (zh8c32k)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6698,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in specific roles? (ce5t067)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.581,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "How old were you when you first experienced sexual interest in your preferred object/objects? (3vnq7jt)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8011,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "humiliation",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7711,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "humiliation2most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.789,
+      "approxCardinality": 23,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "In erotic scenarios involving age gaps, I prefer to be ____ (6njm5tr)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7701,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "In erotic scenarios involving nonconsent, you generally prefer when the nonconsenting person is:",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6473,
+      "approxCardinality": 1,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "In general, I prefer when the person in bondage is",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4389,
+      "approxCardinality": 1,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "In general, it's most erotic when _____ wears the clothing you find erotic (eowvxbs)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4778,
+      "approxCardinality": 3,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "In general, the most erotic scenarios are: (6e7lhil)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0262,
+      "approxCardinality": 7,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "In general, you find it most erotic when the subject of humiliation is:",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7792,
+      "approxCardinality": 1,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "In scenarios you find erotic, you tend to identify with (or imagine being): (irv6czg)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0262,
+      "approxCardinality": 4,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "incest",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8436,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "inducefetish",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.1133,
+      "approxCardinality": 4,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "knowwhatarousesyou",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "lightbondage",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4387,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "marriage100blood",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8453,
+      "approxCardinality": 134,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "masterslave",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.436,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "mediumbondage",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4388,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "mentalalteration",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8051,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "mentalalteration2most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8209,
+      "approxCardinality": 10,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "mindbreak",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.436,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "multiplepartners",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5959,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "My erotic fantasies involving toys typically involve ____ using the toys",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.462,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "mythical",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7544,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "neuroticismvariable",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 13,
+      "tags": [
+        "demographic",
+        "ocean",
+        "derived"
+      ]
+    },
+    {
+      "name": "nonconsent",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6386,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "nonconsent1most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6685,
+      "approxCardinality": 18,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "normalsex",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "obedience",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.436,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "objects",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7917,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7eg)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.3299,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7eh)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8774,
+      "approxCardinality": 12,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ei)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4583,
+      "approxCardinality": 9,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ej)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7891,
+      "approxCardinality": 23,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ek)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9251,
+      "approxCardinality": 7,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7el)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8209,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7em)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.625,
+      "approxCardinality": 20,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7en)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7686,
+      "approxCardinality": 20,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7eo)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6685,
+      "approxCardinality": 18,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ep)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.853,
+      "approxCardinality": 20,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ew)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4658,
+      "approxCardinality": 18,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ex)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8716,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ey)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.659,
+      "approxCardinality": 21,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7ez)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8507,
+      "approxCardinality": 10,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7f0)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6948,
+      "approxCardinality": 16,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7f1)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.82,
+      "approxCardinality": 24,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7f2)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4804,
+      "approxCardinality": 24,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7f3)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9023,
+      "approxCardinality": 12,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (35jn7f4)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.96,
+      "approxCardinality": 20,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77h)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9808,
+      "approxCardinality": 12,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77i)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8346,
+      "approxCardinality": 16,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77j)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9005,
+      "approxCardinality": 20,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77k)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.5706,
+      "approxCardinality": 32,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77l)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9634,
+      "approxCardinality": 14,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77m)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.6795,
+      "approxCardinality": 20,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77n)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9676,
+      "approxCardinality": 9,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77o)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9928,
+      "approxCardinality": 11,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (i73h77p)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.986,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Of these options, which one is the most erotic? (s4xytoy)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.94,
+      "approxCardinality": 11,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "older",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7329,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "opennessvariable",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 13,
+      "tags": [
+        "ocean",
+        "derived"
+      ]
+    },
+    {
+      "name": "oralsexanimal",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9151,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "oralsexanimal2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9152,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "otherfeel1most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0561,
+      "approxCardinality": 24,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "penetration",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.915,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "penetration2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.915,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Personally, your preferred relationship style is: (4jib23m)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0002,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "politics",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 3,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "pornhabit",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 11,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "powerdynamic",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4324,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "powerdynamic2most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4658,
+      "approxCardinality": 18,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "powerlessnessvariable",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 21,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "pregnancy",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7984,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "pregnancy2most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8716,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "progression",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.733,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "receivepain",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6697,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "regression",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.733,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "roles",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5653,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "sadomasochism",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6635,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "secretions",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.796,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Select all body parts you find significantly erotic",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.5664,
+      "approxCardinality": 5280,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "sensory",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.7932,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "sexcount",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0155,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "spanking",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.6697,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "straightness",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 2,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "supernatural",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4113,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "teasing",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2496,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "The thought of someone else admiring me while I am a man in the nude is: (g219v7x)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9687,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "The thought of someone else admiring me while I am a woman in the nude is: (yf7onjn)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9414,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "The type of erotic content you prefer tends to be more (2y636ej)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0847,
+      "approxCardinality": 5,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "The type of erotic content you prefer tends to be: (f98tjn5)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0848,
+      "approxCardinality": 4,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Totalanimals",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9187,
+      "approxCardinality": 11,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalanimals2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9724,
+      "approxCardinality": 13,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalbodyhorror",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9913,
+      "approxCardinality": 11,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalbodyparts",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.5663,
+      "approxCardinality": 29,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalbodypartsabnormal",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8926,
+      "approxCardinality": 18,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalbondage",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.442,
+      "approxCardinality": 20,
+      "tags": [
+        "demographic",
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalbrutal2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9563,
+      "approxCardinality": 17,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalclothingitems",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.6729,
+      "approxCardinality": 24,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalcreep2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9607,
+      "approxCardinality": 10,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totaldirty2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9766,
+      "approxCardinality": 7,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totaleager2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.2714,
+      "approxCardinality": 10,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalfetish1",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.0108,
+      "approxCardinality": 18,
+      "tags": [
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalfetish2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.3392,
+      "approxCardinality": 15,
+      "tags": [
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "totalfetishcategory",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0,
+      "approxCardinality": 30,
+      "tags": [
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalgenderplay2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8411,
+      "approxCardinality": 12,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalgentleness2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.4393,
+      "approxCardinality": 10,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalhumiliation2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.7807,
+      "approxCardinality": 22,
+      "tags": [
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalincest3",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8992,
+      "approxCardinality": 9,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalmentalalteration2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8119,
+      "approxCardinality": 11,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "TotalMentalIllness",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0,
+      "approxCardinality": 2,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalmultiplepartners2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.6034,
+      "approxCardinality": 20,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalmythical2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.7608,
+      "approxCardinality": 21,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalnonconsent1",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.6507,
+      "approxCardinality": 17,
+      "tags": [
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalobjects2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8226,
+      "approxCardinality": 20,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalotherfeel1",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.0221,
+      "approxCardinality": 24,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalpowerdynamic2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.4452,
+      "approxCardinality": 18,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalpregnancy2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8052,
+      "approxCardinality": 7,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalprofession",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.6524,
+      "approxCardinality": 24,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalsadomasochism1",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.6753,
+      "approxCardinality": 18,
+      "tags": [
+        "fetish",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalsecretions",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8131,
+      "approxCardinality": 15,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalsensory2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8156,
+      "approxCardinality": 27,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalsexacts",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.0161,
+      "approxCardinality": 16,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalsexyrace",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8353,
+      "approxCardinality": 10,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totaltoys2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.4662,
+      "approxCardinality": 22,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "Totaltransform1",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.8902,
+      "approxCardinality": 13,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totaltransform2",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.9574,
+      "approxCardinality": 18,
+      "tags": [
+        "demographic",
+        "derived"
+      ]
+    },
+    {
+      "name": "Totalyoufeel",
+      "duckdbType": "DOUBLE",
+      "logicalType": "numeric",
+      "nullRatio": 0.0078,
+      "approxCardinality": 24,
+      "tags": [
+        "derived"
+      ]
+    },
+    {
+      "name": "toys",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4577,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "toys2most",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4802,
+      "approxCardinality": 24,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "transform",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8798,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "Uncommon things: Check all the following categories that contain a thing that arouses you.",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.3392,
+      "approxCardinality": 1728,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "violentporn",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0848,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "vore",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9609,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "voyeurother",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5663,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "voyeurself",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.5663,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "What kind of vore do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9697,
+      "approxCardinality": 39,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "When I picture my own nude female breasts, buttocks, legs, or genitals, I find this: (qkw5ssz)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.941,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "When I picture my own nude male buttocks, legs, or genitals, I find this: (f77m7qu)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9684,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "When I picture myself as having a nude female body, I find this: (yqi5pre)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8775,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "When I picture myself with a nude male body, I find this: (dl5zw4l)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.9217,
+      "approxCardinality": 6,
+      "tags": [
+        "demographic"
+      ]
+    },
+    {
+      "name": "When it comes to bestiality, which of the following creatures do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9187,
+      "approxCardinality": 266,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "When it comes to body horror, which of the following are erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9913,
+      "approxCardinality": 83,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "When it comes to necrophilia, it's most erotic when your role is:",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9826,
+      "approxCardinality": 3,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "When it comes to necrophilia, you generally prefer fantasies where the dead body is:",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9826,
+      "approxCardinality": 2,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "When it comes to power dynamics, you tend to prefer scenarios that are more (xjfb7yy)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4361,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Where are you currently at in your menstrual cycle? Options are based on a typical 28 day cycle, but cycle length can change (7ok2l1v)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9087,
+      "approxCardinality": 9,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Which body parts are most erotic when extremely huge?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9657,
+      "approxCardinality": 308,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which body parts are most erotic when extremely small?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9902,
+      "approxCardinality": 117,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which body parts are most erotic when giant/oversized?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9578,
+      "approxCardinality": 382,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which describes you best? (cvc5b81)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0263,
+      "approxCardinality": 7,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Which of the following bodily secretions do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8131,
+      "approxCardinality": 653,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following body modifications do you find significantly erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.4034,
+      "approxCardinality": 504,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following body types do you find significantly erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4637,
+      "approxCardinality": 54,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following body weights do you find most erotic? (1jq57nf)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.3528,
+      "approxCardinality": 6,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following categories contains things you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.5914,
+      "approxCardinality": 7,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following categories of transformations do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8902,
+      "approxCardinality": 695,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following disgust-oriented things do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9766,
+      "approxCardinality": 78,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic, in the context of humiliation?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.7808,
+      "approxCardinality": 2481,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (26qr0sp)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.776,
+      "approxCardinality": 7,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (32snt5e)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8932,
+      "approxCardinality": 785,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (3hof3bj)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8489,
+      "approxCardinality": 1962,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (46pfeif)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.677,
+      "approxCardinality": 3270,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (5j281rq)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8534,
+      "approxCardinality": 204,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (5mhacm7)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.878,
+      "approxCardinality": 219,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (88ox5nl)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.7546,
+      "approxCardinality": 2611,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (9d7qzaw)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8756,
+      "approxCardinality": 172,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (9fkr5dx)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9034,
+      "approxCardinality": 210,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (9kmxhci)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9147,
+      "approxCardinality": 871,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (a1m9v6u)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9541,
+      "approxCardinality": 197,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (afadhb)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9764,
+      "approxCardinality": 121,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (fnwke2d)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.7682,
+      "approxCardinality": 2348,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (fv0xaot)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7142,
+      "approxCardinality": 7,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (g5qw0tc)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.7918,
+      "approxCardinality": 2069,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (lb02f7w)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9118,
+      "approxCardinality": 198,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (lfolao)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.6746,
+      "approxCardinality": 2821,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (m66m8ix)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8891,
+      "approxCardinality": 228,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (mfc7eve)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.6901,
+      "approxCardinality": 361,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (npcvctu)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8461,
+      "approxCardinality": 1574,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (ovb55gx)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9755,
+      "approxCardinality": 324,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (rhb3fup)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9294,
+      "approxCardinality": 590,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (twppkp3)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9753,
+      "approxCardinality": 120,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (u661iml)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.7613,
+      "approxCardinality": 270,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (uju0gwc)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9318,
+      "approxCardinality": 197,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (vqogs86)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.6783,
+      "approxCardinality": 306,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (w1qo1g1)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8506,
+      "approxCardinality": 260,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (wddo7ee)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9809,
+      "approxCardinality": 218,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (xhe2co5)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.9142,
+      "approxCardinality": 167,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (yf0rmix)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8587,
+      "approxCardinality": 1783,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (yftwuzf)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.5813,
+      "approxCardinality": 370,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (ymvkzuu)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8142,
+      "approxCardinality": 2736,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find erotic? (zewlx2)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9843,
+      "approxCardinality": 118,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following do you find to be erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.4422,
+      "approxCardinality": 2774,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following drugs are erotic in sexual situations?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9142,
+      "approxCardinality": 112,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following is erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8052,
+      "approxCardinality": 86,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following is the most severe for you? (trspees)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.7052,
+      "approxCardinality": 17,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Which of the following messiness do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.9919,
+      "approxCardinality": 72,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following nonconsent scenarios do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.6507,
+      "approxCardinality": 3351,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following pairings do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8473,
+      "approxCardinality": 15,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following roles are erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.6525,
+      "approxCardinality": 4055,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following sensations do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.8156,
+      "approxCardinality": 2705,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following sex acts do you find significantly erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.0163,
+      "approxCardinality": 4632,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following sexual positions do you find significantly erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.0148,
+      "approxCardinality": 132,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following types of mental alteration do you find erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.812,
+      "approxCardinality": 343,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "Which of the following types of sadomasochism do you find erotic?\"",
+      "duckdbType": "VARCHAR",
+      "logicalType": "text",
+      "nullRatio": 0.6753,
+      "approxCardinality": 1755,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "whowears",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.4776,
+      "approxCardinality": 13,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "worshipped",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2496,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "worshipping",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.2496,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "written",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.0848,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "You ______ what arouses you (7mz0awx)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0001,
+      "approxCardinality": 5,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "You find raceplay to be: (fkk3ykn)",
+      "duckdbType": "DOUBLE",
+      "logicalType": "categorical",
+      "nullRatio": 0.8787,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "You find vore in which orifices to be erotic?",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.969,
+      "approxCardinality": 49,
+      "tags": [
+        "fetish"
+      ]
+    },
+    {
+      "name": "You prefer it when the mentally altered person is:",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.8109,
+      "approxCardinality": 3,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "You're more sexually attracted to people whose gender identity ____ match their genitals (5b30vz2)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.001,
+      "approxCardinality": 5,
+      "tags": [
+        "demographic",
+        "fetish"
+      ]
+    },
+    {
+      "name": "youfeelmost",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0341,
+      "approxCardinality": 24,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Your preferred breast size in a partner is: (dnuiinj)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.4471,
+      "approxCardinality": 6,
+      "tags": [
+        "other"
+      ]
+    },
+    {
+      "name": "Your sexual interests feel (44qhm16)",
+      "duckdbType": "VARCHAR",
+      "logicalType": "categorical",
+      "nullRatio": 0.0003,
+      "approxCardinality": 7,
+      "tags": [
+        "fetish"
+      ]
+    }
+  ]
+}

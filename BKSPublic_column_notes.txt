@@ -1,0 +1,124 @@
+BKSPublic.parquet - Column Modification Notes
+==============================================
+15,511 rows x 376 columns
+
+This is a ~1.6% stratified subsample of the full BKS dataset (~980K responses).
+Reference the GT source file for original question wording.
+
+These notes describe columns that were binned, combined, renamed, or computed
+in ways that differ from the original GT survey questions. If you're looking
+for a GT question and can't find it, check below — it may have been merged,
+renamed, or dropped.
+
+
+BINNED / COLLAPSED COLUMNS
+---------------------------
+
+politics
+  Original: 5 levels (Very Liberal, Liberal, Moderate, Conservative, Very Conservative)
+  Now: 3 levels (Liberal, Moderate, Conservative)
+  Very Liberal + Liberal -> Liberal; Very Conservative + Conservative -> Conservative
+
+bmi
+  Original: 10 bins from height + weight
+  Now: 2 levels (Not overweight, Overweight+)
+  Underweight + Normal -> "Not overweight"; Overweight + Obese -> "Overweight+"
+
+straightness
+  Original: Computed from attractedtomasculine + attractedtofeminine (continuous).
+  Now: 5 levels (Gay, Leaning gay, Bi, Leaning straight, Straight)
+  Source columns (attractedtomasculine, attractedtofeminine, penis/vagina
+  attraction) have been removed.
+
+sexcount ("How many people have you had sex with?")
+  Original: Free-text numeric entry (0-600)
+  Now: 5 bins (0, 1-2, 3-7, 8-20, 21+)
+
+How "sexually liberated" was your upbringing? (fs700v2)
+  Original: 7 levels (Highly repressed through Highly liberated)
+  Now: 3 levels (Repressed, Neutral, Liberated)
+  Highly/Moderately/Slightly repressed -> Repressed
+  Equally repressed/liberated -> Neutral
+  Slightly/Moderately/Highly liberated -> Liberated
+
+
+COMBINED / MERGED COLUMNS
+--------------------------
+
+childhood_adversity
+  Combined from two separate GT questions:
+    - "Were you (at least semiregularly) abused as a child?" (abuse)
+    - "As a child, were you the victim of sexual assault?" (sexualAssaultLevel)
+  Now: 2 levels (None, Any)
+  "Any" = answered Yes to either or both. Original columns removed.
+
+childhood_gender_tolerance
+  Combined from two separate GT questions:
+    - "In your childhood culture, how did people feel about traditional
+       gender role violations?" (tkpfq6j)
+    - "In your childhood culture, how did people feel about visible
+       genderbending?" (gjt7igv)
+  Both were 6-level scales from "So normal nobody noticed" to "Nearly
+  unheard of, if done generated full community eviction."
+  Averaged the two (mapped to 0-5 numeric), then binned:
+    Low avg (intolerant cultures) -> "Intolerant"
+    Mid avg -> "Medium"
+    High avg (tolerant cultures) -> "Tolerant"
+  Original columns removed.
+
+TotalMentalIllness
+  Original: Count of mental illnesses checked (0, 1, 2, 3, 4, 5+)
+  Now: 2 levels (None, Any)
+  0 -> None; 1+ -> Any
+
+Personally, your preferred relationship style is: (4jib23m)
+  Original: 3 levels (Mono, Middle, Poly)
+  Now: 2 levels (Monogamous, Not monogamous)
+  Middle + Poly -> "Not monogamous"
+
+
+COMPUTED COLUMNS (not directly from GT questions)
+-------------------------------------------------
+
+These are averages/sums of multiple GT sub-questions. They don't correspond
+to a single GT question:
+
+  opennessvariable          OCEAN personality (avg of sub-questions, range -6 to 6)
+  consciensiousnessvariable OCEAN personality (avg of sub-questions, range -6 to 6)
+  extroversionvariable      OCEAN personality (avg of sub-questions, range -6 to 6)
+  neuroticismvariable       OCEAN personality (avg of sub-questions, range -6 to 6)
+  agreeablenessvariable     OCEAN personality (avg of sub-questions, range -6 to 6)
+  powerlessnessvariable     Computed score (range -9 to 9)
+  totalfetishcategory       Count of fetish categories with any interest
+  bondageaverage            Average across bondage sub-items
+  Total* columns            Sum/count columns for various fetish categories
+                            (e.g., Totalbondage, Totalnonconsent1, etc.)
+
+
+DROPPED GT QUESTIONS (not in this dataset)
+------------------------------------------
+
+Demographics removed:
+  - country
+  - ethnicity/race
+  - religion_importance (how important is religion to you)
+  - sexage (age of first intercourse)
+  - "Growing up, your family was..." (social class)
+  - "Which category fits you best?" (detailed gender identity beyond cis/trans)
+  - Relationship status 
+  - Sex work questions
+
+Source columns removed (replaced by computed versions):
+  - attractedtomasculine, attractedtofeminine (replaced by straightness)
+  - penis/vagina attraction columns (replaced by straightness)
+  - abuse, sexualAssaultLevel (replaced by childhood_adversity)
+  - Gender role violations + genderbending (replaced by childhood_gender_tolerance)
+
+Content removed:
+  - All pedophilia-related questions (gate + sub-questions)
+  - Abuse sub-questions (verbal/physical by man/woman, neglect)
+  - All *smost columns (sparse "second most erotic" picks)
+
+Duplicate GT columns removed:
+  - Several columns had GT bug duplicates (same question, two column IDs).
+    The shorter-fill version was dropped in each case.

@@ -1,0 +1,13 @@
+[project]
+name = "bks-mcp-server"
+version = "0.1.0"
+description = "MCP server for the Big Kink Survey dataset"
+requires-python = ">=3.11"
+dependencies = [
+    "mcp>=1.0.0",
+    "duckdb>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
