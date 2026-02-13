@@ -28,7 +28,7 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 4. Return typed JSON envelopes (`ok`/`error`) via `src/lib/server/api-response.ts`.
 
 ### Why DuckDB CLI in the server layer
-`@duckdb/node-api` is used for schema profiling scripts but currently avoided in runtime route bundles because Nitro build/bundling with native `.node` bindings is fragile. Runtime API queries execute via the `duckdb` binary and JSON output, with timeout and row-limit controls.
+`@duckdb/node-api` is used for schema profiling scripts but currently avoided as the primary runtime engine because Nitro build/bundling with native `.node` bindings is fragile. Runtime API queries execute via the `duckdb` binary and JSON output, with timeout and row-limit controls. A fallback to `@duckdb/node-api` activates automatically when the CLI binary is not available (e.g., on Railway), with bigint normalization for JSON compatibility.
 
 ## Data and Metadata Flow
 1. Source parquet lives at `data/BKSPublic.parquet`.
@@ -38,8 +38,55 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 5. UI pages (`/`, `/explore`, `/profile`, `/sql`) call the API endpoints.
 
 ## Current Route Coverage
-- `/` dashboard with schema stats, caveats, missingness, and per-column stats
-- `/explore` cross-tab explorer with optional demographic filters
-- `/profile` cohort builder with percentile summary cards
-- `/sql` SQL console with result grid and CSV export
+
+### UI Pages
+- `/about` — intro page: dataset background, methodology caveats, feature guide, credits (links to Aella's blog post)
+- `/` — dashboard with schema stats, global caveats, missingness histogram, tag breakdown, column inspector
+- `/explore` — cross-tab explorer with pivot matrix, Cramer's V, normalization modes, demographic filters, cell drilldown, notebook save
+- `/columns` — Column Atlas with search, tag filters, sort modes, Column Inspector panel, URL state sync
+- `/profile` — cohort builder with single/compare modes, percentile cards, over-indexing signals, small-N warnings, notebook save
+- `/relationships` — Relationship Finder with precomputed Cramer's V and Pearson correlations for 159 columns
+- `/sql` — SQL console with templates, click-to-insert quoted identifiers, CSV export, notebook save
+- `/notebook` — Research Notebook with localStorage persistence, inline editing, JSON export
+
+### API Endpoints
 - `/api/health`, `/api/schema`, `/api/query`, `/api/stats/$column`, `/api/crosstab`
+
+## Shared Components
+- `src/components/pivot-matrix.tsx` — pivot table with normalization, marginals, small-cell suppression
+- `src/components/column-inspector.tsx` — column detail panel with stats queries
+- `src/components/data-table.tsx` — generic editorial data table
+- `src/components/missingness-badge.tsx` — null meaning badge (GATED, LATE_ADDED, etc.)
+- `src/components/sample-size-display.tsx` — N/non-null/used display
+- `src/components/section-header.tsx` — numbered section headers
+- `src/components/stat-card.tsx` — stat display card
+
+## Ad-Hoc Data Queries (for agents)
+
+The `duckdb` CLI is installed locally and can query the parquet file directly. This is the fastest way to inspect data without starting the dev server.
+
+```bash
+# Basic query
+duckdb -c "SELECT column_name, count(*) FROM read_parquet('data/BKSPublic.parquet') WHERE column_name IS NOT NULL GROUP BY 1 ORDER BY 2 DESC"
+
+# JSON output (for piping/parsing)
+duckdb -json -c "SELECT DISTINCT whowears FROM read_parquet('data/BKSPublic.parquet') WHERE whowears IS NOT NULL"
+
+# Describe all columns
+duckdb -c "DESCRIBE SELECT * FROM read_parquet('data/BKSPublic.parquet')"
+
+# Sample rows
+duckdb -c "SELECT * FROM read_parquet('data/BKSPublic.parquet') LIMIT 5"
+```
+
+Note: `@duckdb/node-api` and Python `duckdb` are also available but require their respective runtimes. The CLI is the simplest option — no imports or environment setup needed.
+
+## Key Libraries
+- `src/lib/notebook-store.ts` — localStorage CRUD for notebook entries
+- `src/lib/cell-hygiene.ts` — small-cell suppression (MIN_CELL_COUNT = 10)
+- `src/lib/format.ts` — number/percent formatting utilities
+- `src/lib/schema/null-meaning.ts` — null meaning inference (NOT_APPLICABLE, GATED, LATE_ADDED, UNKNOWN)
+- `src/lib/schema/metadata.ts` — schema metadata access layer
+- `src/lib/schema/relationships.generated.json` — precomputed pairwise associations (3,065 entries)
+- `src/lib/duckdb/use-query.ts` — React hook for DuckDB-WASM queries
+- `src/lib/duckdb/sql-helpers.ts` — SQL quoting and WHERE clause builder

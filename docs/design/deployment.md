@@ -24,10 +24,14 @@ Railway injects `PORT`; Nitro uses it automatically.
 - `GET /api/crosstab` - x/y grouped counts with optional filters
 
 ## App Surface (Current)
-- `GET /` dashboard
-- `GET /explore` cross-tab explorer
-- `GET /profile` profile/cohort percentile summary
-- `GET /sql` SQL console and CSV export
+- `GET /about` intro page (dataset background, credits, feature guide)
+- `GET /` dashboard (schema stats, caveats, missingness, column inspector)
+- `GET /explore` cross-tab explorer (pivot matrix, Cramer's V, filters, notebook save)
+- `GET /columns` Column Atlas (search, tags, sort, Column Inspector, URL state)
+- `GET /profile` profile/cohort builder (single + compare modes, over-indexing, notebook save)
+- `GET /relationships` Relationship Finder (precomputed associations for 159 columns)
+- `GET /sql` SQL console (templates, quoted identifiers, CSV export, notebook save)
+- `GET /notebook` Research Notebook (localStorage persistence, inline editing, JSON export)
 
 ## Deploying
 ```bash
@@ -41,10 +45,40 @@ mcp__Railway__deploy({ workspacePath: "/Users/austin/dev/kink" })
 ```
 
 ## MCP Service (Service B)
-`mcp-server/Dockerfile` is ready. To deploy MCP separately on Railway:
-1. Create/link a second Railway service.
-2. Configure start command to run the Python MCP server.
-3. Set `BKS_PARQUET_PATH` if data is mounted at a non-default path.
+- **Service**: bks-mcp-server
+- **URL**: https://bks-mcp-server-production.up.railway.app
+- **MCP endpoint**: `POST https://bks-mcp-server-production.up.railway.app/mcp`
+- **Transport**: streamable-http (MCP protocol over HTTP)
+- **Dockerfile**: `mcp-server/Dockerfile` (build context is repo root)
+
+Environment variables set on the service:
+- `MCP_TRANSPORT=streamable-http`
+- `BKS_PARQUET_PATH=/app/data/BKSPublic.parquet`
+- `RAILWAY_DOCKERFILE_PATH=mcp-server/Dockerfile`
+- `PORT` — injected by Railway (default 8080)
+
+### Deploying MCP Service
+```bash
+# link to the MCP service first
+railway service bks-mcp-server
+# then deploy
+railway up
+```
+
+Or via Railway MCP:
+```text
+mcp__Railway__link-service({ workspacePath: "...", serviceName: "bks-mcp-server" })
+mcp__Railway__deploy({ workspacePath: "..." })
+```
+
+### MCP Smoke Check
+```bash
+curl -s -X POST \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json, text/event-stream" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-03-26","capabilities":{},"clientInfo":{"name":"test","version":"1.0"}}}' \
+  https://bks-mcp-server-production.up.railway.app/mcp
+```
 
 ## Smoke Checks After Deploy
 ```bash

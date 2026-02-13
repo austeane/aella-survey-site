@@ -1,8 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { DataTable } from "@/components/data-table";
+import { SectionHeader } from "@/components/section-header";
+import { StatCard } from "@/components/stat-card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
-import { getSchema, getStats, runQuery } from "@/lib/client/api";
+import { getSchema } from "@/lib/client/api";
+import { MIN_CELL_COUNT, shouldSuppressCell } from "@/lib/cell-hygiene";
+import { useDuckDB } from "@/lib/duckdb/provider";
+import { quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
+import { asNumber, formatNumber, formatPercent } from "@/lib/format";
+import { addNotebookEntry } from "@/lib/notebook-store";
 
 export const Route = createFileRoute("/profile")({
   component: ProfilePage,
@@ -18,67 +34,103 @@ interface ProfileSummary {
     cohortMedian: number | null;
     globalPercentile: number | null;
   }>;
+  overIndexing: Array<{
+    columnName: string;
+    value: string;
+    cohortCount: number;
+    globalCount: number;
+    cohortPct: number;
+    globalPct: number;
+    ratio: number;
+  }>;
 }
 
-function quoteIdentifier(identifier: string): string {
-  return `"${identifier.replaceAll('"', '""')}"`;
+interface ComparisonResult {
+  a: ProfileSummary;
+  b: ProfileSummary;
 }
 
-function quoteLiteral(value: string): string {
-  return `'${value.replaceAll("'", "''")}'`;
+interface ComparisonPercentileRow {
+  metric: string;
+  medianA: number | null;
+  medianB: number | null;
+  delta: number | null;
 }
 
-function numberOrNull(value: unknown): number | null {
-  if (value == null) {
-    return null;
-  }
+type Mode = "single" | "compare";
 
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : null;
-  }
+const NONE = "__none__";
 
-  if (typeof value === "string") {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
+type FilterPair = { column: string; value: string };
 
+function getWarning(cohortSize: number) {
+  if (cohortSize < 30) {
+    return {
+      kind: "critical" as const,
+      message: "N < 30: Too small for reliable comparisons.",
+    };
+  }
+  if (cohortSize < 100) {
+    return {
+      kind: "warn" as const,
+      message: "N < 100: Treat patterns as unstable.",
+    };
+  }
   return null;
 }
 
 function ProfilePage() {
+  const { db } = useDuckDB();
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
 
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [mode, setMode] = useState<Mode>("single");
+
+  // Single-cohort state
+  const [selectedColumns, setSelectedColumns] = useState<[string, string, string]>(["", "", ""]);
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
   const [valueOptionsByColumn, setValueOptionsByColumn] = useState<Record<string, string[]>>({});
 
+  // Compare-cohort state
+  const [columnsA, setColumnsA] = useState<[string, string, string]>(["", "", ""]);
+  const [valuesA, setValuesA] = useState<Record<string, string>>({});
+  const [valueOptionsA, setValueOptionsA] = useState<Record<string, string[]>>({});
+
+  const [columnsB, setColumnsB] = useState<[string, string, string]>(["", "", ""]);
+  const [valuesB, setValuesB] = useState<Record<string, string>>({});
+  const [valueOptionsB, setValueOptionsB] = useState<Record<string, string[]>>({});
+
   const [summary, setSummary] = useState<ProfileSummary | null>(null);
+  const [comparison, setComparison] = useState<ComparisonResult | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
+  const [notebookSaved, setNotebookSaved] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
     void getSchema()
       .then((response) => {
-        if (cancelled) {
-          return;
-        }
-
+        if (cancelled) return;
         setSchema(response.data);
 
         const demographicColumns = response.data.columns
-          .filter((column) => column.tags.includes("demographic") && column.logicalType === "categorical")
+          .filter((c) => c.tags.includes("demographic") && c.logicalType === "categorical")
           .slice(0, 3)
-          .map((column) => column.name);
+          .map((c) => c.name);
 
-        setSelectedColumns(demographicColumns);
+        const defaults: [string, string, string] = [
+          demographicColumns[0] ?? "",
+          demographicColumns[1] ?? "",
+          demographicColumns[2] ?? "",
+        ];
+
+        setSelectedColumns(defaults);
+        setColumnsA([...defaults]);
+        setColumnsB([...defaults]);
       })
       .catch((error: Error) => {
-        if (!cancelled) {
-          setSchemaError(error.message);
-        }
+        if (!cancelled) setSchemaError(error.message);
       });
 
     return () => {
@@ -86,295 +138,878 @@ function ProfilePage() {
     };
   }, []);
 
+  // Load value options for single-cohort columns
   useEffect(() => {
-    if (selectedColumns.length === 0) {
-      return;
-    }
+    if (!db) return;
+
+    const activeColumns = selectedColumns.filter((column) => Boolean(column));
+    if (activeColumns.length === 0) return;
 
     let cancelled = false;
 
-    void Promise.all(
-      selectedColumns.map(async (column) => {
-        const response = await getStats(column);
-        if (response.data.stats.kind !== "categorical") {
-          return [column, [] as string[]] as const;
-        }
-
-        return [
-          column,
-          response.data.stats.topValues.map((item) => String(item.value ?? "NULL")),
-        ] as const;
-      }),
-    )
-      .then((entries) => {
-        if (cancelled) {
-          return;
-        }
-
-        const nextOptions: Record<string, string[]> = {};
-        for (const [column, options] of entries) {
-          nextOptions[column] = options;
-        }
-
-        setValueOptionsByColumn(nextOptions);
-        setSelectedValues((current) => {
-          const next: Record<string, string> = {};
-          for (const column of selectedColumns) {
-            const existing = current[column];
-            if (existing && nextOptions[column]?.includes(existing)) {
-              next[column] = existing;
-            }
-          }
-          return next;
-        });
+    void loadValueOptions(activeColumns)
+      .then((next) => {
+        if (!cancelled) setValueOptionsByColumn(next);
       })
       .catch(() => {
-        if (!cancelled) {
-          setValueOptionsByColumn({});
-        }
+        if (!cancelled) setValueOptionsByColumn({});
       });
 
     return () => {
       cancelled = true;
     };
-  }, [selectedColumns]);
+  }, [selectedColumns, db]);
+
+  // Load value options for cohort A columns
+  useEffect(() => {
+    if (!db) return;
+
+    const activeColumns = columnsA.filter((column) => Boolean(column));
+    if (activeColumns.length === 0) return;
+
+    let cancelled = false;
+
+    void loadValueOptions(activeColumns)
+      .then((next) => {
+        if (!cancelled) setValueOptionsA(next);
+      })
+      .catch(() => {
+        if (!cancelled) setValueOptionsA({});
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [columnsA, db]);
+
+  // Load value options for cohort B columns
+  useEffect(() => {
+    if (!db) return;
+
+    const activeColumns = columnsB.filter((column) => Boolean(column));
+    if (activeColumns.length === 0) return;
+
+    let cancelled = false;
+
+    void loadValueOptions(activeColumns)
+      .then((next) => {
+        if (!cancelled) setValueOptionsB(next);
+      })
+      .catch(() => {
+        if (!cancelled) setValueOptionsB({});
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [columnsB, db]);
+
+  const loadValueOptions = useCallback(
+    async (activeColumns: string[]): Promise<Record<string, string[]>> => {
+      if (!db) return {};
+
+      const entries = await Promise.all(
+        activeColumns.map(async (column) => {
+          const quoted = quoteIdentifier(column);
+          const sql = `
+            SELECT cast(${quoted} AS VARCHAR) AS value, count(*)::BIGINT AS cnt
+            FROM data
+            WHERE ${quoted} IS NOT NULL
+            GROUP BY 1
+            ORDER BY cnt DESC
+            LIMIT 20
+          `;
+
+          const conn = await db.connect();
+          try {
+            const result = await conn.query(sql);
+            const values: string[] = [];
+            for (let i = 0; i < result.numRows; i++) {
+              values.push(String(result.getChildAt(0)?.get(i) ?? "NULL"));
+            }
+            return [column, values] as const;
+          } finally {
+            await conn.close();
+          }
+        }),
+      );
+
+      const next: Record<string, string[]> = {};
+      for (const [column, options] of entries) {
+        next[column] = options;
+      }
+      return next;
+    },
+    [db],
+  );
 
   const availableDemographicColumns = useMemo(() => {
-    if (!schema) {
-      return [];
-    }
-
+    if (!schema) return [];
     return schema.columns.filter(
-      (column) => column.tags.includes("demographic") && column.logicalType === "categorical",
+      (c) => c.tags.includes("demographic") && c.logicalType === "categorical",
     );
   }, [schema]);
 
   const filterPairs = useMemo(() => {
     return selectedColumns
       .map((column) => ({ column, value: selectedValues[column] }))
-      .filter((item) => Boolean(item.column && item.value));
+      .filter((item): item is FilterPair => Boolean(item.column && item.value));
   }, [selectedColumns, selectedValues]);
 
-  const canRun = filterPairs.length > 0 && !running;
+  const filterPairsA = useMemo(() => {
+    return columnsA
+      .map((column) => ({ column, value: valuesA[column] }))
+      .filter((item): item is FilterPair => Boolean(item.column && item.value));
+  }, [columnsA, valuesA]);
 
-  async function runProfile() {
-    if (filterPairs.length === 0) {
-      setRunError("Select at least one demographic value before running profile analysis.");
-      return;
-    }
+  const filterPairsB = useMemo(() => {
+    return columnsB
+      .map((column) => ({ column, value: valuesB[column] }))
+      .filter((item): item is FilterPair => Boolean(item.column && item.value));
+  }, [columnsB, valuesB]);
 
-    setRunning(true);
-    setRunError(null);
+  const canRun = mode === "single"
+    ? filterPairs.length > 0 && !running && !!db
+    : filterPairsA.length > 0 && filterPairsB.length > 0 && !running && !!db;
 
-    const whereClause = `WHERE ${filterPairs
+  const buildCondition = useCallback((pairs: FilterPair[]) => {
+    return pairs
       .map((pair) => `${quoteIdentifier(pair.column)} = ${quoteLiteral(pair.value)}`)
-      .join(" AND ")}`;
+      .join(" AND ");
+  }, []);
 
-    try {
-      const totalResult = await runQuery({
-        sql: "SELECT count(*)::BIGINT AS total_size FROM data",
-        limit: 1,
-      });
-      const cohortResult = await runQuery({
-        sql: `SELECT count(*)::BIGINT AS cohort_size FROM data ${whereClause}`,
-        limit: 1,
-      });
+  const runSingleCohort = useCallback(
+    async (condition: string): Promise<ProfileSummary> => {
+      if (!db) throw new Error("DuckDB not available");
 
-      const totalSize = numberOrNull(totalResult.data.rows[0]?.[0]) ?? 0;
-      const cohortSize = numberOrNull(cohortResult.data.rows[0]?.[0]) ?? 0;
-      const cohortSharePercent = totalSize > 0 ? (cohortSize / totalSize) * 100 : 0;
-      const uniquenessPercentile = Math.max(0, Math.min(100, 100 - cohortSharePercent));
+      const conn = await db.connect();
+      try {
+        const runSql = async (sql: string) => {
+          const result = await conn.query(sql);
+          const rows: unknown[][] = [];
+          for (let i = 0; i < result.numRows; i++) {
+            const row: unknown[] = [];
+            for (let c = 0; c < result.schema.fields.length; c++) {
+              let val = result.getChildAt(c)?.get(i);
+              if (typeof val === "bigint") val = Number(val);
+              row.push(val ?? null);
+            }
+            rows.push(row);
+          }
+          return rows;
+        };
 
-      const metricCandidates = [
-        "totalfetishcategory",
-        "powerlessnessvariable",
-        "opennessvariable",
-        "extroversionvariable",
-        "neuroticismvariable",
-      ].filter((metric) => schema?.columns.some((column) => column.name === metric));
+        const sizeRows = await runSql(`
+          SELECT
+            count(*)::BIGINT AS total_size,
+            count(*) FILTER (WHERE ${condition})::BIGINT AS cohort_size
+          FROM data
+        `);
 
-      const percentileCards = await Promise.all(
-        metricCandidates.map(async (metric) => {
-          const metricSql = `
-            WITH cohort AS (
-              SELECT quantile_cont(${quoteIdentifier(metric)}, 0.5)::DOUBLE AS cohort_median
-              FROM data
-              ${whereClause} AND ${quoteIdentifier(metric)} IS NOT NULL
+        const totalSize = asNumber(sizeRows[0]?.[0]);
+        const cohortSize = asNumber(sizeRows[0]?.[1]);
+        const cohortSharePercent = totalSize > 0 ? (cohortSize / totalSize) * 100 : 0;
+        const uniquenessPercentile = Math.max(0, Math.min(100, 100 - cohortSharePercent));
+
+        const metricCandidates = [
+          "totalfetishcategory",
+          "powerlessnessvariable",
+          "opennessvariable",
+          "extroversionvariable",
+          "neuroticismvariable",
+        ].filter((metric) => schema?.columns.some((c) => c.name === metric));
+
+        const percentileCards = await Promise.all(
+          metricCandidates.map(async (metric) => {
+            const rows = await runSql(`
+              WITH cohort AS (
+                SELECT quantile_cont(${quoteIdentifier(metric)}, 0.5)::DOUBLE AS cohort_median
+                FROM data
+                WHERE ${condition} AND ${quoteIdentifier(metric)} IS NOT NULL
+              )
+              SELECT
+                (SELECT cohort_median FROM cohort) AS cohort_median,
+                CASE
+                  WHEN (SELECT cohort_median FROM cohort) IS NULL THEN NULL
+                  ELSE (
+                    SELECT
+                      100.0 *
+                      SUM(CASE WHEN ${quoteIdentifier(metric)} <= (SELECT cohort_median FROM cohort) THEN 1 ELSE 0 END)::DOUBLE /
+                      COUNT(*)::DOUBLE
+                    FROM data
+                    WHERE ${quoteIdentifier(metric)} IS NOT NULL
+                  )
+                END AS percentile
+            `);
+
+            return {
+              metric,
+              cohortMedian: rows[0]?.[0] == null ? null : Number(rows[0][0]),
+              globalPercentile: rows[0]?.[1] == null ? null : Number(rows[0][1]),
+            };
+          }),
+        );
+
+        const candidateCategoricalColumns =
+          schema?.columns
+            .filter(
+              (column) =>
+                column.logicalType === "categorical" &&
+                (column.tags.includes("demographic") || column.tags.includes("ocean")),
             )
-            SELECT
-              (SELECT cohort_median FROM cohort) AS cohort_median,
-              CASE
-                WHEN (SELECT cohort_median FROM cohort) IS NULL THEN NULL
-                ELSE (
-                  SELECT 100.0 *
-                    SUM(CASE WHEN ${quoteIdentifier(metric)} <= (SELECT cohort_median FROM cohort) THEN 1 ELSE 0 END)::DOUBLE /
-                    COUNT(*)::DOUBLE
+            .slice(0, 30)
+            .map((column) => column.name) ?? [];
+
+        const overIndexingRows =
+          candidateCategoricalColumns.length === 0
+            ? []
+            : await runSql(`
+                WITH counts AS (
+                  ${candidateCategoricalColumns
+                    .map((columnName) => {
+                      const quoted = quoteIdentifier(columnName);
+                      return `
+                        SELECT
+                          ${quoteLiteral(columnName)} AS column_name,
+                          cast(${quoted} AS VARCHAR) AS value,
+                          SUM(CASE WHEN ${condition} THEN 1 ELSE 0 END)::DOUBLE AS cohort_count,
+                          COUNT(*)::DOUBLE AS global_count
+                        FROM data
+                        WHERE ${quoted} IS NOT NULL
+                        GROUP BY 1, 2
+                      `;
+                    })
+                    .join(" UNION ALL ")}
+                ),
+                sizes AS (
+                  SELECT
+                    count(*) FILTER (WHERE ${condition})::DOUBLE AS cohort_size,
+                    count(*)::DOUBLE AS global_size
                   FROM data
-                  WHERE ${quoteIdentifier(metric)} IS NOT NULL
+                ),
+                scored AS (
+                  SELECT
+                    counts.column_name,
+                    counts.value,
+                    counts.cohort_count,
+                    counts.global_count,
+                    CASE WHEN sizes.cohort_size = 0 THEN 0 ELSE counts.cohort_count / sizes.cohort_size END AS cohort_pct,
+                    CASE WHEN sizes.global_size = 0 THEN 0 ELSE counts.global_count / sizes.global_size END AS global_pct
+                  FROM counts
+                  CROSS JOIN sizes
+                ),
+                ranked AS (
+                  SELECT
+                    column_name,
+                    value,
+                    cohort_count,
+                    global_count,
+                    cohort_pct,
+                    global_pct,
+                    CASE WHEN global_pct <= 0 THEN NULL ELSE cohort_pct / global_pct END AS ratio
+                  FROM scored
                 )
-              END AS percentile
-          `;
+                SELECT
+                  column_name,
+                  value,
+                  cohort_count,
+                  global_count,
+                  cohort_pct,
+                  global_pct,
+                  ratio
+                FROM ranked
+                WHERE cohort_count >= 30
+                  AND global_count >= 30
+                  AND ratio IS NOT NULL
+                ORDER BY ratio DESC, cohort_count DESC
+                LIMIT 8
+              `);
 
-          const metricResult = await runQuery({
-            sql: metricSql,
-            limit: 1,
-          });
+        const overIndexing = overIndexingRows.map((row) => ({
+          columnName: String(row[0] ?? ""),
+          value: String(row[1] ?? ""),
+          cohortCount: asNumber(row[2]),
+          globalCount: asNumber(row[3]),
+          cohortPct: asNumber(row[4]) * 100,
+          globalPct: asNumber(row[5]) * 100,
+          ratio: asNumber(row[6]),
+        }));
 
-          return {
-            metric,
-            cohortMedian: numberOrNull(metricResult.data.rows[0]?.[0]),
-            globalPercentile: numberOrNull(metricResult.data.rows[0]?.[1]),
-          };
-        }),
-      );
+        return {
+          totalSize,
+          cohortSize,
+          cohortSharePercent,
+          uniquenessPercentile,
+          percentileCards,
+          overIndexing,
+        };
+      } finally {
+        await conn.close();
+      }
+    },
+    [db, schema],
+  );
 
-      setSummary({
-        totalSize,
-        cohortSize,
-        cohortSharePercent,
-        uniquenessPercentile,
-        percentileCards,
-      });
-    } catch (error) {
-      setRunError(error instanceof Error ? error.message : "Failed to run profile analysis.");
-    } finally {
-      setRunning(false);
+  const runProfile = useCallback(async () => {
+    if (mode === "single") {
+      if (filterPairs.length === 0 || !db) {
+        setRunError("Select at least one demographic value before running profile analysis.");
+        return;
+      }
+
+      setRunning(true);
+      setRunError(null);
+      setComparison(null);
+
+      try {
+        const condition = buildCondition(filterPairs);
+        const result = await runSingleCohort(condition);
+        setSummary(result);
+      } catch (error) {
+        setRunError(error instanceof Error ? error.message : "Failed to run profile analysis.");
+      } finally {
+        setRunning(false);
+      }
+    } else {
+      if (filterPairsA.length === 0 || filterPairsB.length === 0 || !db) {
+        setRunError("Select at least one demographic value for each cohort.");
+        return;
+      }
+
+      setRunning(true);
+      setRunError(null);
+      setSummary(null);
+
+      try {
+        const conditionA = buildCondition(filterPairsA);
+        const conditionB = buildCondition(filterPairsB);
+        const [a, b] = await Promise.all([
+          runSingleCohort(conditionA),
+          runSingleCohort(conditionB),
+        ]);
+        setComparison({ a, b });
+      } catch (error) {
+        setRunError(error instanceof Error ? error.message : "Failed to run comparison analysis.");
+      } finally {
+        setRunning(false);
+      }
     }
-  }
+  }, [mode, db, filterPairs, filterPairsA, filterPairsB, buildCondition, runSingleCohort]);
+
+  const warning = useMemo(() => {
+    if (!summary) return null;
+    return getWarning(summary.cohortSize);
+  }, [summary]);
+
+  const comparisonPercentileRows = useMemo((): ComparisonPercentileRow[] => {
+    if (!comparison) return [];
+    const { a, b } = comparison;
+
+    const metricsSet = new Set([
+      ...a.percentileCards.map((c) => c.metric),
+      ...b.percentileCards.map((c) => c.metric),
+    ]);
+
+    return Array.from(metricsSet).map((metric) => {
+      const cardA = a.percentileCards.find((c) => c.metric === metric);
+      const cardB = b.percentileCards.find((c) => c.metric === metric);
+      const medianA = cardA?.cohortMedian ?? null;
+      const medianB = cardB?.cohortMedian ?? null;
+      const delta = medianA != null && medianB != null ? medianB - medianA : null;
+      return { metric, medianA, medianB, delta };
+    });
+  }, [comparison]);
+
+  const renderFilterSlots = (
+    columns: [string, string, string],
+    setColumns: React.Dispatch<React.SetStateAction<[string, string, string]>>,
+    values: Record<string, string>,
+    setValues: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+    valueOptions: Record<string, string[]>,
+  ) => (
+    <div className="grid gap-4 md:grid-cols-3">
+      {[0, 1, 2].map((slot) => {
+        const column = columns[slot] ?? "";
+        const options = valueOptions[column] ?? [];
+
+        return (
+          <div key={`slot-${slot}`} className="space-y-2 border border-[var(--rule)] bg-[var(--paper)] p-3">
+            <label className="editorial-label">
+              Field {slot + 1}
+              <Select
+                value={column || NONE}
+                onValueChange={(value) => {
+                  const resolved = value === NONE ? "" : value;
+                  const next = [...columns] as [string, string, string];
+                  next[slot] = resolved;
+                  setColumns(next);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a column" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE}>None</SelectItem>
+                  {availableDemographicColumns.map((item) => (
+                    <SelectItem key={item.name} value={item.name}>
+                      {item.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </label>
+
+            <label className="editorial-label">
+              Value
+              <Select
+                value={values[column] || NONE}
+                onValueChange={(value) => {
+                  const resolved = value === NONE ? "" : value;
+                  setValues((current) => ({
+                    ...current,
+                    [column]: resolved,
+                  }));
+                }}
+                disabled={!column || options.length === 0}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select value" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE}>None</SelectItem>
+                  {options.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </label>
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  const renderWarningBanner = (cohortSize: number) => {
+    const w = getWarning(cohortSize);
+    if (!w) return null;
+    return (
+      <p className={`alert ${w.kind === "critical" ? "alert--critical" : "alert--warn"}`}>
+        {w.message}
+      </p>
+    );
+  };
+
+  const saveToNotebook = useCallback(() => {
+    const activeSummary = mode === "single" ? summary : null;
+    const activeComparison = mode === "compare" ? comparison : null;
+
+    if (!activeSummary && !activeComparison) return;
+
+    const filters = mode === "single" ? filterPairs : [...filterPairsA, ...filterPairsB];
+    const filterDesc = filters.map((f) => `${f.column}=${f.value}`).join(", ");
+
+    addNotebookEntry({
+      title: `Profile: ${filterDesc}`,
+      queryDefinition: {
+        type: "profile",
+        params: {
+          mode,
+          ...(mode === "single" ? { filters: filterPairs } : { filtersA: filterPairsA, filtersB: filterPairsB }),
+        },
+      },
+      resultsSnapshot: {
+        summary: activeSummary
+          ? {
+              cohortSize: activeSummary.cohortSize,
+              cohortShare: activeSummary.cohortSharePercent,
+              topOverIndexing: activeSummary.overIndexing.slice(0, 5).map((o) => `${o.columnName}=${o.value} (${o.ratio.toFixed(1)}x)`),
+            }
+          : activeComparison
+            ? {
+                cohortA: activeComparison.a.cohortSize,
+                cohortB: activeComparison.b.cohortSize,
+              }
+            : {},
+      },
+      notes: "",
+    });
+
+    setNotebookSaved(true);
+    setTimeout(() => setNotebookSaved(false), 2000);
+  }, [mode, summary, comparison, filterPairs, filterPairsA, filterPairsB]);
+
+  const deltaDirection = (delta: number): string => {
+    if (delta > 0) return "higher";
+    if (delta < 0) return "lower";
+    return "equal";
+  };
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Profile Builder</h1>
-        <p className="text-slate-300">
-          Choose demographic answers and compute a people-like-you cohort with percentile summaries.
-        </p>
+    <div className="page">
+      <header className="page-header">
+        <h1 className="page-title">Profile Builder</h1>
+        <p className="page-subtitle">Define a demographic cohort and see what over-indexes against the full dataset.</p>
       </header>
 
-      {schemaError ? (
-        <section className="rounded-lg border border-red-500/40 bg-red-900/20 p-4 text-red-200">
-          Failed to load schema: {schemaError}
-        </section>
-      ) : null}
+      {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
 
       {schema ? (
-        <section className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="text-lg font-semibold">Profile Inputs</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
-            {[0, 1, 2].map((slot) => {
-              const column = selectedColumns[slot] ?? "";
-              const options = valueOptionsByColumn[column] ?? [];
+        <section className="raised-panel space-y-4">
+          <SectionHeader number="01" title="Profile Inputs" />
 
-              return (
-                <div key={`slot-${slot}`} className="space-y-2 rounded border border-slate-800 bg-slate-950 p-3">
-                  <label className="block text-sm text-slate-300">
-                    Field {slot + 1}
-                    <select
-                      className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-2 py-2"
-                      value={column}
-                      onChange={(event) => {
-                        const next = [...selectedColumns];
-                        next[slot] = event.target.value;
-                        setSelectedColumns(next.filter(Boolean));
-                      }}
-                    >
-                      <option value="">Select a column</option>
-                      {availableDemographicColumns.map((item) => (
-                        <option key={item.name} value={item.name}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="block text-sm text-slate-300">
-                    Value
-                    <select
-                      className="mt-1 w-full rounded border border-slate-700 bg-slate-900 px-2 py-2"
-                      value={selectedValues[column] ?? ""}
-                      onChange={(event) => {
-                        const value = event.target.value;
-                        setSelectedValues((current) => ({
-                          ...current,
-                          [column]: value,
-                        }));
-                      }}
-                      disabled={!column || options.length === 0}
-                    >
-                      <option value="">Select a value</option>
-                      {options.map((option) => (
-                        <option key={option} value={option}>
-                          {option}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              );
-            })}
+          <div className="flex gap-0 border border-[var(--rule)]" style={{ width: "fit-content" }}>
+            <button
+              type="button"
+              className={`px-4 py-2 text-[0.75rem] tracking-[0.08em] uppercase font-['JetBrains_Mono',ui-monospace,monospace] border-r border-[var(--rule)] transition-colors ${
+                mode === "single"
+                  ? "bg-[var(--ink)] text-[var(--paper)]"
+                  : "bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--accent-hover)]"
+              }`}
+              onClick={() => {
+                setMode("single");
+                setComparison(null);
+                setRunError(null);
+              }}
+            >
+              Single Cohort
+            </button>
+            <button
+              type="button"
+              className={`px-4 py-2 text-[0.75rem] tracking-[0.08em] uppercase font-['JetBrains_Mono',ui-monospace,monospace] transition-colors ${
+                mode === "compare"
+                  ? "bg-[var(--ink)] text-[var(--paper)]"
+                  : "bg-[var(--paper)] text-[var(--ink)] hover:text-[var(--accent-hover)]"
+              }`}
+              onClick={() => {
+                setMode("compare");
+                setSummary(null);
+                setRunError(null);
+              }}
+            >
+              Compare Cohorts
+            </button>
           </div>
 
-          <button
+          {mode === "single" ? (
+            renderFilterSlots(
+              selectedColumns,
+              setSelectedColumns,
+              selectedValues,
+              setSelectedValues,
+              valueOptionsByColumn,
+            )
+          ) : (
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="space-y-3 border border-[var(--rule)] p-4">
+                <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  Cohort A
+                </p>
+                {renderFilterSlots(columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA)}
+              </div>
+              <div className="space-y-3 border border-[var(--rule)] p-4">
+                <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                  Cohort B
+                </p>
+                {renderFilterSlots(columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB)}
+              </div>
+            </div>
+          )}
+
+          <Button
             type="button"
             onClick={() => {
               void runProfile();
             }}
             disabled={!canRun}
-            className="mt-4 rounded border border-slate-700 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+            variant="default"
           >
-            {running ? "Running..." : "Build profile"}
-          </button>
+            {running
+              ? "Running..."
+              : mode === "single"
+                ? "Build Profile"
+                : "Compare"}
+          </Button>
 
-          {runError ? (
-            <p className="mt-4 rounded border border-red-500/40 bg-red-900/20 p-3 text-sm text-red-200">
-              {runError}
-            </p>
-          ) : null}
+          {runError ? <p className="alert alert--error">{runError}</p> : null}
         </section>
       ) : (
-        <section className="rounded-lg border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-400">
-          Loading schema metadata...
-        </section>
+        <section className="editorial-panel">Loading schema metadata...</section>
       )}
 
+      {/* --- Single cohort results --- */}
       {summary ? (
-        <section className="space-y-4 rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="text-lg font-semibold">People-Like-You Summary</h2>
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <SectionHeader number="02" title="People-Like-You Summary" />
+            <button type="button" className="editorial-button" onClick={saveToNotebook}>
+              {notebookSaved ? "Saved!" : "Add to Notebook"}
+            </button>
+          </div>
 
-          <div className="grid gap-3 md:grid-cols-4">
-            <SummaryCard label="Dataset Size" value={summary.totalSize.toLocaleString("en-US")} />
-            <SummaryCard label="Cohort Size" value={summary.cohortSize.toLocaleString("en-US")} />
-            <SummaryCard label="Cohort Share" value={`${summary.cohortSharePercent.toFixed(2)}%`} />
-            <SummaryCard
+          <div className="stat-grid grid-cols-1 md:grid-cols-4">
+            <StatCard label="Dataset Size" value={formatNumber(summary.totalSize)} />
+            <StatCard label="Cohort Size" value={formatNumber(summary.cohortSize)} />
+            <StatCard
+              label="Cohort Share"
+              value={formatPercent(summary.cohortSharePercent, 2)}
+              note={`N = ${formatNumber(summary.cohortSize)}`}
+            />
+            <StatCard
               label="Uniqueness Percentile"
-              value={`${summary.uniquenessPercentile.toFixed(2)}%`}
+              value={formatPercent(summary.uniquenessPercentile, 2)}
+              note={`N = ${formatNumber(summary.cohortSize)}`}
             />
           </div>
 
-          <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {summary.percentileCards.map((card) => (
-              <div key={card.metric} className="rounded border border-slate-800 bg-slate-950 p-3 text-sm">
-                <p className="font-medium text-slate-100">{card.metric}</p>
-                <p className="mt-2 text-slate-300">
-                  Cohort median: {card.cohortMedian == null ? "n/a" : card.cohortMedian.toFixed(3)}
-                </p>
-                <p className="text-slate-400">
-                  Global percentile: {card.globalPercentile == null ? "n/a" : `${card.globalPercentile.toFixed(2)}%`}
-                </p>
-              </div>
-            ))}
+          {warning ? (
+            <p className={`alert ${warning.kind === "critical" ? "alert--critical" : "alert--warn"}`}>
+              {warning.message}
+            </p>
+          ) : null}
+
+          <div className="raised-panel space-y-3">
+            <SectionHeader number="03" title="Percentile Metrics" />
+            <DataTable
+              rows={summary.percentileCards}
+              rowKey={(row) => row.metric}
+              columns={[
+                { id: "metric", header: "Metric", cell: (row) => row.metric },
+                {
+                  id: "cohort",
+                  header: "Cohort Median",
+                  align: "right",
+                  cell: (row) => {
+                    if (summary.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
+                    return row.cohortMedian == null ? "n/a" : row.cohortMedian.toFixed(3);
+                  },
+                },
+                {
+                  id: "global",
+                  header: "Global Percentile",
+                  align: "right",
+                  cell: (row) => {
+                    if (summary.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
+                    return row.globalPercentile == null ? "n/a" : formatPercent(row.globalPercentile, 2);
+                  },
+                },
+                {
+                  id: "n",
+                  header: "N",
+                  align: "right",
+                  cell: () => formatNumber(summary.cohortSize),
+                },
+              ]}
+            />
+          </div>
+
+          <div className="raised-panel space-y-3">
+            <SectionHeader number="04" title="Top Over-Indexing Signals" />
+            <DataTable
+              rows={summary.overIndexing}
+              rowKey={(row, index) => `${row.columnName}-${row.value}-${index}`}
+              columns={[
+                { id: "column", header: "Column", cell: (row) => row.columnName },
+                { id: "value", header: "Value", cell: (row) => row.value },
+                {
+                  id: "ratio",
+                  header: "Lift",
+                  align: "right",
+                  cell: (row) => `${row.ratio.toFixed(2)}x`,
+                },
+                {
+                  id: "cohort",
+                  header: "Cohort % (N)",
+                  align: "right",
+                  cell: (row) => {
+                    if (shouldSuppressCell(row.cohortCount)) {
+                      return "[suppressed]";
+                    }
+                    return `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`;
+                  },
+                },
+                {
+                  id: "global",
+                  header: "Global % (N)",
+                  align: "right",
+                  cell: (row) =>
+                    `${formatPercent(row.globalPct, 2)} (N=${formatNumber(row.globalCount)})`,
+                },
+              ]}
+              emptyMessage="No over-indexing values met the N >= 30 thresholds"
+            />
           </div>
         </section>
       ) : null}
-    </div>
-  );
-}
 
-function SummaryCard({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded border border-slate-800 bg-slate-950 p-3">
-      <p className="text-xs uppercase tracking-wide text-slate-400">{label}</p>
-      <p className="mt-1 text-base font-medium text-slate-100">{value}</p>
+      {/* --- Comparison results --- */}
+      {comparison ? (
+        <section className="space-y-4">
+          <div className="flex items-center justify-between">
+            <SectionHeader number="02" title="Cohort Comparison" />
+            <button type="button" className="editorial-button" onClick={saveToNotebook}>
+              {notebookSaved ? "Saved!" : "Add to Notebook"}
+            </button>
+          </div>
+
+          {/* Side-by-side cohort Ns */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Cohort A
+              </p>
+              <div className="stat-grid grid-cols-1 md:grid-cols-3">
+                <StatCard label="Dataset Size" value={formatNumber(comparison.a.totalSize)} />
+                <StatCard label="Cohort Size" value={formatNumber(comparison.a.cohortSize)} />
+                <StatCard
+                  label="Cohort Share"
+                  value={formatPercent(comparison.a.cohortSharePercent, 2)}
+                  note={`N = ${formatNumber(comparison.a.cohortSize)}`}
+                />
+              </div>
+              {renderWarningBanner(comparison.a.cohortSize)}
+            </div>
+            <div className="space-y-2">
+              <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+                Cohort B
+              </p>
+              <div className="stat-grid grid-cols-1 md:grid-cols-3">
+                <StatCard label="Dataset Size" value={formatNumber(comparison.b.totalSize)} />
+                <StatCard label="Cohort Size" value={formatNumber(comparison.b.cohortSize)} />
+                <StatCard
+                  label="Cohort Share"
+                  value={formatPercent(comparison.b.cohortSharePercent, 2)}
+                  note={`N = ${formatNumber(comparison.b.cohortSize)}`}
+                />
+              </div>
+              {renderWarningBanner(comparison.b.cohortSize)}
+            </div>
+          </div>
+
+          {/* Percentile comparison with deltas */}
+          <div className="raised-panel space-y-3">
+            <SectionHeader number="03" title="Median Comparison" />
+            {comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30 ? (
+              <p className="alert alert--critical">
+                One or both cohorts have N &lt; 30. Delta values are suppressed.
+              </p>
+            ) : null}
+            <DataTable
+              rows={comparisonPercentileRows}
+              rowKey={(row) => row.metric}
+              columns={[
+                { id: "metric", header: "Metric", cell: (row) => row.metric },
+                {
+                  id: "medianA",
+                  header: "Cohort A Median",
+                  align: "right",
+                  cell: (row) => {
+                    if (comparison.a.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
+                    return row.medianA == null ? "n/a" : row.medianA.toFixed(3);
+                  },
+                },
+                {
+                  id: "medianB",
+                  header: "Cohort B Median",
+                  align: "right",
+                  cell: (row) => {
+                    if (comparison.b.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
+                    return row.medianB == null ? "n/a" : row.medianB.toFixed(3);
+                  },
+                },
+                {
+                  id: "delta",
+                  header: "Delta (B - A)",
+                  align: "right",
+                  cell: (row) => {
+                    if (comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30) {
+                      return "[suppressed]";
+                    }
+                    if (row.delta == null) return "n/a";
+                    const sign = row.delta > 0 ? "+" : "";
+                    return `${sign}${row.delta.toFixed(3)} (${deltaDirection(row.delta)})`;
+                  },
+                },
+                {
+                  id: "nA",
+                  header: "N (A)",
+                  align: "right",
+                  cell: () => formatNumber(comparison.a.cohortSize),
+                },
+                {
+                  id: "nB",
+                  header: "N (B)",
+                  align: "right",
+                  cell: () => formatNumber(comparison.b.cohortSize),
+                },
+              ]}
+            />
+          </div>
+
+          {/* Over-indexing side by side */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="raised-panel space-y-3">
+              <SectionHeader number="04a" title="Cohort A Over-Indexing" />
+              <DataTable
+                rows={comparison.a.overIndexing}
+                rowKey={(row, index) => `a-${row.columnName}-${row.value}-${index}`}
+                columns={[
+                  { id: "column", header: "Column", cell: (row) => row.columnName },
+                  { id: "value", header: "Value", cell: (row) => row.value },
+                  {
+                    id: "ratio",
+                    header: "Lift",
+                    align: "right",
+                    cell: (row) => `${row.ratio.toFixed(2)}x`,
+                  },
+                  {
+                    id: "cohort",
+                    header: "Cohort % (N)",
+                    align: "right",
+                    cell: (row) => {
+                      if (shouldSuppressCell(row.cohortCount)) {
+                        return "[suppressed]";
+                      }
+                      return `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`;
+                    },
+                  },
+                ]}
+                emptyMessage="No over-indexing values met the N >= 30 thresholds"
+              />
+            </div>
+            <div className="raised-panel space-y-3">
+              <SectionHeader number="04b" title="Cohort B Over-Indexing" />
+              <DataTable
+                rows={comparison.b.overIndexing}
+                rowKey={(row, index) => `b-${row.columnName}-${row.value}-${index}`}
+                columns={[
+                  { id: "column", header: "Column", cell: (row) => row.columnName },
+                  { id: "value", header: "Value", cell: (row) => row.value },
+                  {
+                    id: "ratio",
+                    header: "Lift",
+                    align: "right",
+                    cell: (row) => `${row.ratio.toFixed(2)}x`,
+                  },
+                  {
+                    id: "cohort",
+                    header: "Cohort % (N)",
+                    align: "right",
+                    cell: (row) => {
+                      if (shouldSuppressCell(row.cohortCount)) {
+                        return "[suppressed]";
+                      }
+                      return `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`;
+                    },
+                  },
+                ]}
+                emptyMessage="No over-indexing values met the N >= 30 thresholds"
+              />
+            </div>
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }

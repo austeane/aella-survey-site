@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction 3: Velvet — Dark Luxury</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Manrope:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --bg-deep: #0e0a10;
+    --bg: #14101a;
+    --bg-card: #1a1522;
+    --bg-card-hover: #201a2c;
+    --plum: #8b5cf6;
+    --plum-dim: #6d42d6;
+    --plum-glow: rgba(139, 92, 246, 0.12);
+    --gold: #d4a855;
+    --gold-bright: #e8c06a;
+    --gold-faint: rgba(212, 168, 85, 0.08);
+    --rose: #e8507a;
+    --text: #d4cee0;
+    --text-dim: #7a7288;
+    --text-bright: #f0ecf6;
+    --border: #2a2234;
+    --border-light: #362e44;
+    --gradient-1: linear-gradient(135deg, #1a1228, #0e0a10);
+    --gradient-accent: linear-gradient(135deg, var(--plum), var(--rose));
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Manrope', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Background gradient mesh */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 10%, rgba(139, 92, 246, 0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 600px 400px at 80% 80%, rgba(232, 80, 122, 0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 400px 400px at 50% 50%, rgba(212, 168, 85, 0.02) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Grain overlay */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='300' height='300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 10000;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    position: relative;
+    z-index: 10;
+    padding: 0 2.5rem;
+    background: rgba(14, 10, 16, 0.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    height: 64px;
+    gap: 3rem;
+  }
+
+  .nav-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    letter-spacing: -0.02em;
+    color: var(--text-bright);
+    text-decoration: none;
+  }
+
+  .nav-title span {
+    font-weight: 300;
+    font-style: italic;
+    color: var(--gold);
+    font-size: 0.9rem;
+    margin-left: 0.35rem;
+    letter-spacing: 0.08em;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    transition: all 0.25s ease;
+  }
+
+  .nav-links a:hover {
+    color: var(--text);
+    background: rgba(139, 92, 246, 0.08);
+  }
+
+  .nav-links a.active {
+    color: var(--text-bright);
+    background: var(--plum-glow);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+  }
+
+  /* ---- MAIN ---- */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2.5rem 4rem;
+  }
+
+  /* ---- HEADER ---- */
+  .page-header {
+    margin-bottom: 3rem;
+    text-align: center;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 3.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+    color: var(--text-bright);
+    margin-bottom: 0.75rem;
+  }
+
+  .page-header h1 em {
+    font-style: italic;
+    color: var(--gold);
+  }
+
+  .page-header .sub {
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  .page-header .divider {
+    width: 60px;
+    height: 1px;
+    background: var(--gradient-accent);
+    margin: 1.25rem auto;
+  }
+
+  /* ---- STAT CARDS ---- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .stat-card:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--border-light);
+    transform: translateY(-2px);
+  }
+
+  .stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    border-radius: 0 0 2px 2px;
+  }
+
+  .stat-card:nth-child(1)::before { background: var(--plum); }
+  .stat-card:nth-child(2)::before { background: var(--gold); }
+  .stat-card:nth-child(3)::before { background: var(--rose); }
+
+  .stat-card .label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-card .value {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: 3rem;
+    color: var(--text-bright);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .stat-card .note {
+    font-size: 0.78rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+    font-weight: 400;
+  }
+
+  /* ---- TWO COLUMN ---- */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .card-header .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--plum);
+    flex-shrink: 0;
+  }
+
+  .card-header h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 1.25rem;
+    color: var(--text-bright);
+    letter-spacing: -0.01em;
+  }
+
+  /* Caveats */
+  .caveat-item {
+    padding: 1rem 1.25rem;
+    background: rgba(139, 92, 246, 0.04);
+    border-left: 2px solid var(--plum-dim);
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 0.75rem;
+  }
+
+  .caveat-item:last-child { margin-bottom: 0; }
+
+  .caveat-title {
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--text-bright);
+    margin-bottom: 0.3rem;
+  }
+
+  .caveat-desc {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* Missing table */
+  .miss-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 100px;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+
+  .miss-row:last-child { border-bottom: none; }
+
+  .miss-row.head {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom-color: var(--border-light);
+    padding-bottom: 0.75rem;
+  }
+
+  .miss-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .miss-pct {
+    text-align: right;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-dim);
+  }
+
+  .miss-bar {
+    height: 6px;
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .miss-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--gradient-accent);
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ---- INSPECTOR ---- */
+  .inspector-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .inspector-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
+  }
+
+  .inspector-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  select {
+    font-family: 'Manrope', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 500;
+    padding: 0.5rem 1.25rem 0.5rem 0.75rem;
+    background: var(--bg-deep);
+    color: var(--gold);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    transition: border-color 0.2s;
+  }
+
+  select:hover, select:focus { border-color: var(--gold); }
+
+  .mini-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mini-stat {
+    background: var(--bg-deep);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--border);
+  }
+
+  .mini-stat .label {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+  }
+
+  .mini-stat .val {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    font-size: 1.5rem;
+    color: var(--text-bright);
+  }
+
+  /* Cat values */
+  .val-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 60px;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+    align-items: center;
+  }
+
+  .val-row.head {
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom-color: var(--border-light);
+    padding-bottom: 0.75rem;
+  }
+
+  .val-row:last-child { border-bottom: none; }
+  .val-name { color: var(--text-bright); font-weight: 500; }
+  .val-count { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--text-dim); }
+  .val-pct { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--gold); font-weight: 500; }
+
+  /* ---- FOOTER ---- */
+  footer {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 2.5rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    display: flex;
+    justify-content: space-between;
+    letter-spacing: 0.03em;
+  }
+
+  /* ---- DESIGN TAG ---- */
+  .design-note {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--gradient-accent);
+    color: white;
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    border-radius: 100px;
+    z-index: 99999;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .fade-1 { animation-delay: 0.1s; }
+  .fade-2 { animation-delay: 0.2s; }
+  .fade-3 { animation-delay: 0.3s; }
+  .fade-4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+  <div class="design-note">Direction 3 — Velvet</div>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-title" href="#">Big Kink Survey <span>explorer</span></a>
+      <div class="nav-links">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Explore</a>
+        <a href="#">Profile</a>
+        <a href="#">SQL</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header fade">
+      <h1>The <em>Dataset</em></h1>
+      <div class="divider"></div>
+      <p class="sub">A stratified 1.6% subsample of 980,000 survey responses exploring human sexuality, personality traits, and identity across 365 variables.</p>
+    </div>
+
+    <div class="stats-row fade fade-1">
+      <div class="stat-card">
+        <div class="label">Respondents</div>
+        <div class="value">15,503</div>
+        <div class="note">Stratified subsample</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Variables</div>
+        <div class="value">365</div>
+        <div class="note">251 categorical, 52 numeric, 62 text</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Domains</div>
+        <div class="value">5</div>
+        <div class="note">Demographic, fetish, OCEAN, derived, other</div>
+      </div>
+    </div>
+
+    <div class="two-col fade fade-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="dot"></div>
+          <h2>Caveats</h2>
+        </div>
+        <div class="caveat-item">
+          <div class="caveat-title">Gated Missingness</div>
+          <div class="caveat-desc">Questions shown only after prerequisite answers. Missing values may reflect skip-logic rather than non-response.</div>
+        </div>
+        <div class="caveat-item" style="border-left-color: var(--gold);">
+          <div class="caveat-title">Late-Added Questions</div>
+          <div class="caveat-desc">Some variables introduced mid-collection. Consider temporal bias for high null rates.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="dot" style="background:var(--rose);"></div>
+          <h2>Highest Missingness</h2>
+        </div>
+        <div class="miss-row head">
+          <span>Column</span>
+          <span style="text-align:right">Ratio</span>
+          <span></span>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_estrogen_regularity</span>
+          <span class="miss-pct">96.2%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:96%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_estrogen_duration</span>
+          <span class="miss-pct">96.0%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:96%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_testosterone_reg.</span>
+          <span class="miss-pct">95.8%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:95.8%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">PMS_symptoms</span>
+          <span class="miss-pct">52.1%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:52%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">menstrual_cycle_phase</span>
+          <span class="miss-pct">51.8%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:51.8%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">childhood_adversity</span>
+          <span class="miss-pct">12.4%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:12.4%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inspector-card fade fade-3">
+      <div class="inspector-top">
+        <div class="card-header" style="margin:0">
+          <div class="dot" style="background:var(--gold);"></div>
+          <h2>Column Inspector</h2>
+        </div>
+        <select>
+          <option>straightness</option>
+          <option>politics</option>
+          <option>gender_identity</option>
+        </select>
+      </div>
+
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <div class="label">Type</div>
+          <div class="val" style="font-size:1rem;color:var(--plum);">Categorical</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Total</div>
+          <div class="val">15,503</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Non-null</div>
+          <div class="val">15,466</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Null</div>
+          <div class="val">37</div>
+        </div>
+      </div>
+
+      <div class="val-row head">
+        <span>Value</span>
+        <span style="text-align:right">Count</span>
+        <span style="text-align:right">Share</span>
+      </div>
+      <div class="val-row"><span class="val-name">Straight</span><span class="val-count">5,412</span><span class="val-pct">34.9%</span></div>
+      <div class="val-row"><span class="val-name">Mostly Straight</span><span class="val-count">3,821</span><span class="val-pct">24.7%</span></div>
+      <div class="val-row"><span class="val-name">Bisexual</span><span class="val-count">3,104</span><span class="val-pct">20.0%</span></div>
+      <div class="val-row"><span class="val-name">Mostly Gay</span><span class="val-count">1,890</span><span class="val-pct">12.2%</span></div>
+      <div class="val-row"><span class="val-name">Gay</span><span class="val-count">1,239</span><span class="val-pct">8.0%</span></div>
+    </div>
+  </main>
+
+  <footer>
+    <span>Big Kink Survey Explorer &middot; Public Sample</span>
+    <span>DuckDB + TanStack Start &middot; 2026</span>
+  </footer>
+</body>
+</html>

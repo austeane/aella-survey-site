@@ -52,7 +52,13 @@ NUMERIC_TYPE_PREFIXES = (
     "NUMERIC",
 )
 
-mcp = FastMCP("Big Kink Survey")
+_transport = os.environ.get("MCP_TRANSPORT", "stdio")
+_mcp_kwargs: dict[str, Any] = {}
+if _transport == "streamable-http":
+    _mcp_kwargs["host"] = "0.0.0.0"
+    _mcp_kwargs["port"] = int(os.environ.get("PORT", "8000"))
+
+mcp = FastMCP("Big Kink Survey", **_mcp_kwargs)
 
 
 def success(data: Any, meta: dict[str, Any] | None = None) -> dict[str, Any]:
@@ -703,4 +709,4 @@ def search_columns(query: str, limit: int = 25) -> dict[str, Any]:
 
 
 if __name__ == "__main__":
-    mcp.run(transport="stdio")
+    mcp.run(transport=_transport)

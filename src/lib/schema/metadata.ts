@@ -1,5 +1,6 @@
 import rawSchemaMetadata from "./columns.generated.json";
 import { getCaveatKeysForColumn } from "./caveats";
+import { inferNullMeaning } from "./null-meaning";
 import type { ColumnMetadata, SchemaMetadata } from "./types";
 
 const schemaMetadata = rawSchemaMetadata as SchemaMetadata;
@@ -21,8 +22,12 @@ export function listColumns(): ColumnMetadata[] {
 }
 
 export function listColumnsWithCaveats() {
-  return schemaMetadata.columns.map((column) => ({
-    ...column,
-    caveatKeys: getCaveatKeysForColumn(column.name),
-  }));
+  return schemaMetadata.columns.map((column) => {
+    const caveatKeys = getCaveatKeysForColumn(column.name);
+    return {
+      ...column,
+      nullMeaning: column.nullMeaning ?? inferNullMeaning(column.name, column.nullRatio, caveatKeys),
+      caveatKeys,
+    };
+  });
 }

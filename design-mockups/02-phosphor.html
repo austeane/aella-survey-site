@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction 2: Phosphor — Retro Terminal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Outfit:wght@300;400;600;800&display=swap');
+
+  :root {
+    --bg: #0a0a0c;
+    --bg-panel: #0f0f14;
+    --bg-raised: #16161e;
+    --phosphor: #00ff88;
+    --phosphor-dim: #00cc6a;
+    --phosphor-faint: rgba(0, 255, 136, 0.08);
+    --phosphor-glow: rgba(0, 255, 136, 0.15);
+    --amber: #ffaa00;
+    --amber-dim: #cc8800;
+    --text: #c8ccd0;
+    --text-dim: #686e78;
+    --text-bright: #eef0f2;
+    --border: #1e2028;
+    --border-bright: #2a2e38;
+    --red: #ff4466;
+    --scan-opacity: 0.03;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Mono', 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* CRT scanline effect */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, var(--scan-opacity)) 2px,
+      rgba(0, 0, 0, var(--scan-opacity)) 4px
+    );
+    pointer-events: none;
+    z-index: 10000;
+  }
+
+  /* Vignette */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.4) 100%);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    background: var(--bg-panel);
+    position: relative;
+  }
+
+  nav::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--phosphor-glow), transparent);
+  }
+
+  .nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    height: 56px;
+    gap: 2rem;
+  }
+
+  .nav-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--phosphor);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .nav-title .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background: var(--phosphor);
+    animation: blink 1s step-end infinite;
+    opacity: 0.8;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    padding: 0.4rem 1rem;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+  }
+
+  .nav-links a:hover {
+    color: var(--phosphor);
+    background: var(--phosphor-faint);
+    border-color: var(--phosphor);
+    border-color: rgba(0, 255, 136, 0.2);
+  }
+
+  .nav-links a.active {
+    color: var(--bg);
+    background: var(--phosphor);
+    border-color: var(--phosphor);
+    text-shadow: none;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--phosphor);
+    border-radius: 50%;
+    margin-left: 1.5rem;
+    box-shadow: 0 0 6px var(--phosphor);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* ---- MAIN ---- */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ---- HEADER ---- */
+  .page-header {
+    margin-bottom: 2.5rem;
+  }
+
+  .page-header .breadcrumb {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-header .breadcrumb span { color: var(--phosphor-dim); }
+
+  .page-header h1 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 2.5rem;
+    color: var(--text-bright);
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+
+  .page-header .tagline {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 0.5rem;
+    font-style: italic;
+  }
+
+  /* ---- STAT STRIP ---- */
+  .stat-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin-bottom: 2.5rem;
+    border: 1px solid var(--border);
+  }
+
+  .stat-cell {
+    background: var(--bg-panel);
+    padding: 1.25rem 1.5rem;
+    position: relative;
+  }
+
+  .stat-cell::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .stat-cell:nth-child(1)::before { background: var(--phosphor); }
+  .stat-cell:nth-child(2)::before { background: var(--amber); }
+  .stat-cell:nth-child(3)::before { background: var(--red); }
+  .stat-cell:nth-child(4)::before { background: #8866ff; }
+
+  .stat-cell .label {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-cell .value {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--text-bright);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .stat-cell .sub {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+  }
+
+  /* ---- GRID LAYOUT ---- */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, var(--phosphor-glow), transparent 50%);
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--phosphor-dim);
+    font-weight: 700;
+  }
+
+  .panel-header .icon {
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--phosphor-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: var(--phosphor);
+  }
+
+  /* ---- CAVEATS ---- */
+  .caveat-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .caveat-item:last-child { border-bottom: none; }
+
+  .caveat-flag {
+    display: inline-block;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.5rem;
+    background: rgba(255, 170, 0, 0.1);
+    color: var(--amber);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    margin-bottom: 0.4rem;
+    font-weight: 700;
+  }
+
+  .caveat-text {
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  .caveat-hint {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    font-style: italic;
+    margin-top: 0.3rem;
+  }
+
+  /* ---- MISSING TABLE ---- */
+  .miss-row {
+    display: grid;
+    grid-template-columns: 1fr 60px 1fr;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+    font-size: 0.8rem;
+  }
+
+  .miss-row.head {
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom-color: var(--border-bright);
+    padding-bottom: 0.6rem;
+    font-weight: 700;
+  }
+
+  .miss-name { color: var(--text-bright); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .miss-pct { text-align: right; font-weight: 700; }
+  .miss-pct.high { color: var(--red); }
+  .miss-pct.med { color: var(--amber); }
+  .miss-pct.low { color: var(--phosphor-dim); }
+
+  .miss-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 0;
+    overflow: hidden;
+  }
+
+  .miss-bar-fill {
+    height: 100%;
+    transition: width 0.6s ease-out;
+  }
+
+  .miss-bar-fill.high { background: var(--red); box-shadow: 0 0 4px rgba(255, 68, 102, 0.3); }
+  .miss-bar-fill.med { background: var(--amber); }
+  .miss-bar-fill.low { background: var(--phosphor-dim); }
+
+  /* ---- INSPECTOR ---- */
+  .inspector {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+  }
+
+  .inspector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--phosphor), var(--amber), var(--red));
+  }
+
+  .inspector-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  select {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.75rem;
+    padding: 0.4rem 0.75rem;
+    background: var(--bg);
+    color: var(--phosphor);
+    border: 1px solid var(--border-bright);
+    cursor: pointer;
+    outline: none;
+  }
+
+  select:focus { border-color: var(--phosphor); box-shadow: 0 0 0 1px var(--phosphor-glow); }
+
+  .mini-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+  }
+
+  .mini-cell {
+    background: var(--bg);
+    padding: 1rem;
+  }
+
+  .mini-cell .label {
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 0.3rem;
+  }
+
+  .mini-cell .val {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 1.3rem;
+    color: var(--text-bright);
+  }
+
+  /* Categorical values */
+  .val-row {
+    display: grid;
+    grid-template-columns: 1fr 70px 50px;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.8rem;
+    align-items: center;
+  }
+
+  .val-row.head {
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    border-bottom-color: var(--border-bright);
+    font-weight: 700;
+  }
+
+  .val-row .name { color: var(--text-bright); }
+  .val-row .count { text-align: right; color: var(--text-dim); }
+  .val-row .pct { text-align: right; color: var(--phosphor); font-weight: 700; }
+
+  /* ---- DESIGN TAG ---- */
+  .design-note {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: var(--phosphor);
+    color: var(--bg);
+    font-family: 'Space Mono', monospace;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    z-index: 99999;
+    font-weight: 700;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .slide-in { animation: slideIn 0.4s ease-out both; }
+  .slide-in-1 { animation-delay: 0.05s; }
+  .slide-in-2 { animation-delay: 0.1s; }
+  .slide-in-3 { animation-delay: 0.15s; }
+  .slide-in-4 { animation-delay: 0.2s; }
+  .slide-in-5 { animation-delay: 0.25s; }
+</style>
+</head>
+<body>
+  <div class="design-note">Direction 2 — Phosphor</div>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-title" href="#">BKS_<span class="cursor"></span></a>
+      <div class="nav-links">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Explore</a>
+        <a href="#">Profile</a>
+        <a href="#">SQL</a>
+      </div>
+      <div class="status-dot"></div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header slide-in">
+      <div class="breadcrumb">sys / <span>bks-explorer</span> / dashboard</div>
+      <h1>Dataset Dashboard</h1>
+      <div class="tagline">// 15.5k-row stratified subsample &middot; 365 variables &middot; DuckDB runtime</div>
+    </div>
+
+    <div class="stat-strip slide-in slide-in-1">
+      <div class="stat-cell">
+        <div class="label">Rows</div>
+        <div class="value">15,503</div>
+        <div class="sub">1.6% of 980k total</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Columns</div>
+        <div class="value">365</div>
+        <div class="sub">251 cat / 52 num / 62 txt</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Domains</div>
+        <div class="value">5</div>
+        <div class="sub">demo, fetish, OCEAN, derived</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Parquet</div>
+        <div class="value">3.7<span style="font-size:0.9rem;color:var(--text-dim);font-weight:400">MB</span></div>
+        <div class="sub">BKSPublic.parquet</div>
+      </div>
+    </div>
+
+    <div class="grid-2 slide-in slide-in-2">
+      <div class="panel">
+        <div class="panel-header">
+          <div class="icon">!</div>
+          Caveats
+        </div>
+        <div class="caveat-item">
+          <div class="caveat-flag">Warning: Structural NAs</div>
+          <div class="caveat-text">Gated missingness: questions only shown after prerequisite answers. Missing values may reflect skip-logic, not non-response.</div>
+          <div class="caveat-hint">Filter or impute with care.</div>
+        </div>
+        <div class="caveat-item">
+          <div class="caveat-flag">Warning: Temporal Bias</div>
+          <div class="caveat-text">Late-added questions create cohort-dependent missingness. Some variables were introduced partway through collection.</div>
+          <div class="caveat-hint">Consider temporal bias for null rates > 30%.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="icon">%</div>
+          Null Ratio Ranking
+        </div>
+        <div class="miss-row head">
+          <span>Column</span>
+          <span style="text-align:right">Ratio</span>
+          <span></span>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_estrogen_regularity</span>
+          <span class="miss-pct high">96.2%</span>
+          <div class="miss-bar"><div class="miss-bar-fill high" style="width:96%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_estrogen_duration</span>
+          <span class="miss-pct high">96.0%</span>
+          <div class="miss-bar"><div class="miss-bar-fill high" style="width:96%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_testosterone_regularity</span>
+          <span class="miss-pct high">95.8%</span>
+          <div class="miss-bar"><div class="miss-bar-fill high" style="width:95.8%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">PMS_symptoms</span>
+          <span class="miss-pct med">52.1%</span>
+          <div class="miss-bar"><div class="miss-bar-fill med" style="width:52%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">menstrual_cycle_phase</span>
+          <span class="miss-pct med">51.8%</span>
+          <div class="miss-bar"><div class="miss-bar-fill med" style="width:51.8%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">hormonal_birth_control</span>
+          <span class="miss-pct med">51.3%</span>
+          <div class="miss-bar"><div class="miss-bar-fill med" style="width:51.3%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">childhood_adversity</span>
+          <span class="miss-pct low">12.4%</span>
+          <div class="miss-bar"><div class="miss-bar-fill low" style="width:12.4%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inspector slide-in slide-in-3">
+      <div class="inspector-top">
+        <div class="panel-header" style="margin:0">
+          <div class="icon">&gt;</div>
+          Column Inspector
+        </div>
+        <select>
+          <option>straightness</option>
+          <option>politics</option>
+          <option>gender_identity</option>
+          <option>opennessvariable</option>
+        </select>
+      </div>
+
+      <div class="mini-grid">
+        <div class="mini-cell">
+          <div class="label">Type</div>
+          <div class="val" style="font-size:0.9rem;color:var(--amber)">Categorical</div>
+        </div>
+        <div class="mini-cell">
+          <div class="label">Total</div>
+          <div class="val">15,503</div>
+        </div>
+        <div class="mini-cell">
+          <div class="label">Non-null</div>
+          <div class="val">15,466</div>
+        </div>
+        <div class="mini-cell">
+          <div class="label">Null</div>
+          <div class="val">37</div>
+        </div>
+      </div>
+
+      <div class="val-row head">
+        <span>Value</span>
+        <span style="text-align:right">Count</span>
+        <span style="text-align:right">Share</span>
+      </div>
+      <div class="val-row"><span class="name">Straight</span><span class="count">5,412</span><span class="pct">34.9%</span></div>
+      <div class="val-row"><span class="name">Mostly Straight</span><span class="count">3,821</span><span class="pct">24.7%</span></div>
+      <div class="val-row"><span class="name">Bisexual</span><span class="count">3,104</span><span class="pct">20.0%</span></div>
+      <div class="val-row"><span class="name">Mostly Gay</span><span class="count">1,890</span><span class="pct">12.2%</span></div>
+      <div class="val-row"><span class="name">Gay</span><span class="count">1,239</span><span class="pct">8.0%</span></div>
+    </div>
+  </main>
+</body>
+</html>

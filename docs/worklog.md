@@ -2,6 +2,39 @@
 
 ## 2026-02-12
 
+### V2 Next-Steps Plan Created
+
+**Plan document**: `docs/plans/active/v2-next-steps.md`
+
+Comprehensive 4-phase execution plan synthesizing GPT 5.2 Pro product recommendations with a full codebase audit. Covers:
+- **Phase 1**: Ink & Paper design system application (CSS tokens, font loading, restyle all 4 routes + root, extract shared components)
+- **Phase 2**: Core UX upgrades (Column Atlas, Column Inspector, Missingness Lens, Explore pivot matrix with Cramer's V, dashboard recipes)
+- **Phase 3**: Advanced features (Profile cohort guardrails + over-indexing + comparison, Relationship Finder, SQL Console upgrades)
+- **Phase 4**: Polish (Exploration Notebook, small-cell hygiene, MCP Service B deploy, URL state)
+
+Also includes schema enhancement plan (add `nullMeaning`, `displayName` fields), files index, dependency graph, and reusable infrastructure catalog.
+
+---
+
+### Session 2 - Parallel agent buildout
+
+**DuckDB-WASM client-side queries**: Adding browser-side DuckDB-WASM so UI pages can query parquet directly without server round-trips. In progress.
+
+**MCP Service B deployment**: Deploying the Python MCP server (`mcp-server/`) as a separate Railway service (Service B) for AI agent access. In progress.
+
+**Comprehensive tests**: Adding unit and integration tests for SQL guardrails, API contracts, schema utilities, and data helpers. In progress.
+
+**Pre-commit hooks**: Setting up husky + lint-staged to enforce lint, type-check, and test gates before every commit.
+
+**Open decisions resolved** (PLAN.md section 13):
+- Public API: broadly available with read-only guardrails
+- SQL console: production, no feature flag
+- MCP service: internet-exposed, no auth restriction
+
+**Data exploration summary**: Deep exploration of the BKS dataset (15.5k rows, 365 columns) to document distributions, notable patterns, and data quality characteristics.
+
+---
+
 ### 22:13 UTC - Deployment verification and limitation discovered
 - **Status**: Railway deployment `ee1487d9-ced4-40f3-822f-0fcf0266f37f` reached `SUCCESS`.
 - **Observed limitation**:
@@ -66,3 +99,36 @@
 - **Current status**: deployment healthy and query endpoints operational in production.
 - **Known limitation (tracked)**:
   - Runtime uses dual-path query execution (CLI first, Node API fallback). This is intentional until hosting guarantees include DuckDB CLI binary.
+
+### Session 3 - V2 feature buildout (Phases 3-4)
+
+**Phase 1-2 executed** by prior agent session: Ink & Paper design system, Column Atlas, Column Inspector, Missingness Lens, Explore pivot matrix with Cramer's V, dashboard recipes.
+
+**Phase 3-4 parallel agent buildout** (this session):
+
+1. **Profile side-by-side comparison** (Task 3.3): Added single/compare mode toggle to profile page. Compare mode runs two independent cohorts through the same analysis pipeline and displays side-by-side stat cards, delta comparison table, and dual over-indexing panels. Small-N warnings per cohort.
+
+2. **Relationship Finder** (Task 3.4): Created precompute script (`scripts/precompute-relationships.mjs`) that computes pairwise Cramer's V (categorical) and Pearson correlation (numeric) for 159 eligible columns. Generated `src/lib/schema/relationships.generated.json` (3,065 entries). New `/relationships` page shows top related columns for any selected column with strength labels, metric badges, and clickable links to the cross-tab explorer.
+
+3. **Exploration Notebook** (Task 4.1): Created `src/lib/notebook-store.ts` (localStorage CRUD) and `/notebook` page. Entries store query definition + results snapshot. Inline title/notes editing, delete with confirmation, JSON export.
+
+4. **Integration work**:
+   - Added Relationships and Notebook to nav links in `__root.tsx`
+   - Added "Add to Notebook" buttons to Explore, Profile, and SQL pages
+   - URL state sync for Columns page (column selection, search, tags, sort persist in URL)
+
+5. **Deployment**: Triggered deploy `19b0ee28` to bks-explorer service.
+
+**Verification**: All 121 tests pass, type-check clean, lint clean, build successful.
+
+6. **About / Intro page** (`/about`): Created editorial intro page describing the Big Kink Survey, dataset methodology, anonymization caveats, feature guide with links to all pages, interpretation notes, and credits section linking to [Aella's blog post](https://aella.substack.com/p/heres-my-big-kink-survey-dataset) and Zenodo DOI. Added to nav.
+
+7. **Docs updated** per session hygiene:
+   - `CLAUDE.md` — updated project description, stack (DuckDB-WASM, design system), key files list (9 UI pages, notebook store, relationships JSON)
+   - `PLAN.md` — marked v1 as COMPLETE, pointed to v2 plan
+   - `docs/design/architecture.md` — full route coverage (9 pages), shared components inventory, key libraries list
+   - `docs/design/deployment.md` — updated app surface with all 9 routes
+   - `docs/plans/active/v2-next-steps.md` — marked Session 3 completions, updated deferred items
+   - `docs/worklog.md` — this entry
+
+**Final deployment**: deploy `81cdd894` to bks-explorer service (includes About page + all Session 3 work).

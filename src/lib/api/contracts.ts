@@ -24,6 +24,13 @@ export const CaveatKeySchema = z.enum([
   "late_added_questions",
 ]);
 
+export const NullMeaningSchema = z.enum([
+  "GATED",
+  "LATE_ADDED",
+  "NOT_APPLICABLE",
+  "UNKNOWN",
+]);
+
 export const CaveatSchema = z.object({
   key: CaveatKeySchema,
   title: z.string(),
@@ -38,6 +45,7 @@ export const ColumnMetadataSchema = z.object({
   nullRatio: z.number().min(0).max(1),
   approxCardinality: z.number().int().nonnegative(),
   tags: z.array(CategoryTagSchema),
+  nullMeaning: NullMeaningSchema.default("UNKNOWN"),
   caveatKeys: z.array(CaveatKeySchema).default([]),
 });
 

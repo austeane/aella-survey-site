@@ -30,8 +30,12 @@ Key tools:
 ## Chrome MCP (`mcp__claude-in-chrome__*`)
 Browser automation — navigate, click, read pages, take screenshots, run JS.
 
-## Project MCP Server (not yet deployed)
+## BKS MCP Server (deployed)
 Python MCP server at `mcp-server/server.py` for AI agent access to BKS data.
+
+- **URL**: https://bks-mcp-server-production.up.railway.app
+- **Endpoint**: `POST /mcp` (streamable-http transport)
+- **Railway service**: `bks-mcp-server`
 
 Tools:
 - `get_schema(timeout_ms?)`
@@ -55,4 +59,8 @@ Behavior parity with plan/API conventions:
   - configurable `timeout_ms` (default `5000`, capped at `30000`)
   - server attempts DuckDB `statement_timeout`; response metadata reports whether timeout was enforced
 
-Uses DuckDB Python bindings. Dockerfile is ready but service is not yet deployed as Railway Service B.
+Uses DuckDB Python bindings with in-memory DuckDB reading from a bundled parquet file.
+
+Supports two transports:
+- `stdio` (default) — for local use via `python server.py`
+- `streamable-http` — set `MCP_TRANSPORT=streamable-http` for HTTP deployment; reads `PORT` env var

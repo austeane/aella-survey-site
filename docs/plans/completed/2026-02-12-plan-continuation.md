@@ -14,7 +14,7 @@ Advance the repo from scaffold to a fully usable local application with hardened
 - [x] Upgrade MCP tools to parity with API behavior and safety guardrails.
 - [x] Add tests for contract + SQL guardrails + data helpers.
 - [x] Validate (`check-types`, `test --run`, `build`) and fix regressions.
-- [ ] Move this file to `docs/plans/completed/` with closure summary.
+- [x] Move this file to `docs/plans/completed/` with closure summary.
 
 ## Progress Log
 - 2026-02-12: Scanned repository baseline and plan docs.

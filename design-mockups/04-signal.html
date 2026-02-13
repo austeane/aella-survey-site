@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction 4: Signal — Swiss Brutalist</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;0,9..40,900;1,9..40,400&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --white: #fafafa;
+    --off-white: #f2f0ed;
+    --light-gray: #e5e2dd;
+    --mid-gray: #999590;
+    --dark-gray: #555048;
+    --near-black: #1a1816;
+    --black: #0d0c0a;
+    --signal: #e53e2f;
+    --signal-dark: #c4321f;
+    --signal-faint: rgba(229, 62, 47, 0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--white);
+    color: var(--near-black);
+    font-family: 'DM Sans', Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- NAV ---- */
+  nav {
+    border-bottom: 3px solid var(--black);
+    padding: 0 2rem;
+  }
+
+  .nav-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: flex;
+    align-items: stretch;
+    height: 60px;
+  }
+
+  .nav-title {
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: -0.03em;
+    color: var(--black);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding-right: 2rem;
+    border-right: 1px solid var(--light-gray);
+  }
+
+  .nav-title .mark {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background: var(--signal);
+    border-radius: 50%;
+    margin-right: 0.6rem;
+  }
+
+  .nav-links {
+    display: flex;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    border-left: 1px solid var(--light-gray);
+    transition: all 0.15s;
+  }
+
+  .nav-links a:hover {
+    color: var(--black);
+    background: var(--off-white);
+  }
+
+  .nav-links a.active {
+    color: var(--white);
+    background: var(--black);
+    font-weight: 700;
+  }
+
+  /* ---- MAIN ---- */
+  main {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ---- HEADER ---- */
+  .page-header {
+    padding: 3rem 0 2rem;
+    border-bottom: 1px solid var(--light-gray);
+    margin-bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 2rem;
+    align-items: end;
+  }
+
+  .page-header h1 {
+    font-family: 'Instrument Serif', Georgia, serif;
+    font-weight: 400;
+    font-style: italic;
+    font-size: 4.5rem;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    color: var(--black);
+  }
+
+  .page-header .meta {
+    text-align: right;
+    font-size: 0.72rem;
+    color: var(--mid-gray);
+    line-height: 1.8;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .page-header .meta strong {
+    color: var(--dark-gray);
+    font-weight: 600;
+  }
+
+  /* ---- STATS BANNER ---- */
+  .stats-banner {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-bottom: 3px solid var(--black);
+  }
+
+  .stat-cell {
+    padding: 2rem 1.5rem;
+    border-right: 1px solid var(--light-gray);
+    position: relative;
+  }
+
+  .stat-cell:last-child { border-right: none; }
+
+  .stat-cell .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    margin-bottom: 0.75rem;
+  }
+
+  .stat-cell .value {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 900;
+    font-size: 3.5rem;
+    letter-spacing: -0.04em;
+    color: var(--black);
+    line-height: 1;
+  }
+
+  .stat-cell .value .unit {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--mid-gray);
+    margin-left: 0.15rem;
+  }
+
+  .stat-cell .sub {
+    font-size: 0.75rem;
+    color: var(--mid-gray);
+    margin-top: 0.4rem;
+  }
+
+  .stat-cell:first-child .value { color: var(--signal); }
+
+  /* ---- BODY GRID ---- */
+  .body-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .body-left {
+    padding: 2rem 2rem 2rem 0;
+    border-right: 1px solid var(--light-gray);
+  }
+
+  .body-right {
+    padding: 2rem 0 2rem 2rem;
+  }
+
+  .section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--signal);
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--light-gray);
+  }
+
+  /* Caveats */
+  .caveat-block {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .caveat-block:last-child { border-bottom: none; }
+
+  .caveat-block h3 {
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: var(--black);
+    margin-bottom: 0.3rem;
+  }
+
+  .caveat-block p {
+    font-size: 0.82rem;
+    color: var(--dark-gray);
+    line-height: 1.55;
+  }
+
+  .caveat-block .tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--signal-faint);
+    color: var(--signal);
+    padding: 0.2rem 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Missing table */
+  .miss-table {
+    width: 100%;
+  }
+
+  .miss-row {
+    display: grid;
+    grid-template-columns: 1fr 55px 80px;
+    gap: 0.75rem;
+    align-items: center;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid var(--light-gray);
+    font-size: 0.82rem;
+  }
+
+  .miss-row.head {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    border-bottom: 2px solid var(--black);
+    padding-bottom: 0.6rem;
+  }
+
+  .miss-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--near-black);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .miss-pct {
+    text-align: right;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--dark-gray);
+  }
+
+  .miss-bar {
+    height: 8px;
+    background: var(--off-white);
+    overflow: hidden;
+  }
+
+  .miss-bar-fill {
+    height: 100%;
+    background: var(--black);
+  }
+
+  .miss-row:first-of-type:not(.head) .miss-bar-fill,
+  .miss-row:nth-of-type(2):not(.head) .miss-bar-fill,
+  .miss-row:nth-of-type(3):not(.head) .miss-bar-fill {
+    background: var(--signal);
+  }
+
+  /* ---- INSPECTOR ---- */
+  .inspector {
+    padding: 2rem 0 3rem;
+  }
+
+  .inspector-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+
+  select {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.5rem 1.5rem 0.5rem 0.75rem;
+    background: var(--white);
+    color: var(--black);
+    border: 2px solid var(--black);
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+  }
+
+  select:hover { background: var(--off-white); }
+
+  .mini-strip {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border: 2px solid var(--black);
+    margin-bottom: 1.5rem;
+  }
+
+  .mini-cell {
+    padding: 1.25rem 1rem;
+    border-right: 1px solid var(--light-gray);
+  }
+
+  .mini-cell:last-child { border-right: none; }
+
+  .mini-cell .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    margin-bottom: 0.3rem;
+  }
+
+  .mini-cell .val {
+    font-weight: 900;
+    font-size: 1.5rem;
+    letter-spacing: -0.03em;
+    color: var(--black);
+  }
+
+  /* Value rows */
+  .val-table {
+    border: 2px solid var(--black);
+  }
+
+  .val-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 60px;
+    gap: 0;
+    font-size: 0.82rem;
+    border-bottom: 1px solid var(--light-gray);
+  }
+
+  .val-row:last-child { border-bottom: none; }
+
+  .val-row.head {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    background: var(--black);
+    color: var(--mid-gray);
+  }
+
+  .val-row > span {
+    padding: 0.6rem 1rem;
+  }
+
+  .val-row.head > span {
+    padding: 0.5rem 1rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .val-name { font-weight: 500; color: var(--near-black); }
+  .val-count { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: var(--dark-gray); border-left: 1px solid var(--light-gray); }
+  .val-pct { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; font-weight: 600; color: var(--signal); border-left: 1px solid var(--light-gray); }
+
+  .val-row.head .val-count,
+  .val-row.head .val-pct {
+    border-left-color: rgba(255,255,255,0.1);
+  }
+
+  .val-row:hover:not(.head) {
+    background: var(--signal-faint);
+  }
+
+  /* ---- FOOTER ---- */
+  footer {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    border-top: 3px solid var(--black);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.6rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--mid-gray);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  footer span:first-child { color: var(--black); }
+
+  /* ---- DESIGN TAG ---- */
+  .design-note {
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: var(--signal);
+    color: white;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.55rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.75rem;
+    z-index: 99999;
+  }
+
+  @keyframes clipIn {
+    from { clip-path: inset(0 100% 0 0); }
+    to { clip-path: inset(0 0 0 0); }
+  }
+  .clip { animation: clipIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .clip-1 { animation-delay: 0.05s; }
+  .clip-2 { animation-delay: 0.1s; }
+  .clip-3 { animation-delay: 0.2s; }
+</style>
+</head>
+<body>
+  <div class="design-note">Direction 4 — Signal</div>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-title" href="#"><span class="mark"></span>BKS Explorer</a>
+      <div class="nav-links">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Explore</a>
+        <a href="#">Profile</a>
+        <a href="#">SQL</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header clip">
+      <h1>Dataset<br>Dashboard</h1>
+      <div class="meta">
+        <strong>Source</strong> Big Kink Survey<br>
+        <strong>Sample</strong> 1.6% stratified<br>
+        <strong>Format</strong> Parquet + DuckDB<br>
+        <strong>Profiled</strong> Feb 12, 2026
+      </div>
+    </div>
+
+    <div class="stats-banner clip clip-1">
+      <div class="stat-cell">
+        <div class="label">Rows</div>
+        <div class="value">15,503</div>
+        <div class="sub">Respondents</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Columns</div>
+        <div class="value">365</div>
+        <div class="sub">Variables</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Categorical</div>
+        <div class="value">251</div>
+        <div class="sub">68.8% of columns</div>
+      </div>
+      <div class="stat-cell">
+        <div class="label">Numeric</div>
+        <div class="value">52</div>
+        <div class="sub">14.2% of columns</div>
+      </div>
+    </div>
+
+    <div class="body-grid clip clip-2">
+      <div class="body-left">
+        <div class="section-label">Caveats</div>
+        <div class="caveat-block">
+          <div class="tag">Structural NAs</div>
+          <h3>Gated Missingness</h3>
+          <p>Some questions were only shown after prerequisite answers. Missing values may reflect skip-logic, not non-response. Filter or impute with care.</p>
+        </div>
+        <div class="caveat-block">
+          <div class="tag">Temporal Bias</div>
+          <h3>Late-Added Questions</h3>
+          <p>Certain variables were added partway through the survey's collection period, creating cohort-dependent missingness. Consider temporal bias when interpreting null rates above 30%.</p>
+        </div>
+      </div>
+
+      <div class="body-right">
+        <div class="section-label">Null Ratio Ranking</div>
+        <div class="miss-row head">
+          <span>Column</span>
+          <span style="text-align:right">Ratio</span>
+          <span></span>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_estrogen_regularity</span>
+          <span class="miss-pct">96.2%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:96%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_estrogen_duration</span>
+          <span class="miss-pct">96.0%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:96%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">HRT_testosterone_reg.</span>
+          <span class="miss-pct">95.8%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:95.8%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">PMS_symptoms</span>
+          <span class="miss-pct">52.1%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:52%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">menstrual_cycle_phase</span>
+          <span class="miss-pct">51.8%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:51.8%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">hormonal_birth_control</span>
+          <span class="miss-pct">51.3%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:51.3%"></div></div>
+        </div>
+        <div class="miss-row">
+          <span class="miss-name">childhood_adversity</span>
+          <span class="miss-pct">12.4%</span>
+          <div class="miss-bar"><div class="miss-bar-fill" style="width:12.4%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="inspector clip clip-3">
+      <div class="inspector-header">
+        <div class="section-label" style="margin:0">Column Inspector</div>
+        <select>
+          <option>straightness</option>
+          <option>politics</option>
+          <option>gender_identity</option>
+        </select>
+      </div>
+
+      <div class="mini-strip">
+        <div class="mini-cell">
+          <div class="label">Type</div>
+          <div class="val" style="font-size:0.9rem;color:var(--signal)">Categorical</div>
+        </div>
+        <div class="mini-cell">
+          <div class="label">Total</div>
+          <div class="val">15,503</div>
+        </div>
+        <div class="mini-cell">
+          <div class="label">Non-null</div>
+          <div class="val">15,466</div>
+        </div>
+        <div class="mini-cell">
+          <div class="label">Null</div>
+          <div class="val">37</div>
+        </div>
+      </div>
+
+      <div class="val-table">
+        <div class="val-row head">
+          <span class="val-name">Value</span>
+          <span class="val-count">Count</span>
+          <span class="val-pct">Share</span>
+        </div>
+        <div class="val-row"><span class="val-name">Straight</span><span class="val-count">5,412</span><span class="val-pct">34.9%</span></div>
+        <div class="val-row"><span class="val-name">Mostly Straight</span><span class="val-count">3,821</span><span class="val-pct">24.7%</span></div>
+        <div class="val-row"><span class="val-name">Bisexual</span><span class="val-count">3,104</span><span class="val-pct">20.0%</span></div>
+        <div class="val-row"><span class="val-name">Mostly Gay</span><span class="val-count">1,890</span><span class="val-pct">12.2%</span></div>
+        <div class="val-row"><span class="val-name">Gay</span><span class="val-count">1,239</span><span class="val-pct">8.0%</span></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>Big Kink Survey Explorer</span>
+    <span>DuckDB + TanStack Start</span>
+    <span>2026</span>
+  </footer>
+</body>
+</html>

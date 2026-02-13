@@ -1,258 +1,481 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-import type { SchemaData, StatsData } from "@/lib/api/contracts";
-import { getCrosstab, getSchema, getStats } from "@/lib/client/api";
+import { DataTable } from "@/components/data-table";
+import { MissingnessBadge } from "@/components/missingness-badge";
+import { PivotMatrix, type PivotCellDetail, type PivotNormalization } from "@/components/pivot-matrix";
+import { SampleSizeDisplay } from "@/components/sample-size-display";
+import { SectionHeader } from "@/components/section-header";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { SchemaData } from "@/lib/api/contracts";
+import { getSchema } from "@/lib/client/api";
+import { MIN_CELL_COUNT, shouldSuppressCell } from "@/lib/cell-hygiene";
+import { addNotebookEntry } from "@/lib/notebook-store";
+import { buildWhereClause, quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
+import { asNumber, formatNumber, formatPercent } from "@/lib/format";
+import { useDuckDBQuery } from "@/lib/duckdb/use-query";
 
 export const Route = createFileRoute("/explore")({
+  validateSearch: (search) => ({
+    x: typeof search.x === "string" ? search.x : undefined,
+    y: typeof search.y === "string" ? search.y : undefined,
+  }),
   component: ExplorePage,
 });
 
+const NORMALIZATION_OPTIONS: Array<{ value: PivotNormalization; label: string }> = [
+  { value: "count", label: "Counts" },
+  { value: "row", label: "Row %" },
+  { value: "column", label: "Column %" },
+  { value: "overall", label: "Overall %" },
+];
+const NONE_FILTER = "__none_filter__";
+
+function associationLabel(cramersV: number): string {
+  if (cramersV < 0.1) return "negligible";
+  if (cramersV < 0.3) return "weak";
+  if (cramersV < 0.5) return "moderate";
+  return "strong";
+}
+
+function computeCramersV(rows: Array<{ x: string; y: string; count: number }>): { value: number; nUsed: number } {
+  if (rows.length === 0) {
+    return { value: 0, nUsed: 0 };
+  }
+
+  const rowTotals = new Map<string, number>();
+  const colTotals = new Map<string, number>();
+  let total = 0;
+
+  for (const row of rows) {
+    rowTotals.set(row.y, (rowTotals.get(row.y) ?? 0) + row.count);
+    colTotals.set(row.x, (colTotals.get(row.x) ?? 0) + row.count);
+    total += row.count;
+  }
+
+  const rowCount = rowTotals.size;
+  const colCount = colTotals.size;
+
+  if (total <= 0 || rowCount < 2 || colCount < 2) {
+    return { value: 0, nUsed: total };
+  }
+
+  const observed = new Map<string, number>();
+  for (const row of rows) {
+    observed.set(`${row.y}\u0000${row.x}`, row.count);
+  }
+
+  let chiSquare = 0;
+  for (const [yValue, yTotal] of rowTotals.entries()) {
+    for (const [xValue, xTotal] of colTotals.entries()) {
+      const expected = (yTotal * xTotal) / total;
+      if (expected <= 0) continue;
+
+      const obs = observed.get(`${yValue}\u0000${xValue}`) ?? 0;
+      chiSquare += ((obs - expected) ** 2) / expected;
+    }
+  }
+
+  const denominator = total * Math.min(rowCount - 1, colCount - 1);
+  if (denominator <= 0) {
+    return { value: 0, nUsed: total };
+  }
+
+  return {
+    value: Math.sqrt(chiSquare / denominator),
+    nUsed: total,
+  };
+}
+
 function ExplorePage() {
+  const search = Route.useSearch();
+
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
 
   const [xColumn, setXColumn] = useState("");
   const [yColumn, setYColumn] = useState("");
   const [limit, setLimit] = useState(50);
+  const [normalization, setNormalization] = useState<PivotNormalization>("count");
+  const [topN, setTopN] = useState(12);
 
   const [filterColumn, setFilterColumn] = useState("");
-  const [filterOptions, setFilterOptions] = useState<Array<{ value: string; count: number }>>([]);
   const [selectedFilterValues, setSelectedFilterValues] = useState<string[]>([]);
-
-  const [result, setResult] = useState<
-    | {
-        x: string;
-        y: string;
-        rows: Array<{ x: string | number | boolean | null; y: string | number | boolean | null; count: number }>;
-      }
-    | null
-  >(null);
-  const [resultError, setResultError] = useState<string | null>(null);
-  const [resultLoading, setResultLoading] = useState(false);
+  const [selectedCell, setSelectedCell] = useState<PivotCellDetail | null>(null);
 
   useEffect(() => {
     let cancelled = false;
 
     void getSchema()
       .then((response) => {
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
 
-        setSchema(response.data);
+        const nextSchema = response.data;
+        setSchema(nextSchema);
 
-        const preferredX = response.data.columns.find((column) => column.name === "straightness");
-        const preferredY = response.data.columns.find((column) => column.name === "politics");
+        const preferredX =
+          (search.x ? nextSchema.columns.find((c) => c.name === search.x) : undefined) ??
+          nextSchema.columns.find((c) => c.name === "straightness") ??
+          nextSchema.columns[0];
 
-        setXColumn(preferredX?.name ?? response.data.columns[0]?.name ?? "");
-        setYColumn(preferredY?.name ?? response.data.columns[1]?.name ?? "");
+        const preferredY =
+          (search.y ? nextSchema.columns.find((c) => c.name === search.y) : undefined) ??
+          nextSchema.columns.find((c) => c.name === "politics") ??
+          nextSchema.columns[1];
 
-        const firstDemographicFilter = response.data.columns.find(
-          (column) => column.tags.includes("demographic") && column.logicalType === "categorical",
+        setXColumn(preferredX?.name ?? "");
+        setYColumn(preferredY?.name ?? "");
+
+        const firstDemoFilter = nextSchema.columns.find(
+          (c) => c.tags.includes("demographic") && c.logicalType === "categorical",
         );
-        setFilterColumn(firstDemographicFilter?.name ?? "");
+        setFilterColumn(firstDemoFilter?.name ?? "");
       })
       .catch((error: Error) => {
-        if (!cancelled) {
-          setSchemaError(error.message);
-        }
+        if (!cancelled) setSchemaError(error.message);
       });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [search.x, search.y]);
+
+  const xMeta = useMemo(() => schema?.columns.find((c) => c.name === xColumn) ?? null, [schema, xColumn]);
+  const yMeta = useMemo(() => schema?.columns.find((c) => c.name === yColumn) ?? null, [schema, yColumn]);
+
+  const isPivotable =
+    xMeta != null &&
+    yMeta != null &&
+    ["categorical", "boolean"].includes(xMeta.logicalType) &&
+    ["categorical", "boolean"].includes(yMeta.logicalType);
+
+  const filterOptionsSql = useMemo(() => {
+    if (!filterColumn) return null;
+    const quoted = quoteIdentifier(filterColumn);
+    return `
+      SELECT cast(${quoted} AS VARCHAR) AS value, count(*)::BIGINT AS cnt
+      FROM data
+      WHERE ${quoted} IS NOT NULL
+      GROUP BY 1
+      ORDER BY cnt DESC
+      LIMIT 20
+    `;
+  }, [filterColumn]);
+
+  const filterOptionsQuery = useDuckDBQuery(filterOptionsSql);
+
+  const filterOptions = useMemo(() => {
+    if (!filterOptionsQuery.data) return [];
+    return filterOptionsQuery.data.rows.map((r) => ({
+      value: String(r[0] ?? "NULL"),
+      count: asNumber(r[1]),
+    }));
+  }, [filterOptionsQuery.data]);
 
   useEffect(() => {
-    if (!filterColumn) {
-      setFilterOptions([]);
-      setSelectedFilterValues([]);
-      return;
-    }
-
-    let cancelled = false;
-
-    void getStats(filterColumn)
-      .then((response) => {
-        if (cancelled) {
-          return;
-        }
-
-        const stats = response.data as StatsData;
-        if (stats.stats.kind !== "categorical") {
-          setFilterOptions([]);
-          setSelectedFilterValues([]);
-          return;
-        }
-
-        const options = stats.stats.topValues.map((item) => ({
-          value: String(item.value ?? "NULL"),
-          count: item.count,
-        }));
-
-        setFilterOptions(options);
-        setSelectedFilterValues([]);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setFilterOptions([]);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
+    setSelectedFilterValues([]);
   }, [filterColumn]);
 
   const queryFilters = useMemo(() => {
-    if (!filterColumn || selectedFilterValues.length === 0) {
-      return undefined;
-    }
-
+    if (!filterColumn || selectedFilterValues.length === 0) return undefined;
     return {
-      [filterColumn]: selectedFilterValues.map((value) => (value === "NULL" ? null : value)),
+      [filterColumn]: selectedFilterValues.map((v) => (v === "NULL" ? null : v)),
     };
   }, [filterColumn, selectedFilterValues]);
 
-  useEffect(() => {
-    if (!xColumn || !yColumn) {
-      return;
+  const whereClause = useMemo(() => buildWhereClause(queryFilters), [queryFilters]);
+
+  const crosstabSql = useMemo(() => {
+    if (!xColumn || !yColumn) return null;
+
+    const xQuoted = quoteIdentifier(xColumn);
+    const yQuoted = quoteIdentifier(yColumn);
+
+    const clauses: string[] = [];
+    if (whereClause.startsWith("WHERE ")) {
+      clauses.push(whereClause.replace(/^WHERE\s+/i, ""));
+    }
+    clauses.push(`${xQuoted} IS NOT NULL`);
+    clauses.push(`${yQuoted} IS NOT NULL`);
+
+    const fullWhere = clauses.length > 0 ? `WHERE ${clauses.join(" AND ")}` : "";
+
+    return `
+      SELECT
+        cast(${xQuoted} AS VARCHAR) AS x,
+        cast(${yQuoted} AS VARCHAR) AS y,
+        count(*)::BIGINT AS count
+      FROM data
+      ${fullWhere}
+      GROUP BY 1, 2
+      ORDER BY count DESC
+      ${isPivotable ? "" : `LIMIT ${limit}`}
+    `;
+  }, [xColumn, yColumn, whereClause, isPivotable, limit]);
+
+  const sampleSizeSql = useMemo(() => {
+    if (!xColumn || !yColumn) return null;
+
+    const xQuoted = quoteIdentifier(xColumn);
+    const yQuoted = quoteIdentifier(yColumn);
+
+    return `
+      SELECT
+        count(*)::BIGINT AS total_count,
+        count(${xQuoted})::BIGINT AS x_non_null,
+        count(${yQuoted})::BIGINT AS y_non_null,
+        count(*) FILTER (
+          WHERE ${xQuoted} IS NOT NULL AND ${yQuoted} IS NOT NULL
+        )::BIGINT AS used_count
+      FROM data
+      ${whereClause}
+    `;
+  }, [xColumn, yColumn, whereClause]);
+
+  const crosstabQuery = useDuckDBQuery(crosstabSql);
+  const sampleSizeQuery = useDuckDBQuery(sampleSizeSql);
+
+  const rows = useMemo(() => {
+    if (!crosstabQuery.data) return [];
+    return crosstabQuery.data.rows.map((r) => ({
+      x: String(r[0] ?? "NULL"),
+      y: String(r[1] ?? "NULL"),
+      count: asNumber(r[2]),
+    }));
+  }, [crosstabQuery.data]);
+
+  const sampleSizes = useMemo(() => {
+    const row = sampleSizeQuery.data?.rows[0];
+    if (!row) {
+      return {
+        total: 0,
+        xNonNull: 0,
+        yNonNull: 0,
+        used: 0,
+      };
     }
 
-    let cancelled = false;
-    setResultLoading(true);
-    setResultError(null);
-
-    void getCrosstab({
-      x: xColumn,
-      y: yColumn,
-      limit,
-      filters: queryFilters,
-    })
-      .then((response) => {
-        if (!cancelled) {
-          setResult(response.data);
-        }
-      })
-      .catch((error: Error) => {
-        if (!cancelled) {
-          setResultError(error.message);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) {
-          setResultLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
+    return {
+      total: asNumber(row[0]),
+      xNonNull: asNumber(row[1]),
+      yNonNull: asNumber(row[2]),
+      used: asNumber(row[3]),
     };
-  }, [xColumn, yColumn, limit, queryFilters]);
+  }, [sampleSizeQuery.data]);
+
+  const association = useMemo(() => {
+    if (!isPivotable) return null;
+    return computeCramersV(rows);
+  }, [rows, isPivotable]);
 
   const demographicColumns = useMemo(() => {
-    if (!schema) {
-      return [];
-    }
-
+    if (!schema) return [];
     return schema.columns.filter(
-      (column) => column.tags.includes("demographic") && column.logicalType === "categorical",
+      (c) => c.tags.includes("demographic") && c.logicalType === "categorical",
     );
   }, [schema]);
 
+  const sqlForCell = useMemo(() => {
+    if (!selectedCell || !xColumn || !yColumn) return null;
+
+    const predicates: string[] = [];
+    if (queryFilters) {
+      for (const [columnName, rawValue] of Object.entries(queryFilters)) {
+        if (!Array.isArray(rawValue)) continue;
+        const normalized = rawValue.filter((value) => value !== null);
+        if (normalized.length > 0) {
+          predicates.push(
+            `${quoteIdentifier(columnName)} IN (${normalized.map((value) => quoteLiteral(value)).join(", ")})`,
+          );
+        }
+      }
+    }
+
+    predicates.push(`${quoteIdentifier(xColumn)} = ${quoteLiteral(selectedCell.x)}`);
+    predicates.push(`${quoteIdentifier(yColumn)} = ${quoteLiteral(selectedCell.y)}`);
+
+    return `
+SELECT *
+FROM data
+WHERE ${predicates.join("\n  AND ")}
+LIMIT 250
+`.trim();
+  }, [selectedCell, xColumn, yColumn, queryFilters]);
+
+  const sqlHref = sqlForCell ? `/sql?sql=${encodeURIComponent(sqlForCell)}` : "/sql";
+
+  const [notebookSaved, setNotebookSaved] = useState(false);
+
+  const saveToNotebook = useCallback(() => {
+    if (!xColumn || !yColumn || rows.length === 0) return;
+
+    addNotebookEntry({
+      title: `Cross-tab: ${xColumn} × ${yColumn}`,
+      queryDefinition: {
+        type: "crosstab",
+        params: {
+          x: xColumn,
+          y: yColumn,
+          normalization,
+          filterColumn: filterColumn || undefined,
+          filterValues: selectedFilterValues.length > 0 ? selectedFilterValues : undefined,
+        },
+      },
+      resultsSnapshot: {
+        columns: ["x", "y", "count"],
+        rows: rows.slice(0, 50).map((r) => [r.x, r.y, r.count]),
+        summary: association ? { cramersV: association.value, nUsed: association.nUsed } : {},
+      },
+      notes: "",
+    });
+
+    setNotebookSaved(true);
+    setTimeout(() => setNotebookSaved(false), 2000);
+  }, [xColumn, yColumn, rows, normalization, filterColumn, selectedFilterValues, association]);
+
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Cross-Tab Explorer</h1>
-        <p className="text-slate-300">Choose two variables and optional demographic filters.</p>
+    <div className="page">
+      <header className="page-header">
+        <h1 className="page-title">Cross-Tab Explorer</h1>
+        <p className="page-subtitle">Cross-tabulate any two variables. Normalize, filter by demographics, and measure association strength.</p>
       </header>
 
-      {schemaError ? (
-        <section className="rounded-lg border border-red-500/40 bg-red-900/20 p-4 text-red-200">
-          Failed to load schema: {schemaError}
-        </section>
-      ) : null}
+      {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
 
       {schema ? (
-        <section className="grid gap-4 rounded-lg border border-slate-800 bg-slate-900/70 p-4 lg:grid-cols-2">
-          <label className="text-sm text-slate-300">
-            X column
-            <select
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
-              value={xColumn}
-              onChange={(event) => setXColumn(event.target.value)}
-            >
-              {schema.columns.map((column) => (
-                <option key={column.name} value={column.name}>
-                  {column.name}
-                </option>
-              ))}
-            </select>
-          </label>
+        <section className="raised-panel space-y-4">
+          <SectionHeader number="01" title="Controls" />
 
-          <label className="text-sm text-slate-300">
-            Y column
-            <select
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
-              value={yColumn}
-              onChange={(event) => setYColumn(event.target.value)}
-            >
-              {schema.columns.map((column) => (
-                <option key={column.name} value={column.name}>
-                  {column.name}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <label className="editorial-label">
+              X Column
+              <Select value={xColumn} onValueChange={setXColumn}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select X" />
+                </SelectTrigger>
+                <SelectContent>
+                  {schema.columns.map((column) => (
+                    <SelectItem key={column.name} value={column.name}>
+                      {column.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {xMeta ? <MissingnessBadge meaning={xMeta.nullMeaning} /> : null}
+            </label>
 
-          <label className="text-sm text-slate-300">
-            Result row limit
-            <input
-              type="number"
-              min={1}
-              max={1000}
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
-              value={limit}
-              onChange={(event) => setLimit(Math.max(1, Math.min(1000, Number(event.target.value) || 1)))}
-            />
-          </label>
+            <label className="editorial-label">
+              Y Column
+              <Select value={yColumn} onValueChange={setYColumn}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Y" />
+                </SelectTrigger>
+                <SelectContent>
+                  {schema.columns.map((column) => (
+                    <SelectItem key={column.name} value={column.name}>
+                      {column.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {yMeta ? <MissingnessBadge meaning={yMeta.nullMeaning} /> : null}
+            </label>
 
-          <label className="text-sm text-slate-300">
-            Optional demographic filter
-            <select
-              className="mt-1 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2"
-              value={filterColumn}
-              onChange={(event) => setFilterColumn(event.target.value)}
-            >
-              <option value="">None</option>
-              {demographicColumns.map((column) => (
-                <option key={column.name} value={column.name}>
-                  {column.name}
-                </option>
-              ))}
-            </select>
-          </label>
+            <label className="editorial-label">
+              Optional Demographic Filter
+              <Select
+                value={filterColumn || NONE_FILTER}
+                onValueChange={(value) => setFilterColumn(value === NONE_FILTER ? "" : value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="None" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE_FILTER}>None</SelectItem>
+                  {demographicColumns.map((column) => (
+                    <SelectItem key={column.name} value={column.name}>
+                      {column.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </label>
+
+            <label className="editorial-label">
+              Result Row Limit (non-pivot)
+              <Input
+                type="number"
+                name="result_limit"
+                min={1}
+                max={1000}
+                value={limit}
+                onChange={(event) =>
+                  setLimit(Math.max(1, Math.min(1000, Number(event.target.value) || 1)))
+                }
+              />
+            </label>
+
+            {isPivotable ? (
+              <>
+                <label className="editorial-label">
+                  Normalization
+                  <Select value={normalization} onValueChange={(value) => setNormalization(value as PivotNormalization)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {NORMALIZATION_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </label>
+
+                <label className="editorial-label">
+                  Show Top N Categories Per Axis
+                  <Input
+                    type="number"
+                    name="top_n"
+                    min={3}
+                    max={30}
+                    value={topN}
+                    onChange={(event) =>
+                      setTopN(Math.max(3, Math.min(30, Number(event.target.value) || 3)))
+                    }
+                  />
+                </label>
+              </>
+            ) : null}
+          </div>
 
           {filterColumn && filterOptions.length > 0 ? (
-            <div className="lg:col-span-2">
-              <p className="mb-2 text-sm text-slate-300">Filter values</p>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <div>
+              <p className="mono-label">Filter Values</p>
+              <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {filterOptions.map((option) => {
                   const checked = selectedFilterValues.includes(option.value);
                   return (
                     <label
                       key={option.value}
-                      className="flex items-center justify-between rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200"
+                      className="flex items-center justify-between border border-[var(--rule)] bg-[var(--paper)] px-2.5 py-2"
                     >
-                      <span className="truncate pr-2">{option.value}</span>
-                      <span className="ml-2 shrink-0 text-xs text-slate-400">{option.count}</span>
-                      <input
+                      <span className="mono-value truncate pr-2">{option.value}</span>
+                      <span className="mono-value text-[var(--ink-faded)]">{formatNumber(option.count)}</span>
+                      <Checkbox
                         className="ml-3"
-                        type="checkbox"
                         checked={checked}
-                        onChange={(event) => {
-                          if (event.target.checked) {
+                        onCheckedChange={(nextChecked) => {
+                          if (nextChecked === true) {
                             setSelectedFilterValues((current) => [...current, option.value]);
                           } else {
                             setSelectedFilterValues((current) =>
@@ -269,41 +492,91 @@ function ExplorePage() {
           ) : null}
         </section>
       ) : (
-        <section className="rounded-lg border border-slate-800 bg-slate-900/70 p-4 text-sm text-slate-400">
-          Loading schema metadata...
-        </section>
+        <section className="editorial-panel">Loading schema metadata...</section>
       )}
 
-      <section className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-        <h2 className="text-lg font-semibold">Results</h2>
-        {resultLoading ? <p className="mt-3 text-sm text-slate-400">Running crosstab query...</p> : null}
-        {resultError ? (
-          <p className="mt-3 rounded border border-red-500/40 bg-red-900/20 p-3 text-sm text-red-200">
-            {resultError}
+      <section className="editorial-panel space-y-4">
+        <SectionHeader number="02" title="Results" />
+
+        <SampleSizeDisplay
+          total={sampleSizes.total}
+          nonNull={Math.min(sampleSizes.xNonNull, sampleSizes.yNonNull)}
+          used={sampleSizes.used}
+        />
+        <p className="mono-value">
+          N non-null {xColumn || "X"}: {formatNumber(sampleSizes.xNonNull)} | N non-null {yColumn || "Y"}:{" "}
+          {formatNumber(sampleSizes.yNonNull)}
+        </p>
+
+        {association ? (
+          <p className="mono-value">
+            Association: V = {association.value.toFixed(3)} ({associationLabel(association.value)}) | N used: {formatNumber(association.nUsed)}
           </p>
         ) : null}
 
-        {result && !resultLoading ? (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="text-slate-400">
-                <tr>
-                  <th className="pb-2">{result.x}</th>
-                  <th className="pb-2">{result.y}</th>
-                  <th className="pb-2">Count</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.rows.map((row, index) => (
-                  <tr key={`${String(row.x)}-${String(row.y)}-${index}`} className="border-t border-slate-800/80">
-                    <td className="py-2 text-slate-200">{String(row.x ?? "NULL")}</td>
-                    <td className="py-2 text-slate-200">{String(row.y ?? "NULL")}</td>
-                    <td className="py-2 text-slate-300">{row.count.toLocaleString("en-US")}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        {rows.length > 0 ? (
+          <button
+            type="button"
+            className="editorial-button"
+            onClick={saveToNotebook}
+          >
+            {notebookSaved ? "Saved!" : "Add to Notebook"}
+          </button>
+        ) : null}
+
+        {crosstabQuery.loading ? <p className="section-subtitle">Running crosstab query...</p> : null}
+        {crosstabQuery.error ? <p className="alert alert--error">{crosstabQuery.error}</p> : null}
+
+        {!crosstabQuery.loading && !crosstabQuery.error ? (
+          isPivotable ? (
+            <PivotMatrix
+              rows={rows}
+              topN={topN}
+              normalization={normalization}
+              minCellCount={MIN_CELL_COUNT}
+              onCellClick={setSelectedCell}
+            />
+          ) : (
+            <DataTable
+              rows={rows}
+              rowKey={(row, index) => `${row.x}-${row.y}-${index}`}
+              columns={[
+                { id: "x", header: xColumn || "X", cell: (row) => row.x },
+                { id: "y", header: yColumn || "Y", cell: (row) => row.y },
+                {
+                  id: "count",
+                  header: "Count",
+                  align: "right",
+                  cell: (row) =>
+                    shouldSuppressCell(row.count)
+                      ? "[suppressed]"
+                      : formatNumber(row.count),
+                },
+              ]}
+              emptyMessage="No matching rows"
+            />
+          )
+        ) : null}
+
+        {selectedCell ? (
+          <aside className="raised-panel space-y-2">
+            <SectionHeader number="03" title="Selected Cell" />
+            <p className="mono-value">{xColumn}: {selectedCell.x}</p>
+            <p className="mono-value">{yColumn}: {selectedCell.y}</p>
+            <p className="mono-value">Count: {formatNumber(selectedCell.count)}</p>
+            <p className="mono-value">% of row: {formatPercent(selectedCell.rowPercent, 2)}</p>
+            <p className="mono-value">% of column: {formatPercent(selectedCell.columnPercent, 2)}</p>
+            <p className="mono-value">% overall: {formatPercent(selectedCell.overallPercent, 2)}</p>
+
+            <div className="flex flex-wrap gap-2 pt-1">
+              <Link to="/profile" className="editorial-button">
+                Open this cohort in Profile
+              </Link>
+              <a href={sqlHref} className="editorial-button">
+                Generate SQL for this cohort
+              </a>
+            </div>
+          </aside>
         ) : null}
       </section>
     </div>

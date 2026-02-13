@@ -1,15 +1,527 @@
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 
+:root {
+  --paper: #f5f0e8;
+  --paper-warm: #ede6d8;
+  --ink: #1a1612;
+  --ink-light: #4a4238;
+  --ink-faded: #8a7e70;
+  --rule: #c8bfb0;
+  --rule-light: #ddd5c8;
+  --accent: #b8432f;
+  --accent-hover: #9a3625;
+  --highlight: #e8d5a0;
+  --sidebar-bg: #eae3d5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
 body {
-  @apply m-0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 16px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0.03;
+  background: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.app-nav {
+  border-bottom: 2px solid var(--ink);
+  padding: 0 2rem;
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 2rem;
+  padding: 1rem 0 0.75rem;
+}
+
+.brand-link {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.brand-title {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.brand-subtitle {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--ink-faded);
+}
+
+.nav-links {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link {
+  margin-bottom: -2px;
+  border-bottom: 2px solid transparent;
+  padding: 0.45rem 1.25rem 0.65rem;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.85rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: var(--ink);
+}
+
+.nav-link-active {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.app-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 2rem 4rem;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 3rem;
+  animation: fade-up 0.6s ease-out;
+}
+
+.page-header {
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 1.5rem;
+}
+
+.page-title {
+  margin: 0;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.75rem;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.page-subtitle {
+  margin: 0.6rem 0 0;
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--ink-faded);
+}
+
+.dateline {
+  margin-top: 0.75rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ink-faded);
+}
+
+.section-header {
+  margin: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 0.45rem;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.section-number {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.section-subtitle {
+  margin-top: 0.35rem;
+  color: var(--ink-light);
+  font-size: 0.92rem;
+}
+
+.editorial-panel {
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  padding: 1.4rem 1.5rem;
+}
+
+.raised-panel {
+  border: 1px solid var(--rule);
+  background: var(--sidebar-bg);
+  padding: 1.4rem 1.5rem;
+  position: relative;
+}
+
+.raised-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  border-top: 3px solid var(--accent);
+}
+
+.stat-grid {
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--ink);
+}
+
+.stat-cell {
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 1.2rem 1.5rem;
+}
+
+.stat-cell:last-child {
+  border-right: 0;
+}
+
+.stat-cell-label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+}
+
+.stat-cell-value {
+  margin-top: 0.35rem;
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 2.2rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+}
+
+.stat-cell-note {
+  margin-top: 0.3rem;
+  font-size: 0.8rem;
+  color: var(--ink-faded);
+  font-style: italic;
+}
+
+.mono-label {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+}
+
+.mono-value {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.editorial-control {
+  width: 100%;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  padding: 0.5rem 0.65rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.editorial-control:focus {
+  outline: none;
+  border-color: var(--ink);
+}
+
+.editorial-label {
+  display: grid;
+  gap: 0.35rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+}
+
+.editorial-button {
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.5rem 0.95rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.editorial-button:hover:not(:disabled) {
+  color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.editorial-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.editorial-button--accent {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.editorial-button--filled {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.editorial-button--filled:hover:not(:disabled) {
+  color: var(--paper);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.editorial-table-wrap {
+  overflow-x: auto;
+}
+
+.editorial-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.editorial-table thead th {
+  text-align: left;
+  padding: 0.5rem 0.25rem;
+  border-bottom: 2px solid var(--ink);
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  font-weight: 500;
+}
+
+.editorial-table tbody td {
+  padding: 0.56rem 0.25rem;
+  border-bottom: 1px solid var(--rule-light);
+  vertical-align: top;
+}
+
+.editorial-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.editorial-table tbody td:first-child {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  color: var(--ink);
+}
+
+.editorial-table .numeric,
+.editorial-table thead .numeric {
+  text-align: right;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+.caveat-item {
+  border-bottom: 1px solid var(--rule-light);
+  padding: 0.85rem 0;
+}
+
+.caveat-item:last-child {
+  border-bottom: 0;
+}
+
+.caveat-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.caveat-description {
+  margin-top: 0.2rem;
+  color: var(--ink-light);
+  font-size: 0.85rem;
+}
+
+.caveat-guidance {
+  margin-top: 0.3rem;
+  color: var(--ink-faded);
+  font-size: 0.76rem;
+  font-style: italic;
+}
+
+.sample-size {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.2rem;
+  margin-top: 0.6rem;
+  color: var(--ink-faded);
+}
+
+.sample-size-item {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.null-badge {
+  display: inline-block;
+  border: 1px solid var(--rule);
+  padding: 0.12rem 0.4rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  background: var(--paper);
+}
+
+.null-badge--gated {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.null-badge--late_added {
+  border-color: #8f5a2b;
+  color: #8f5a2b;
+}
+
+.null-badge--not_applicable {
+  border-color: #4d5d73;
+  color: #4d5d73;
+}
+
+.inline-ratio {
+  position: relative;
+  height: 4px;
+  background: var(--rule-light);
+  margin-top: 0.3rem;
+}
+
+.inline-ratio > span {
+  display: block;
+  height: 100%;
+  background: color-mix(in srgb, var(--accent) 70%, transparent);
+}
+
+.alert {
+  border: 1px solid var(--ink);
+  padding: 0.75rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.alert--error {
+  border-color: #8b1a1a;
+  color: #8b1a1a;
+  background: #f0ded8;
+}
+
+.alert--warn {
+  border-color: #8a5b10;
+  color: #6d490f;
+  background: #efe0be;
+}
+
+.alert--critical {
+  border-color: #7e1f1f;
+  color: #7e1f1f;
+  background: #ecd3d3;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .app-nav {
+    padding: 0 1rem;
+  }
+
+  .nav-inner {
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    padding-bottom: 0.55rem;
+  }
+
+  .nav-links {
+    margin-left: 0;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .nav-link {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    white-space: nowrap;
+  }
+
+  .app-main {
+    padding: 2rem 1rem 3rem;
+  }
+
+  .page-title {
+    font-size: 2.1rem;
+  }
+
+  .stat-cell-value {
+    font-size: 1.75rem;
+  }
 }

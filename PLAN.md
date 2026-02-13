@@ -1,5 +1,7 @@
 # Big Kink Survey Explorer - Implementation Plan (v1)
 
+**Status: COMPLETE** — All M0-M6 milestones delivered. See `docs/plans/active/v2-next-steps.md` for the ongoing v2 plan.
+
 Last updated: 2026-02-12
 
 ## 1) Product Goal
@@ -312,8 +314,8 @@ Returns cross-tab matrix plus marginal totals and null handling metadata.
 - Deploy pipeline green for app + MCP.
 - Manual exploratory QA complete with no P0/P1 bugs.
 
-## 13) Open Decisions to Resolve Early
+## 13) Open Decisions (Resolved)
 
-- Should public API expose row-level query results broadly, or only aggregate endpoints?
-- Should SQL console be available in production to all users or feature-flagged?
-- Should MCP service be internet-exposed or restricted by network/auth token?
+- **Public API scope**: Expose row-level query results broadly. All API endpoints (`/api/query`, `/api/stats`, `/api/crosstab`, `/api/schema`) are publicly available with read-only guardrails and row limits.
+- **SQL console availability**: Available in production to all users, no feature flag. Guardrails (read-only, row cap, timeout) provide sufficient safety.
+- **MCP service exposure**: Internet-exposed with no auth restriction. Same read-only guardrails as the API apply.

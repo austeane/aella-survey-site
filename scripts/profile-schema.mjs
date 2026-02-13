@@ -130,6 +130,31 @@ function inferTags(name) {
   return [...tags];
 }
 
+function inferNullMeaning(name, nullRatio) {
+  const lowerName = name.toLowerCase();
+
+  if (
+    /(late|newly added|added later|followup|follow_up|second wave|third wave|v2|v3)/i.test(lowerName)
+  ) {
+    return "LATE_ADDED";
+  }
+
+  if (
+    nullRatio > 0.15 &&
+    /(pregnan|menstru|period|erection|penis|vagina|prostate|breastfeed|bio ?male|bio ?female|cis ?male|cis ?female)/i.test(
+      lowerName,
+    )
+  ) {
+    return "NOT_APPLICABLE";
+  }
+
+  if (nullRatio > 0.3) {
+    return "GATED";
+  }
+
+  return "UNKNOWN";
+}
+
 function normalizeInteger(value, fallback = 0) {
   if (typeof value === "bigint") {
     return Number(value);
@@ -194,6 +219,7 @@ async function main() {
       nullRatio: roundRatio(nullRatio),
       approxCardinality,
       tags: inferTags(name),
+      nullMeaning: inferNullMeaning(name, nullRatio),
     });
   }
 

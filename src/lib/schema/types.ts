@@ -2,6 +2,8 @@ export type LogicalType = "categorical" | "numeric" | "boolean" | "text" | "unkn
 
 export type CategoryTag = "demographic" | "ocean" | "fetish" | "derived" | "other";
 
+export type NullMeaning = "GATED" | "LATE_ADDED" | "NOT_APPLICABLE" | "UNKNOWN";
+
 export interface ColumnMetadata {
   name: string;
   duckdbType: string;
@@ -9,6 +11,7 @@ export interface ColumnMetadata {
   nullRatio: number;
   approxCardinality: number;
   tags: CategoryTag[];
+  nullMeaning?: NullMeaning;
 }
 
 export interface DatasetMetadata {

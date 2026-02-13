@@ -1,12 +1,85 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import type { QueryData, SchemaData } from "@/lib/api/contracts";
-import { getSchema, runQuery } from "@/lib/client/api";
+import { DataTable } from "@/components/data-table";
+import { SectionHeader } from "@/components/section-header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
+import type { SchemaData } from "@/lib/api/contracts";
+import { getSchema } from "@/lib/client/api";
+import { useDuckDB } from "@/lib/duckdb/provider";
+import { addNotebookEntry } from "@/lib/notebook-store";
+import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
+import { formatNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/sql")({
+  validateSearch: (search) => ({
+    sql: typeof search.sql === "string" ? search.sql : undefined,
+  }),
   component: SqlConsolePage,
 });
+
+interface QueryResult {
+  columns: string[];
+  rows: unknown[][];
+}
+
+const TEMPLATE_SQL: Array<{ name: string; sql: string }> = [
+  {
+    name: "Distribution (categorical)",
+    sql: `SELECT
+  {{column}},
+  COUNT(*)::BIGINT AS respondents
+FROM data
+WHERE {{column}} IS NOT NULL
+GROUP BY 1
+ORDER BY respondents DESC
+LIMIT 50`,
+  },
+  {
+    name: "Distribution (numeric)",
+    sql: `SELECT
+  MIN({{column}})::DOUBLE AS min_value,
+  QUANTILE_CONT({{column}}, 0.25)::DOUBLE AS p25,
+  MEDIAN({{column}})::DOUBLE AS median_value,
+  QUANTILE_CONT({{column}}, 0.75)::DOUBLE AS p75,
+  MAX({{column}})::DOUBLE AS max_value,
+  AVG({{column}})::DOUBLE AS avg_value
+FROM data
+WHERE {{column}} IS NOT NULL`,
+  },
+  {
+    name: "Cross-tab",
+    sql: `SELECT
+  {{x_column}} AS x,
+  {{y_column}} AS y,
+  COUNT(*)::BIGINT AS respondents
+FROM data
+WHERE {{x_column}} IS NOT NULL
+  AND {{y_column}} IS NOT NULL
+GROUP BY 1, 2
+ORDER BY respondents DESC
+LIMIT 250`,
+  },
+  {
+    name: "Cohort filter",
+    sql: `SELECT *
+FROM data
+WHERE {{column}} = '{{value}}'
+LIMIT 250`,
+  },
+  {
+    name: "Correlation",
+    sql: `SELECT
+  CORR({{x_column}}, {{y_column}}) AS correlation,
+  COUNT(*)::BIGINT AS n_used
+FROM data
+WHERE {{x_column}} IS NOT NULL
+  AND {{y_column}} IS NOT NULL`,
+  },
+];
 
 const starterSql = `SELECT
   straightness,
@@ -17,29 +90,35 @@ GROUP BY 1, 2
 ORDER BY respondents DESC`;
 
 function SqlConsolePage() {
+  const search = Route.useSearch();
+  const { db } = useDuckDB();
   const [schema, setSchema] = useState<SchemaData | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [sql, setSql] = useState(starterSql);
+  const [sql, setSql] = useState(search.sql ?? starterSql);
   const [limit, setLimit] = useState(1000);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<QueryData | null>(null);
-  const [resultMeta, setResultMeta] = useState<Record<string, unknown> | undefined>();
+  const [result, setResult] = useState<QueryResult | null>(null);
+  const [rowCount, setRowCount] = useState<number | undefined>();
+
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  useEffect(() => {
+    if (search.sql) {
+      setSql(search.sql);
+    }
+  }, [search.sql]);
 
   useEffect(() => {
     let cancelled = false;
 
     void getSchema()
       .then((response) => {
-        if (!cancelled) {
-          setSchema(response.data);
-        }
+        if (!cancelled) setSchema(response.data);
       })
       .catch(() => {
-        if (!cancelled) {
-          setSchema(null);
-        }
+        if (!cancelled) setSchema(null);
       });
 
     return () => {
@@ -48,43 +127,95 @@ function SqlConsolePage() {
   }, []);
 
   const filteredColumns = useMemo(() => {
-    if (!schema) {
-      return [];
-    }
+    if (!schema) return [];
+    if (!searchTerm.trim()) return schema.columns.slice(0, 240);
 
-    if (!search.trim()) {
-      return schema.columns.slice(0, 200);
-    }
+    const term = searchTerm.toLowerCase();
+    return schema.columns.filter((column) => column.name.toLowerCase().includes(term)).slice(0, 240);
+  }, [schema, searchTerm]);
 
-    const term = search.toLowerCase();
-    return schema.columns.filter((column) => column.name.toLowerCase().includes(term)).slice(0, 200);
-  }, [schema, search]);
+  const execute = useCallback(async () => {
+    if (!db) return;
 
-  async function execute() {
     setRunning(true);
     setError(null);
 
-    try {
-      const response = await runQuery({
-        sql,
-        limit,
-      });
+    const conn = await db.connect();
 
-      setResult(response.data);
-      setResultMeta(response.meta);
+    try {
+      const limitedSql = `SELECT * FROM (${sql.trim().replace(/;+$/g, "")}) AS bounded_query LIMIT ${limit}`;
+      const arrowResult = await conn.query(limitedSql);
+
+      const columns = arrowResult.schema.fields.map((f) => f.name);
+      const rows: unknown[][] = [];
+
+      for (let i = 0; i < arrowResult.numRows; i++) {
+        const row: unknown[] = [];
+        for (let c = 0; c < columns.length; c++) {
+          let val = arrowResult.getChildAt(c)?.get(i);
+          if (typeof val === "bigint") val = Number(val);
+          row.push(val ?? null);
+        }
+        rows.push(row);
+      }
+
+      setResult({ columns, rows });
+      setRowCount(rows.length);
     } catch (executionError) {
       setError(executionError instanceof Error ? executionError.message : "Query failed");
       setResult(null);
-      setResultMeta(undefined);
+      setRowCount(undefined);
     } finally {
+      await conn.close();
       setRunning(false);
     }
+  }, [db, sql, limit]);
+
+  const insertQuotedIdentifier = useCallback((identifier: string) => {
+    const quoted = quoteIdentifier(identifier);
+    const textarea = textareaRef.current;
+
+    if (!textarea) {
+      setSql((current) => `${current}${current.endsWith("\n") ? "" : "\n"}${quoted}`);
+      return;
+    }
+
+    const start = textarea.selectionStart ?? sql.length;
+    const end = textarea.selectionEnd ?? start;
+
+    setSql((current) => `${current.slice(0, start)}${quoted}${current.slice(end)}`);
+
+    requestAnimationFrame(() => {
+      const caret = start + quoted.length;
+      textarea.focus();
+      textarea.setSelectionRange(caret, caret);
+    });
+  }, [sql.length]);
+
+  const [notebookSaved, setNotebookSaved] = useState(false);
+
+  function saveToNotebook() {
+    if (!result) return;
+
+    addNotebookEntry({
+      title: `SQL: ${sql.trim().slice(0, 60)}${sql.trim().length > 60 ? "..." : ""}`,
+      queryDefinition: {
+        type: "sql",
+        params: { sql },
+      },
+      resultsSnapshot: {
+        columns: result.columns,
+        rows: result.rows.slice(0, 50),
+      },
+      notes: "",
+    });
+
+    setNotebookSaved(true);
+    setTimeout(() => setNotebookSaved(false), 2000);
   }
 
   function exportCsv() {
-    if (!result) {
-      return;
-    }
+    if (!result) return;
 
     const escaped = (value: unknown) => {
       const text = String(value ?? "");
@@ -105,124 +236,131 @@ function SqlConsolePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">SQL Console</h1>
-        <p className="text-slate-300">Run read-only DuckDB SQL with row limits and CSV export.</p>
+    <div className="page">
+      <header className="page-header">
+        <h1 className="page-title">SQL Console</h1>
+        <p className="page-subtitle">Write DuckDB SQL against the dataset. Templates, click-to-insert column names, CSV export.</p>
       </header>
 
-      <div className="grid gap-4 lg:grid-cols-[320px,1fr]">
-        <aside className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-          <h2 className="text-base font-semibold">Schema</h2>
-          <input
-            className="mt-3 w-full rounded border border-slate-700 bg-slate-950 px-2 py-2 text-sm"
-            placeholder="Search columns"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
-          <div className="mt-3 max-h-[420px] overflow-auto pr-1 text-sm">
+      <div className="grid gap-4 xl:grid-cols-[340px,1fr]">
+        <aside className="raised-panel space-y-4">
+          <SectionHeader number="01" title="Schema & Templates" />
+
+          <div>
+            <p className="mono-label">Templates</p>
+            <div className="mt-2 space-y-2">
+              {TEMPLATE_SQL.map((template) => (
+                <Button
+                  key={template.name}
+                  type="button"
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => setSql(template.sql)}
+                >
+                  {template.name}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <label className="editorial-label">
+            Search Columns
+            <Input
+              name="schema_search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Filter by name"
+            />
+          </label>
+
+          <ScrollArea className="max-h-[calc(100vh-520px)] min-h-[200px] border border-[var(--rule)] bg-[var(--paper)] p-1">
             {filteredColumns.map((column) => (
-              <button
+              <Button
                 key={column.name}
                 type="button"
-                className="block w-full truncate rounded px-2 py-1 text-left text-slate-300 hover:bg-slate-800 hover:text-white"
-                onClick={() => {
-                  setSql((current) => `${current}\n-- ${column.name}`);
-                }}
+                variant="ghost"
+                className="w-full justify-start truncate px-2 py-1 text-[0.72rem] normal-case tracking-normal"
+                onClick={() => insertQuotedIdentifier(column.name)}
                 title={column.name}
               >
                 {column.name}
-              </button>
+              </Button>
             ))}
-          </div>
+          </ScrollArea>
         </aside>
 
-        <section className="rounded-lg border border-slate-800 bg-slate-900/70 p-4">
-          <label className="block text-sm text-slate-300" htmlFor="sql-editor">
-            SQL
-          </label>
-          <textarea
-            id="sql-editor"
-            className="mt-2 h-56 w-full rounded border border-slate-700 bg-slate-950 p-3 font-mono text-sm"
+        <section className="editorial-panel space-y-4">
+          <SectionHeader number="02" title="Editor" />
+
+          <Textarea
+            ref={textareaRef}
+            className="h-64"
             value={sql}
             onChange={(event) => setSql(event.target.value)}
           />
 
-          <div className="mt-3 flex flex-wrap items-center gap-3">
-            <label className="text-sm text-slate-300">
+          <div className="flex flex-wrap items-center gap-3">
+            <label className="editorial-label w-[150px]">
               Limit
-              <input
+              <Input
                 type="number"
+                name="query_limit"
                 min={1}
                 max={10000}
-                className="ml-2 w-24 rounded border border-slate-700 bg-slate-950 px-2 py-1"
                 value={limit}
-                onChange={(event) => setLimit(Math.max(1, Math.min(10000, Number(event.target.value) || 1)))}
+                onChange={(event) =>
+                  setLimit(Math.max(1, Math.min(10000, Number(event.target.value) || 1)))
+                }
               />
             </label>
 
-            <button
+            <Button
               type="button"
               onClick={() => {
                 void execute();
               }}
-              disabled={running}
-              className="rounded border border-slate-700 bg-slate-100 px-4 py-2 text-sm font-medium text-slate-900 disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={running || !db}
+              variant="filled"
             >
-              {running ? "Running..." : "Run query"}
-            </button>
+              {running ? "Running..." : "Run Query"}
+            </Button>
 
-            <button
-              type="button"
-              onClick={exportCsv}
-              disabled={!result}
-              className="rounded border border-slate-700 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-            >
+            <Button type="button" onClick={exportCsv} disabled={!result} variant="accent">
               Export CSV
-            </button>
+            </Button>
 
-            {resultMeta ? (
-              <span className="text-xs text-slate-400">
-                Rows: {String(resultMeta.rowCount ?? result?.rows.length ?? 0)} | Limit:{" "}
-                {String(resultMeta.limit ?? limit)}
-              </span>
+            <Button type="button" onClick={saveToNotebook} disabled={!result} variant="ghost">
+              {notebookSaved ? "Saved!" : "Add to Notebook"}
+            </Button>
+          </div>
+
+          {error ? <p className="alert alert--error">{error}</p> : null}
+        </section>
+      </div>
+
+      {result ? (
+        <section className="editorial-panel space-y-3">
+          <SectionHeader number="03" title="Results" />
+
+          <div className="sample-size">
+            <span className="sample-size-item">Rows returned: {formatNumber(rowCount ?? 0)}</span>
+            <span className="sample-size-item">Limit applied: {formatNumber(limit)}</span>
+            {rowCount === limit ? (
+              <span className="sample-size-item text-[var(--accent)]">Results may be truncated</span>
             ) : null}
           </div>
 
-          {error ? (
-            <p className="mt-4 rounded border border-red-500/40 bg-red-900/20 p-3 text-sm text-red-200">
-              {error}
-            </p>
-          ) : null}
-
-          {result ? (
-            <div className="mt-4 max-h-[420px] overflow-auto rounded border border-slate-800">
-              <table className="w-full border-collapse text-left text-sm">
-                <thead className="bg-slate-950 text-slate-300">
-                  <tr>
-                    {result.columns.map((column) => (
-                      <th key={column} className="border-b border-slate-800 px-3 py-2 font-medium">
-                        {column}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.rows.map((row, rowIndex) => (
-                    <tr key={`row-${rowIndex}`} className="border-b border-slate-800/70 text-slate-200">
-                      {row.map((value, columnIndex) => (
-                        <td key={`cell-${rowIndex}-${columnIndex}`} className="px-3 py-2 align-top">
-                          {String(value ?? "NULL")}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : null}
+          <DataTable
+            rows={result.rows}
+            rowKey={(_, index) => `row-${index}`}
+            columns={result.columns.map((column, columnIndex) => ({
+              id: column,
+              header: column,
+              cell: (row: unknown[]) => String(row[columnIndex] ?? "NULL"),
+            }))}
+          />
         </section>
-      </div>
+      ) : null}
     </div>
   );
 }

@@ -10,8 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SqlRouteImport } from './routes/sql'
+import { Route as RelationshipsRouteImport } from './routes/relationships'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as NotebookRouteImport } from './routes/notebook'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as ColumnsRouteImport } from './routes/columns'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSchemaRouteImport } from './routes/api/schema'
 import { Route as ApiQueryRouteImport } from './routes/api/query'
@@ -24,14 +28,34 @@ const SqlRoute = SqlRouteImport.update({
   path: '/sql',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RelationshipsRoute = RelationshipsRouteImport.update({
+  id: '/relationships',
+  path: '/relationships',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NotebookRoute = NotebookRouteImport.update({
+  id: '/notebook',
+  path: '/notebook',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ColumnsRoute = ColumnsRouteImport.update({
+  id: '/columns',
+  path: '/columns',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,8 +91,12 @@ const ApiStatsColumnRoute = ApiStatsColumnRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/columns': typeof ColumnsRoute
   '/explore': typeof ExploreRoute
+  '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
+  '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
   '/api/crosstab': typeof ApiCrosstabRoute
   '/api/health': typeof ApiHealthRoute
@@ -78,8 +106,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/columns': typeof ColumnsRoute
   '/explore': typeof ExploreRoute
+  '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
+  '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
   '/api/crosstab': typeof ApiCrosstabRoute
   '/api/health': typeof ApiHealthRoute
@@ -90,8 +122,12 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/columns': typeof ColumnsRoute
   '/explore': typeof ExploreRoute
+  '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
+  '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
   '/api/crosstab': typeof ApiCrosstabRoute
   '/api/health': typeof ApiHealthRoute
@@ -103,8 +139,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/columns'
     | '/explore'
+    | '/notebook'
     | '/profile'
+    | '/relationships'
     | '/sql'
     | '/api/crosstab'
     | '/api/health'
@@ -114,8 +154,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/columns'
     | '/explore'
+    | '/notebook'
     | '/profile'
+    | '/relationships'
     | '/sql'
     | '/api/crosstab'
     | '/api/health'
@@ -125,8 +169,12 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/columns'
     | '/explore'
+    | '/notebook'
     | '/profile'
+    | '/relationships'
     | '/sql'
     | '/api/crosstab'
     | '/api/health'
@@ -137,8 +185,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  ColumnsRoute: typeof ColumnsRoute
   ExploreRoute: typeof ExploreRoute
+  NotebookRoute: typeof NotebookRoute
   ProfileRoute: typeof ProfileRoute
+  RelationshipsRoute: typeof RelationshipsRoute
   SqlRoute: typeof SqlRoute
   ApiCrosstabRoute: typeof ApiCrosstabRoute
   ApiHealthRoute: typeof ApiHealthRoute
@@ -156,6 +208,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SqlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/relationships': {
+      id: '/relationships'
+      path: '/relationships'
+      fullPath: '/relationships'
+      preLoaderRoute: typeof RelationshipsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -163,11 +222,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/notebook': {
+      id: '/notebook'
+      path: '/notebook'
+      fullPath: '/notebook'
+      preLoaderRoute: typeof NotebookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/explore': {
       id: '/explore'
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/columns': {
+      id: '/columns'
+      path: '/columns'
+      fullPath: '/columns'
+      preLoaderRoute: typeof ColumnsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -217,8 +297,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  ColumnsRoute: ColumnsRoute,
   ExploreRoute: ExploreRoute,
+  NotebookRoute: NotebookRoute,
   ProfileRoute: ProfileRoute,
+  RelationshipsRoute: RelationshipsRoute,
   SqlRoute: SqlRoute,
   ApiCrosstabRoute: ApiCrosstabRoute,
   ApiHealthRoute: ApiHealthRoute,

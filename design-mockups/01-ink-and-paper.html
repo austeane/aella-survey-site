@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direction 1: Ink & Paper — Editorial Research</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --paper: #f5f0e8;
+    --paper-warm: #ede6d8;
+    --ink: #1a1612;
+    --ink-light: #4a4238;
+    --ink-faded: #8a7e70;
+    --rule: #c8bfb0;
+    --rule-light: #ddd5c8;
+    --accent: #b8432f;
+    --accent-hover: #9a3625;
+    --highlight: #e8d5a0;
+    --sidebar-bg: #eae3d5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle paper texture */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='200' height='200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* ---- NAVIGATION ---- */
+  nav {
+    border-bottom: 2px solid var(--ink);
+    padding: 0 2rem;
+  }
+
+  .nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: baseline;
+    gap: 2.5rem;
+    padding: 1rem 0 0.75rem;
+  }
+
+  .nav-title {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .nav-title span {
+    font-weight: 300;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--ink-faded);
+    margin-left: 0.5rem;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 0;
+    margin-left: auto;
+  }
+
+  .nav-links a {
+    font-family: 'Source Serif 4', serif;
+    font-size: 0.85rem;
+    font-weight: 400;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    text-decoration: none;
+    padding: 0.5rem 1.25rem 0.6rem;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+  }
+
+  .nav-links a:hover { color: var(--ink); }
+  .nav-links a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ---- MAIN LAYOUT ---- */
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 3rem 2rem 4rem;
+  }
+
+  /* ---- HEADER ---- */
+  .page-header {
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.5rem;
+  }
+
+  .page-header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 2.75rem;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--ink);
+  }
+
+  .page-header .subtitle {
+    font-family: 'Source Serif 4', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--ink-faded);
+    margin-top: 0.5rem;
+  }
+
+  .page-header .dateline {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    margin-top: 0.75rem;
+  }
+
+  /* ---- STAT CARDS (top row) ---- */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--ink);
+    margin-bottom: 3rem;
+  }
+
+  .stat-card {
+    padding: 1.5rem 2rem;
+    border-right: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .stat-card:last-child { border-right: none; }
+
+  .stat-card .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-card .value {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 2.5rem;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .stat-card .note {
+    font-size: 0.8rem;
+    color: var(--ink-faded);
+    margin-top: 0.3rem;
+    font-style: italic;
+  }
+
+  /* ---- TWO-COLUMN BODY ---- */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 3rem;
+  }
+
+  .section-header {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+  }
+
+  .section-header .number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- CAVEATS ---- */
+  .caveat-item {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--rule-light);
+  }
+
+  .caveat-item:last-child { border-bottom: none; }
+
+  .caveat-title {
+    font-family: 'Source Serif 4', serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--ink);
+    margin-bottom: 0.25rem;
+  }
+
+  .caveat-desc {
+    font-size: 0.85rem;
+    color: var(--ink-light);
+    line-height: 1.5;
+  }
+
+  .caveat-guidance {
+    font-size: 0.75rem;
+    font-style: italic;
+    color: var(--ink-faded);
+    margin-top: 0.35rem;
+  }
+
+  /* ---- TABLE ---- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+
+  thead th {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    text-align: left;
+    padding: 0.5rem 0;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  tbody td {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--rule-light);
+    color: var(--ink-light);
+  }
+
+  tbody td:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+
+  tbody td:last-child {
+    font-family: 'JetBrains Mono', monospace;
+    text-align: right;
+  }
+
+  .bar-cell {
+    position: relative;
+  }
+
+  .bar-fill {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 4px;
+    background: var(--accent);
+    opacity: 0.3;
+    border-radius: 2px;
+  }
+
+  /* ---- COLUMN STATS SECTION ---- */
+  .stats-section {
+    border: 1px solid var(--rule);
+    padding: 2rem;
+    background: var(--sidebar-bg);
+    position: relative;
+  }
+
+  .stats-section::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 2rem;
+    right: 2rem;
+    height: 3px;
+    background: var(--accent);
+  }
+
+  .select-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .select-wrapper select {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    appearance: none;
+    cursor: pointer;
+    border-radius: 0;
+  }
+
+  .select-wrapper::after {
+    content: '\25BE';
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--ink-faded);
+    font-size: 0.7rem;
+  }
+
+  .mini-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--rule);
+    margin-top: 1.5rem;
+  }
+
+  .mini-stat {
+    background: var(--paper);
+    padding: 1rem;
+  }
+
+  .mini-stat .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+  }
+
+  .mini-stat .val {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.4rem;
+    color: var(--ink);
+    margin-top: 0.25rem;
+  }
+
+  /* Categorical table inside stats */
+  .cat-table {
+    margin-top: 1.5rem;
+  }
+
+  .cat-row {
+    display: grid;
+    grid-template-columns: 1fr 80px 60px;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--rule-light);
+    align-items: center;
+    font-size: 0.85rem;
+  }
+
+  .cat-row:first-child {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faded);
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .cat-label { color: var(--ink); }
+  .cat-count { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--ink-light); }
+  .cat-pct { text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent); font-weight: 500; }
+
+  /* ---- FOOTER ---- */
+  footer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    border-top: 2px solid var(--ink);
+    font-size: 0.75rem;
+    color: var(--ink-faded);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ---- ANNOTATION ---- */
+  .design-note {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: var(--accent);
+    color: white;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.4rem 0.75rem;
+    z-index: 9999;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.6s ease-out both; }
+  .fade-up-1 { animation-delay: 0.1s; }
+  .fade-up-2 { animation-delay: 0.2s; }
+  .fade-up-3 { animation-delay: 0.3s; }
+  .fade-up-4 { animation-delay: 0.4s; }
+</style>
+</head>
+<body>
+  <div class="design-note">Direction 1 — Ink & Paper</div>
+
+  <nav>
+    <div class="nav-inner">
+      <a class="nav-title" href="#">Big Kink Survey <span>Explorer</span></a>
+      <div class="nav-links">
+        <a href="#" class="active">Dashboard</a>
+        <a href="#">Explore</a>
+        <a href="#">Profile</a>
+        <a href="#">SQL</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <div class="page-header fade-up">
+      <h1>Dataset Dashboard</h1>
+      <p class="subtitle">A stratified 1.6% subsample of 980,000 survey responses on human sexuality, personality, and identity.</p>
+      <p class="dateline">Schema profiled Feb 12, 2026 &middot; DuckDB + Parquet</p>
+    </div>
+
+    <div class="stats-row fade-up fade-up-1">
+      <div class="stat-card">
+        <div class="label">Respondents</div>
+        <div class="value">15,503</div>
+        <div class="note">stratified subsample</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Variables</div>
+        <div class="value">365</div>
+        <div class="note">251 categorical &middot; 52 numeric &middot; 62 text</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Coverage</div>
+        <div class="value">5</div>
+        <div class="note">domains: demographic, fetish, OCEAN, derived, other</div>
+      </div>
+    </div>
+
+    <div class="two-col fade-up fade-up-2">
+      <div>
+        <div class="section-header">
+          <span class="number">01</span> Global Caveats
+        </div>
+        <div class="caveat-item">
+          <div class="caveat-title">Gated Missingness</div>
+          <div class="caveat-desc">Some questions were only shown after prerequisite answers. Missing values may reflect skip-logic, not non-response.</div>
+          <div class="caveat-guidance">Filter or impute with care when analyzing columns with structural NAs.</div>
+        </div>
+        <div class="caveat-item">
+          <div class="caveat-title">Late-Added Questions</div>
+          <div class="caveat-desc">Certain variables were added partway through the survey's collection period, creating cohort-dependent missingness.</div>
+          <div class="caveat-guidance">Consider temporal bias when interpreting null rates above 30%.</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="section-header">
+          <span class="number">02</span> Highest Missingness
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Column</th>
+              <th style="text-align:right">Null Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>HRT_estrogen_regularity</td><td class="bar-cell" style="text-align:right">96.2%<div class="bar-fill" style="width:96%"></div></td></tr>
+            <tr><td>HRT_estrogen_duration</td><td style="text-align:right">96.0%</td></tr>
+            <tr><td>HRT_testosterone_regularity</td><td style="text-align:right">95.8%</td></tr>
+            <tr><td>HRT_testosterone_duration</td><td style="text-align:right">95.7%</td></tr>
+            <tr><td>PMS_symptoms</td><td style="text-align:right">52.1%</td></tr>
+            <tr><td>menstrual_cycle_phase</td><td style="text-align:right">51.8%</td></tr>
+            <tr><td>hormonal_birth_control</td><td style="text-align:right">51.3%</td></tr>
+            <tr><td>childhood_adversity</td><td style="text-align:right">12.4%</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="stats-section fade-up fade-up-3">
+      <div style="display:flex; justify-content:space-between; align-items:baseline;">
+        <div class="section-header" style="border:none; margin:0; padding:0;">
+          <span class="number">03</span> Column Inspector
+        </div>
+        <div class="select-wrapper">
+          <select>
+            <option>straightness</option>
+            <option>politics</option>
+            <option>gender_identity</option>
+            <option>opennessvariable</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="mini-stats">
+        <div class="mini-stat">
+          <div class="label">Type</div>
+          <div class="val" style="font-size:1rem">Categorical</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Total</div>
+          <div class="val">15,503</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Non-null</div>
+          <div class="val">15,466</div>
+        </div>
+        <div class="mini-stat">
+          <div class="label">Null</div>
+          <div class="val">37</div>
+        </div>
+      </div>
+
+      <div class="cat-table">
+        <div class="cat-row">
+          <span>Value</span>
+          <span style="text-align:right">Count</span>
+          <span style="text-align:right">Share</span>
+        </div>
+        <div class="cat-row">
+          <span class="cat-label">Straight</span>
+          <span class="cat-count">5,412</span>
+          <span class="cat-pct">34.9%</span>
+        </div>
+        <div class="cat-row">
+          <span class="cat-label">Mostly Straight</span>
+          <span class="cat-count">3,821</span>
+          <span class="cat-pct">24.7%</span>
+        </div>
+        <div class="cat-row">
+          <span class="cat-label">Bisexual</span>
+          <span class="cat-count">3,104</span>
+          <span class="cat-pct">20.0%</span>
+        </div>
+        <div class="cat-row">
+          <span class="cat-label">Mostly Gay</span>
+          <span class="cat-count">1,890</span>
+          <span class="cat-pct">12.2%</span>
+        </div>
+        <div class="cat-row">
+          <span class="cat-label">Gay</span>
+          <span class="cat-count">1,239</span>
+          <span class="cat-pct">8.0%</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span>Big Kink Survey &middot; Public Sample &middot; 2026</span>
+    <span>DuckDB + TanStack Start</span>
+  </footer>
+</body>
+</html>
