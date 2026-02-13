@@ -48,6 +48,19 @@ describe("getCaveatKeysForColumn - pattern matching", () => {
     expect(keys).toContain("computed_column");
   });
 
+  it("detects opaque_composite for whowears", () => {
+    const keys = getCaveatKeysForColumn("whowears");
+    expect(keys).toContain("opaque_composite");
+  });
+
+  it("detects negated_scale for exact and question-text vanilla columns", () => {
+    const directKeys = getCaveatKeysForColumn("cunnilingus");
+    expect(directKeys).toContain("negated_scale");
+
+    const questionKeys = getCaveatKeysForColumn('"I find blowjobs:" (yuc275j)');
+    expect(questionKeys).toContain("negated_scale");
+  });
+
   it("deduplicates keys", () => {
     const keys = getCaveatKeysForColumn("TotalMentalIllness");
     const uniqueKeys = [...new Set(keys)];

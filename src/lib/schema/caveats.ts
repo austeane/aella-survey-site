@@ -2,6 +2,8 @@ export type CaveatKey =
   | "binned_or_collapsed"
   | "combined_or_merged"
   | "computed_column"
+  | "negated_scale"
+  | "opaque_composite"
   | "gated_missingness"
   | "late_added_questions";
 
@@ -36,6 +38,22 @@ export const CAVEAT_DEFINITIONS: Record<CaveatKey, CaveatDefinition> = {
       "This value is algorithmically computed (average/total/derived score), not a direct survey answer.",
     guidance:
       "Treat as a modelled score rather than a literal response option.",
+  },
+  negated_scale: {
+    key: "negated_scale",
+    title: "Negated Scale",
+    description:
+      "This column uses an inverted arousal scale where more negative values indicate higher arousal.",
+    guidance:
+      "Interpret values by scale labels rather than signed magnitude (for example -8 is highest arousal).",
+  },
+  opaque_composite: {
+    key: "opaque_composite",
+    title: "Opaque Composite Score",
+    description:
+      "This column contains an encoded composite score derived from multiple signals, and the formula is not documented.",
+    guidance:
+      "Avoid direct ordinal interpretation. Prefer direct survey-response columns when possible.",
   },
   gated_missingness: {
     key: "gated_missingness",
@@ -77,6 +95,26 @@ const COLUMN_CAVEAT_PATTERNS: Array<{ pattern: RegExp; keys: CaveatKey[] }> = [
     pattern:
       /(opennessvariable|consciensiousnessvariable|extroversionvariable|neuroticismvariable|agreeablenessvariable|powerlessnessvariable|totalfetishcategory|bondageaverage)/i,
     keys: ["computed_column"],
+  },
+  {
+    pattern: /^(whowears|ascore)$/i,
+    keys: ["opaque_composite"],
+  },
+  {
+    pattern: /^(normalsex|cunnilingus)$/i,
+    keys: ["negated_scale"],
+  },
+  {
+    pattern: /I find blowjobs.*\(yuc275j\)/i,
+    keys: ["negated_scale"],
+  },
+  {
+    pattern: /I find cunnilingus:.*\(jn2b355\)/i,
+    keys: ["negated_scale"],
+  },
+  {
+    pattern: /I find dirtytalking erotic.*\(947wne3\)/i,
+    keys: ["negated_scale"],
   },
   {
     pattern: /^Total[A-Za-z0-9_]+/,

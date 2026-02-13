@@ -28,7 +28,6 @@ interface PivotMatrixProps {
   rows: PivotInputRow[];
   topN: number;
   normalization: PivotNormalization;
-  minCellCount?: number;
   onCellClick?: (detail: PivotCellDetail) => void;
 }
 
@@ -49,12 +48,7 @@ function displayCellValue(
   rowTotal: number,
   columnTotal: number,
   grandTotal: number,
-  minCellCount: number,
 ): string {
-  if (count > 0 && count < minCellCount) {
-    return "[suppressed]";
-  }
-
   if (normalization === "count") {
     return formatNumber(count);
   }
@@ -74,7 +68,6 @@ export function PivotMatrix({
   rows,
   topN,
   normalization,
-  minCellCount = 10,
   onCellClick,
 }: PivotMatrixProps) {
   const matrix = useMemo(() => {
@@ -197,7 +190,6 @@ export function PivotMatrix({
                           rowTotal,
                           columnTotal,
                           matrix.grandTotal,
-                          minCellCount,
                         )}
                       </button>
                     </td>

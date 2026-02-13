@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { getColumnMetadata, getSchemaMetadata, listColumns, listColumnsWithCaveats } from "./metadata";
+import { HIDDEN_COLUMNS } from "./column-flags";
+import {
+  getColumnMetadata,
+  getSchemaMetadata,
+  listAllColumns,
+  listColumns,
+  listColumnsWithCaveats,
+} from "./metadata";
 
 describe("getSchemaMetadata", () => {
   it("returns dataset with expected shape", () => {
@@ -32,12 +39,34 @@ describe("getColumnMetadata", () => {
   it("returns undefined for unknown column", () => {
     expect(getColumnMetadata("nonexistent_column_xyz_999")).toBeUndefined();
   });
+
+  it("returns hidden columns for direct lookups", () => {
+    for (const hiddenColumn of HIDDEN_COLUMNS) {
+      const meta = getColumnMetadata(hiddenColumn);
+      expect(meta).toBeDefined();
+      expect(meta?.name).toBe(hiddenColumn);
+    }
+  });
+});
+
+describe("listAllColumns", () => {
+  it("returns generated columns without filtering", () => {
+    const schema = getSchemaMetadata();
+    const columns = listAllColumns();
+    expect(columns.length).toBe(schema.dataset.columnCount);
+  });
 });
 
 describe("listColumns", () => {
-  it("returns all columns", () => {
+  it("returns visible columns", () => {
+    const allColumns = listAllColumns();
     const columns = listColumns();
     expect(columns.length).toBeGreaterThan(0);
+    expect(columns.length).toBeLessThan(allColumns.length);
+
+    for (const hiddenColumn of HIDDEN_COLUMNS) {
+      expect(columns.find((column) => column.name === hiddenColumn)).toBeUndefined();
+    }
   });
 
   it("each column has required fields", () => {
@@ -65,6 +94,13 @@ describe("listColumnsWithCaveats", () => {
     }
   });
 
+  it("excludes hidden columns", () => {
+    const columns = listColumnsWithCaveats();
+    for (const hiddenColumn of HIDDEN_COLUMNS) {
+      expect(columns.find((column) => column.name === hiddenColumn)).toBeUndefined();
+    }
+  });
+
   it("known columns get specific caveats", () => {
     const columns = listColumnsWithCaveats();
     const politics = columns.find((c) => c.name === "politics");
@@ -72,5 +108,15 @@ describe("listColumnsWithCaveats", () => {
       expect(politics.caveatKeys).toContain("binned_or_collapsed");
       expect(politics.caveatKeys).toContain("gated_missingness");
     }
+  });
+
+  it("includes valueLabels for labeled columns", () => {
+    const columns = listColumnsWithCaveats();
+
+    const worshipped = columns.find((column) => column.name === "worshipped");
+    expect(worshipped?.valueLabels?.["3"]).toBe("Moderately arousing");
+
+    const blowjobs = columns.find((column) => column.name === '"I find blowjobs:" (yuc275j)');
+    expect(blowjobs?.valueLabels?.["-8"]).toBe("Extremely arousing");
   });
 });

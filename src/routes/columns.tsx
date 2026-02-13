@@ -129,7 +129,7 @@ function ColumnsPage() {
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Column Atlas</h1>
-        <p className="page-subtitle">Search, filter, and sort all 365 columns. Select one to inspect its distribution and caveats.</p>
+        <p className="page-subtitle">Search, filter, and sort columns. Select one to inspect its distribution and caveats.</p>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}

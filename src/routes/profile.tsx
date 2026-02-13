@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
-import { MIN_CELL_COUNT, shouldSuppressCell } from "@/lib/cell-hygiene";
+
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
@@ -780,19 +780,13 @@ function ProfilePage() {
                   id: "cohort",
                   header: "Cohort Median",
                   align: "right",
-                  cell: (row) => {
-                    if (summary.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
-                    return row.cohortMedian == null ? "n/a" : row.cohortMedian.toFixed(3);
-                  },
+                  cell: (row) => row.cohortMedian == null ? "n/a" : row.cohortMedian.toFixed(3),
                 },
                 {
                   id: "global",
                   header: "Global Percentile",
                   align: "right",
-                  cell: (row) => {
-                    if (summary.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
-                    return row.globalPercentile == null ? "n/a" : formatPercent(row.globalPercentile, 2);
-                  },
+                  cell: (row) => row.globalPercentile == null ? "n/a" : formatPercent(row.globalPercentile, 2),
                 },
                 {
                   id: "n",
@@ -822,12 +816,8 @@ function ProfilePage() {
                   id: "cohort",
                   header: "Cohort % (N)",
                   align: "right",
-                  cell: (row) => {
-                    if (shouldSuppressCell(row.cohortCount)) {
-                      return "[suppressed]";
-                    }
-                    return `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`;
-                  },
+                  cell: (row) =>
+                    `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
                 },
                 {
                   id: "global",
@@ -892,7 +882,7 @@ function ProfilePage() {
             <SectionHeader number="03" title="Median Comparison" />
             {comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30 ? (
               <p className="alert alert--critical">
-                One or both cohorts have N &lt; 30. Delta values are suppressed.
+                One or both cohorts have N &lt; 30. Delta values are unreliable at this sample size.
               </p>
             ) : null}
             <DataTable
@@ -904,19 +894,13 @@ function ProfilePage() {
                   id: "medianA",
                   header: "Cohort A Median",
                   align: "right",
-                  cell: (row) => {
-                    if (comparison.a.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
-                    return row.medianA == null ? "n/a" : row.medianA.toFixed(3);
-                  },
+                  cell: (row) => row.medianA == null ? "n/a" : row.medianA.toFixed(3),
                 },
                 {
                   id: "medianB",
                   header: "Cohort B Median",
                   align: "right",
-                  cell: (row) => {
-                    if (comparison.b.cohortSize < MIN_CELL_COUNT) return "[suppressed]";
-                    return row.medianB == null ? "n/a" : row.medianB.toFixed(3);
-                  },
+                  cell: (row) => row.medianB == null ? "n/a" : row.medianB.toFixed(3),
                 },
                 {
                   id: "delta",
@@ -924,7 +908,7 @@ function ProfilePage() {
                   align: "right",
                   cell: (row) => {
                     if (comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30) {
-                      return "[suppressed]";
+                      return "n/a (N<30)";
                     }
                     if (row.delta == null) return "n/a";
                     const sign = row.delta > 0 ? "+" : "";
@@ -967,12 +951,8 @@ function ProfilePage() {
                     id: "cohort",
                     header: "Cohort % (N)",
                     align: "right",
-                    cell: (row) => {
-                      if (shouldSuppressCell(row.cohortCount)) {
-                        return "[suppressed]";
-                      }
-                      return `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`;
-                    },
+                    cell: (row) =>
+                      `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
                   },
                 ]}
                 emptyMessage="No over-indexing values met the N >= 30 thresholds"
@@ -996,12 +976,8 @@ function ProfilePage() {
                     id: "cohort",
                     header: "Cohort % (N)",
                     align: "right",
-                    cell: (row) => {
-                      if (shouldSuppressCell(row.cohortCount)) {
-                        return "[suppressed]";
-                      }
-                      return `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`;
-                    },
+                    cell: (row) =>
+                      `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
                   },
                 ]}
                 emptyMessage="No over-indexing values met the N >= 30 thresholds"

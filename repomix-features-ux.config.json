@@ -1,0 +1,59 @@
+{
+  "output": {
+    "filePath": "repomix-features-ux.xml",
+    "style": "xml",
+    "headerText": "BKS Explorer — Features, UX & Big Picture\n\nThis repomix focuses on the user-facing application: routes (pages), components, schema/data libs, design system, and architectural context. Server internals, tests, generated files, and raw data are excluded — see repomix-notes.md for summaries of excluded content.",
+    "showLineNumbers": false,
+    "topFilesLength": 10
+  },
+  "include": [
+    "CLAUDE.md",
+    "repomix-notes.md",
+    "package.json",
+    "vite.config.ts",
+    "tsconfig.json",
+
+    "src/router.tsx",
+
+    "src/routes/__root.tsx",
+    "src/routes/index.tsx",
+    "src/routes/explore.tsx",
+    "src/routes/profile.tsx",
+    "src/routes/columns.tsx",
+    "src/routes/relationships.tsx",
+    "src/routes/sql.tsx",
+    "src/routes/notebook.tsx",
+
+    "src/components/column-inspector.tsx",
+    "src/components/pivot-matrix.tsx",
+    "src/components/data-table.tsx",
+    "src/components/stat-card.tsx",
+    "src/components/section-header.tsx",
+    "src/components/sample-size-display.tsx",
+    "src/components/missingness-badge.tsx",
+
+    "src/lib/api/contracts.ts",
+    "src/lib/client/api.ts",
+    "src/lib/duckdb/init.ts",
+    "src/lib/duckdb/provider.tsx",
+    "src/lib/duckdb/use-query.ts",
+    "src/lib/duckdb/sql-helpers.ts",
+    "src/lib/schema/types.ts",
+    "src/lib/schema/metadata.ts",
+    "src/lib/schema/caveats.ts",
+    "src/lib/schema/value-labels.ts",
+    "src/lib/notebook-store.ts",
+    "src/lib/utils.ts",
+
+    "docs/design/frontend.md",
+    "docs/design/architecture.md",
+    "docs/plans/active/v2-next-steps.md"
+  ],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true
+  },
+  "security": {
+    "enableSecurityCheck": false
+  }
+}

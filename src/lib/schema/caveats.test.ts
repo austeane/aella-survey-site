@@ -14,6 +14,16 @@ describe("getCaveatKeysForColumn", () => {
     expect(keys).toContain("gated_missingness");
     expect(keys).toContain("late_added_questions");
   });
+
+  it("flags opaque composite columns", () => {
+    const keys = getCaveatKeysForColumn("whowears");
+    expect(keys).toContain("opaque_composite");
+  });
+
+  it("flags negated-scale columns", () => {
+    const keys = getCaveatKeysForColumn("normalsex");
+    expect(keys).toContain("negated_scale");
+  });
 });
 
 describe("formatCaveatHint", () => {

@@ -35,7 +35,7 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 2. `pnpm sync-public-data` copies parquet to `public/BKSPublic.parquet`.
 3. `pnpm profile-schema` regenerates `src/lib/schema/columns.generated.json`.
 4. `/api/schema`, `/api/stats/$column`, `/api/crosstab`, `/api/query` consume that metadata and parquet data.
-5. UI pages (`/`, `/explore`, `/profile`, `/sql`) call the API endpoints.
+5. UI pages and AI docs route (`/llms.txt`) call the shared schema metadata layer and API endpoints.
 
 ## Current Route Coverage
 
@@ -48,6 +48,9 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 - `/relationships` — Relationship Finder with precomputed Cramer's V and Pearson correlations for 159 columns
 - `/sql` — SQL console with templates, click-to-insert quoted identifiers, CSV export, notebook save
 - `/notebook` — Research Notebook with localStorage persistence, inline editing, JSON export
+
+### AI Discovery Route
+- `/llms.txt` — machine-readable AI integration docs generated from schema metadata (`getSchemaMetadata`, `listColumns`)
 
 ### API Endpoints
 - `/api/health`, `/api/schema`, `/api/query`, `/api/stats/$column`, `/api/crosstab`

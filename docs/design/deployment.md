@@ -25,6 +25,7 @@ Railway injects `PORT`; Nitro uses it automatically.
 
 ## App Surface (Current)
 - `GET /about` intro page (dataset background, credits, feature guide)
+- `GET /llms.txt` machine-readable AI docs (MCP + REST + dynamic column list)
 - `GET /` dashboard (schema stats, caveats, missingness, column inspector)
 - `GET /explore` cross-tab explorer (pivot matrix, Cramer's V, filters, notebook save)
 - `GET /columns` Column Atlas (search, tags, sort, Column Inspector, URL state)

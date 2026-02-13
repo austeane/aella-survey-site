@@ -1,5 +1,25 @@
 # Worklog
 
+## 2026-02-13
+
+### AI agent documentation surface implemented
+
+**Plan document**: `docs/plans/completed/2026-02-13-ai-agents-docs.md`
+
+- Added `src/routes/llms[.]txt.ts` as a server route that returns dynamic `text/plain` AI docs at `/llms.txt`.
+- `/llms.txt` now pulls dataset counts from `getSchemaMetadata()` and visible columns from `listColumns()`, so row/column details stay synced with schema metadata changes.
+- Added explicit MCP section (URL, transport, 5 tools, Claude/Cursor config snippets), REST section (5 endpoints), and optional links (UI/about/Zenodo).
+- Added `Cache-Control` header with a 3600 second TTL for `/llms.txt`.
+- Updated `/about` with Section 06 ("For AI Agents"): MCP URL callout, tool list, config snippets, REST fallback endpoints, and `/llms.txt` link.
+- Updated docs to keep the new surface discoverable for agents:
+  - `docs/design/architecture.md`
+  - `docs/design/deployment.md`
+  - `docs/design/mcps.md`
+  - `CLAUDE.md`
+- Archived plan to completed: `docs/plans/completed/2026-02-13-ai-agents-docs.md`
+
+---
+
 ## 2026-02-12
 
 ### V2 Next-Steps Plan Created

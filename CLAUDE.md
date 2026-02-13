@@ -28,7 +28,8 @@ Every commit must pass: lint-staged → type-check → tests
 - `docs/plans/active/v2-next-steps.md` — v2 execution plan (phases 1-3 complete, phase 4 partial)
 - `data/` — source parquet + column notes + survey documentation
 - `src/router.tsx` — TanStack Start entry (required, exports `getRouter`)
-- `src/routes/` — 9 UI pages: about, index, explore, columns, profile, relationships, sql, notebook
+- `src/routes/` — 8 primary UI pages: about, index, explore, columns, profile, relationships, sql, notebook
+- `src/routes/llms[.]txt.ts` — machine-readable AI integration document (schema-driven MCP + REST docs at `/llms.txt`)
 - `src/routes/api/` — server route API endpoints
 - `src/lib/notebook-store.ts` — localStorage CRUD for notebook entries
 - `src/lib/schema/relationships.generated.json` — precomputed pairwise associations

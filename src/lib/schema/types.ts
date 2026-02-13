@@ -12,6 +12,7 @@ export interface ColumnMetadata {
   approxCardinality: number;
   tags: CategoryTag[];
   nullMeaning?: NullMeaning;
+  valueLabels?: Record<string, string>;
 }
 
 export interface DatasetMetadata {

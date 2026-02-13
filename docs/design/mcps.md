@@ -36,6 +36,7 @@ Python MCP server at `mcp-server/server.py` for AI agent access to BKS data.
 - **URL**: https://bks-mcp-server-production.up.railway.app
 - **Endpoint**: `POST /mcp` (streamable-http transport)
 - **Railway service**: `bks-mcp-server`
+- **Discovery doc**: `GET https://bks-explorer-production.up.railway.app/llms.txt`
 
 Tools:
 - `get_schema(timeout_ms?)`

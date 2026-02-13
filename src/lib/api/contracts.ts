@@ -20,6 +20,8 @@ export const CaveatKeySchema = z.enum([
   "binned_or_collapsed",
   "combined_or_merged",
   "computed_column",
+  "negated_scale",
+  "opaque_composite",
   "gated_missingness",
   "late_added_questions",
 ]);
@@ -45,6 +47,7 @@ export const ColumnMetadataSchema = z.object({
   nullRatio: z.number().min(0).max(1),
   approxCardinality: z.number().int().nonnegative(),
   tags: z.array(CategoryTagSchema),
+  valueLabels: z.record(z.string(), z.string()).optional(),
   nullMeaning: NullMeaningSchema.default("UNKNOWN"),
   caveatKeys: z.array(CaveatKeySchema).default([]),
 });

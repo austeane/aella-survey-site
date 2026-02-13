@@ -45,6 +45,10 @@ const demographicHints = [
   "liberated",
 ];
 
+const demographicExclusions = new Set([
+  "marriage100blood",
+]);
+
 const fetishHints = [
   "fetish",
   "bondage",
@@ -61,6 +65,36 @@ const fetishHints = [
   "humiliation",
   "transformation",
 ];
+
+const fetishColumnOverrides = new Set([
+  '"I find scenarios where I eagerly beg others to be:" (jvrbyep)',
+  '"I find scenarios where others eagerly beg me to be:" (stmm5eg)',
+  "appearance",
+  "bestiality",
+  "brutality",
+  "cgl",
+  "clothing",
+  "creepy",
+  "dirty",
+  "eagerness",
+  "frustration",
+  "futa",
+  "gentleness",
+  "incest",
+  "multiplepartners",
+  "mythical",
+  "objects",
+  "pregnancy",
+  "roles",
+  "secretions",
+  "sensory",
+  "spanking",
+  "teasing",
+  "toys",
+  "vore",
+  "worshipped",
+  "worshipping",
+]);
 
 function quoteIdentifier(identifier) {
   return `"${identifier.replaceAll('"', '""')}"`;
@@ -103,7 +137,10 @@ function inferTags(name) {
   const tags = new Set();
   const lowerName = name.toLowerCase();
 
-  if (demographicHints.some((hint) => lowerName.includes(hint))) {
+  if (
+    !demographicExclusions.has(name) &&
+    demographicHints.some((hint) => lowerName.includes(hint))
+  ) {
     tags.add("demographic");
   }
 
@@ -111,7 +148,10 @@ function inferTags(name) {
     tags.add("ocean");
   }
 
-  if (fetishHints.some((hint) => lowerName.includes(hint))) {
+  if (
+    fetishColumnOverrides.has(name) ||
+    fetishHints.some((hint) => lowerName.includes(hint))
+  ) {
     tags.add("fetish");
   }
 

@@ -53,6 +53,8 @@ describe("CaveatKeySchema", () => {
       "binned_or_collapsed",
       "combined_or_merged",
       "computed_column",
+      "negated_scale",
+      "opaque_composite",
       "gated_missingness",
       "late_added_questions",
     ];
@@ -109,6 +111,17 @@ describe("ColumnMetadataSchema", () => {
       caveatKeys: ["binned_or_collapsed"],
     });
     expect(result.caveatKeys).toEqual(["binned_or_collapsed"]);
+  });
+
+  it("accepts valueLabels metadata", () => {
+    const result = ColumnMetadataSchema.parse({
+      ...validColumn,
+      valueLabels: {
+        "0": "Not arousing",
+        "5": "Extremely arousing",
+      },
+    });
+    expect(result.valueLabels?.["5"]).toBe("Extremely arousing");
   });
 
   it("rejects nullRatio out of range", () => {

@@ -2,7 +2,7 @@
   "dataset": {
     "name": "Big Kink Survey (Public Sample)",
     "sourcePath": "/Users/austin/dev/kink/data/BKSPublic.parquet",
-    "generatedAt": "2026-02-12T21:53:36.219Z",
+    "generatedAt": "2026-02-13T00:42:23.183Z",
     "rowCount": 15503,
     "columnCount": 365
   },
@@ -15,7 +15,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I am aroused by being dominant in sexual interactions\" (6w3xquw)",
@@ -25,7 +26,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I am aroused by being submissive in sexual interactions\" (xem7hbu)",
@@ -36,7 +38,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I am ashamed or embarrassed about at least some of what arouses me\" (7cw1ziu)",
@@ -46,7 +49,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I can get aroused by a partner doing what I like, even if I know they aren't aroused by it themselves\" (aw1a1ss)",
@@ -56,7 +60,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find {bodypartsmost}:\" (xw7vr7a)",
@@ -66,7 +71,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I find age-related things (beyond \"normal\" stuff like being attracted to people your own age) to be:\" (92qqx0)",
@@ -76,7 +82,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "\"I find anal sex (with a penis or penile toy):\" (jhvha2f)",
@@ -86,7 +93,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find blowjobs:\" (yuc275j)",
@@ -96,7 +104,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find cunnilingus:\" (jn2b355)",
@@ -106,7 +115,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find dirtytalking erotic\" (947wne3)",
@@ -116,7 +126,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find it erotic when two people of the opposite gender to me sexually interact with each other\" (fbqcymm)",
@@ -127,7 +138,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find it most erotic when the subject of my genderplay interest is:\"",
@@ -138,7 +150,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I find personal freeuse dynamics, arrangements where one partner can sexually \"use\" the other without asking or negotiating, to be erotic\" (kspot4h)",
@@ -148,7 +161,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I find primal play to be:\" (9rncgqc)",
@@ -158,7 +172,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I find psychological pain/torture to be:\" (9hy7wy3)",
@@ -168,7 +183,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I find scenarios where I eagerly beg others to be:\" (jvrbyep)",
@@ -177,8 +193,10 @@
       "nullRatio": 0.2497,
       "approxCardinality": 6,
       "tags": [
-        "demographic"
-      ]
+        "demographic",
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find scenarios where others eagerly beg me to be:\" (stmm5eg)",
@@ -187,8 +205,10 @@
       "nullRatio": 0.2497,
       "approxCardinality": 6,
       "tags": [
-        "demographic"
-      ]
+        "demographic",
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find situations erotic where transformations are ___\" (d14kddh)",
@@ -199,7 +219,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I find the thought of existing (in *nonsexual* situations) as a biological *female* to be erotic\" (6w84yry)",
@@ -210,7 +231,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find the thought of existing (in *nonsexual* situations) as a biological *male* to be erotic\" (l7vpprx)",
@@ -221,7 +243,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find the thought of masturbating alone as a biological female, to be erotic\" (sgdpy8l)",
@@ -232,7 +255,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I find the thought of masturbating alone as a biological male, to be erotic\" (guwym9g)",
@@ -243,7 +267,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I sometimes find people who have clearly reached sexual maturity, but are not yet adults (e.g., ages 13-17), to be sexually attractive\" (kbpolw9)",
@@ -254,7 +279,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I usually don't leave romantic relationships unless there's a very serious violation\" (b7gzhvz)",
@@ -264,7 +290,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"I've acted upon or experimented with all the things that arouse me\" (41kpfir)",
@@ -274,7 +301,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"I've experienced a lot of sexual harrassment\" (3knd12d)",
@@ -284,7 +312,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"If my partner is aroused by something, I can also be aroused by it, even if I don't normally find it erotic\" (j5yb5lu)",
@@ -294,7 +323,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"In general, casual sexual hookups have been a ___ experience for me\" (ytp3gfm)",
@@ -304,7 +334,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"In general, I prefer scenarios where receiver of the pain is:\" (8r5zld8)",
@@ -314,7 +345,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"In general, I prefer scenarios where the intensity of the pain is:\" (m73c3q1)",
@@ -324,7 +356,8 @@
       "approxCardinality": 7,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"In general, on average, the optimal amount of consent in my preferred erotic scenarios is:\" (b0ukpvo)",
@@ -336,7 +369,8 @@
         "demographic",
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "\"In general, when my romantic relationships end, who initiates the breakup?\" (y33ksrt)",
@@ -346,7 +380,8 @@
       "approxCardinality": 4,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"It's most erotic when the altered body is\" (wdflfgk)",
@@ -356,7 +391,8 @@
       "approxCardinality": 127,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"Scenarios where pain is given to genitals are arousing to me\" (bobe874)",
@@ -366,7 +402,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "\"To what extent do you agree with this statement: I am a narcissist. (1bqtk47)",
@@ -376,7 +413,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "abnormalbody",
@@ -386,7 +424,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "age",
@@ -396,7 +435,8 @@
       "approxCardinality": 5,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "agegap",
@@ -406,7 +446,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "agreeablenessvariable",
@@ -417,7 +458,8 @@
       "tags": [
         "ocean",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "allrollidentity",
@@ -427,7 +469,8 @@
       "approxCardinality": 3,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "animals2",
@@ -437,7 +480,8 @@
       "approxCardinality": 180,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "animated",
@@ -447,7 +491,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "appearance",
@@ -456,8 +501,9 @@
       "nullRatio": 0.3414,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Are you currently experiencing PMS symptoms? (g953661)",
@@ -467,7 +513,8 @@
       "approxCardinality": 3,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Are you on hormonal birth control? This is the pill or any hormonal implant (pbj1u8c)",
@@ -477,7 +524,8 @@
       "approxCardinality": 3,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "As an adult, have you been the victim of sexual assault? (ld0srat)",
@@ -487,7 +535,8 @@
       "approxCardinality": 2,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "ascore",
@@ -497,7 +546,8 @@
       "approxCardinality": 12,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "At what age did you begin watching porn or reading erotic content at least semiregularly? (ugf1hyy)",
@@ -508,7 +558,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "At what age did you first begin (at least semiregularly) masturbating?",
@@ -518,7 +569,8 @@
       "approxCardinality": 7,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "badends",
@@ -528,7 +580,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "bestiality",
@@ -537,8 +590,9 @@
       "nullRatio": 0.902,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "biomale",
@@ -548,7 +602,8 @@
       "approxCardinality": 2,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "bmi",
@@ -558,7 +613,8 @@
       "approxCardinality": 2,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "bondageaverage",
@@ -570,7 +626,8 @@
         "demographic",
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "bondagemost",
@@ -581,7 +638,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "brutality",
@@ -590,8 +648,9 @@
       "nullRatio": 0.9452,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Can you have vaginal orgasms *without* clitoral stimulation? (hy7nsai)",
@@ -601,7 +660,8 @@
       "approxCardinality": 3,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "cgl",
@@ -610,8 +670,9 @@
       "nullRatio": 0.733,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Check all that apply: Scenarios you find erotic tend to involve *the other person/people/creatures* feeling",
@@ -621,7 +682,8 @@
       "approxCardinality": 4060,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Check all that apply: Scenarios you find erotic tend to involve *you* feeling",
@@ -631,7 +693,8 @@
       "approxCardinality": 5333,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "childhood_adversity",
@@ -642,7 +705,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "childhood_gender_tolerance",
@@ -653,7 +717,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "clothing",
@@ -662,8 +727,9 @@
       "nullRatio": 0.4673,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Common things: Check all the following categories that contain a thing that arouses you.",
@@ -673,7 +739,8 @@
       "approxCardinality": 7225,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Compared to other people of your same gender and age range, you are (yh6d44s)",
@@ -683,7 +750,8 @@
       "approxCardinality": 7,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "consciensiousnessvariable",
@@ -694,7 +762,8 @@
       "tags": [
         "ocean",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "creepy",
@@ -703,8 +772,9 @@
       "nullRatio": 0.9557,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "cunnilingus",
@@ -714,7 +784,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "dirty",
@@ -723,8 +794,9 @@
       "nullRatio": 0.9686,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Do you feel as though you've \"induced\" new fetishes into yourself through the use of porn or erotic content, that otherwise would not have existed for you?",
@@ -734,7 +806,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Do you get mood-based PMS symptoms during your menstrual cycle?",
@@ -744,7 +817,8 @@
       "approxCardinality": 4,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "Do you have baby fever? (9stu9yy)",
@@ -754,7 +828,8 @@
       "approxCardinality": 3,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "eagerness",
@@ -763,8 +838,10 @@
       "nullRatio": 0.2415,
       "approxCardinality": 6,
       "tags": [
-        "demographic"
-      ]
+        "demographic",
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "exhibitionother",
@@ -774,7 +851,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "exhibitionself",
@@ -784,7 +862,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "extremebondage",
@@ -795,7 +874,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "extroversionvariable",
@@ -806,7 +886,8 @@
       "tags": [
         "ocean",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "For animal transformations, which of the following are the most erotic to you?",
@@ -817,7 +898,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For animal transformations, you prefer when the final result is ____? (yta91wx)",
@@ -828,7 +910,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For aunt/uncle, niece/nephew incest fantasies, which is your preferred pairing",
@@ -838,7 +921,8 @@
       "approxCardinality": 15,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For blood (menstrual), which of the following do you find erotic?",
@@ -848,7 +932,8 @@
       "approxCardinality": 104,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "For blood (normal), which of the following do you find erotic?",
@@ -858,7 +943,8 @@
       "approxCardinality": 136,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For breast milk, which of the following do you find erotic?",
@@ -868,7 +954,8 @@
       "approxCardinality": 204,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For general body transformation, which of the following is erotic?",
@@ -879,7 +966,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For grandparent/grandchild incest fantasies, which is your preferred pairing",
@@ -889,7 +977,8 @@
       "approxCardinality": 48,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For male ejaculate, which of the following do you find erotic?",
@@ -900,7 +989,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "For parent/child incest fantasies, which are your preferred pairings",
@@ -910,7 +1000,8 @@
       "approxCardinality": 130,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For precum, which of the following do you find erotic?",
@@ -920,7 +1011,8 @@
       "approxCardinality": 251,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For saliva, which of the following do you find erotic?",
@@ -930,7 +1022,8 @@
       "approxCardinality": 323,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For scat (poop), which of the following do you find erotic?",
@@ -940,7 +1033,8 @@
       "approxCardinality": 125,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For sibling incest fantasies, which is your preferred pairing",
@@ -950,7 +1044,8 @@
       "approxCardinality": 46,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For smegma, which of the following do you find erotic?",
@@ -960,7 +1055,8 @@
       "approxCardinality": 75,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For squirt, which of the following do you find erotic?",
@@ -970,7 +1066,8 @@
       "approxCardinality": 333,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For sweat, which of the following do you find erotic?",
@@ -980,7 +1077,8 @@
       "approxCardinality": 141,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For urine, which of the following do you find erotic?",
@@ -990,7 +1088,8 @@
       "approxCardinality": 278,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For vomit, which of the following do you find erotic?",
@@ -1000,7 +1099,8 @@
       "approxCardinality": 66,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For Which of the following categories of abnormal body states do you find erotic?",
@@ -1010,7 +1110,8 @@
       "approxCardinality": 965,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "For Which of the following categories of genderswapped body states do you find erotic?",
@@ -1021,7 +1122,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)",
@@ -1031,7 +1133,8 @@
       "approxCardinality": 3,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "frustration",
@@ -1040,8 +1143,9 @@
       "nullRatio": 0.2496,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "fulltimepower",
@@ -1051,7 +1155,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "futa",
@@ -1060,8 +1165,9 @@
       "nullRatio": 0.8238,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "genderplay",
@@ -1071,7 +1177,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "genderswapped",
@@ -1081,7 +1188,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "gentleness",
@@ -1090,8 +1198,9 @@
       "nullRatio": 0.43,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "gentleness2most",
@@ -1101,7 +1210,8 @@
       "approxCardinality": 9,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Getting catcalled on the street (or the thought of getting catcalled) feels more: (3qh0yh8)",
@@ -1111,7 +1221,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "givepain",
@@ -1121,7 +1232,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "gratification",
@@ -1131,7 +1243,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Have you ever had a sexual experience with someone else who did not want the experience? (2zafc2j)",
@@ -1141,7 +1254,8 @@
       "approxCardinality": 4,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Have you paid for porn/erotic content? (pnltks8)",
@@ -1151,7 +1265,8 @@
       "approxCardinality": 4,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "highenergy",
@@ -1161,7 +1276,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "How \"sexually liberated\" was your upbringing? (fs700v2)",
@@ -1172,7 +1288,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How honest were you when answering this survey? (g1vao1y)",
@@ -1182,7 +1299,8 @@
       "approxCardinality": 2,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "How horny are you right now? (1jtj2nx)",
@@ -1192,7 +1310,8 @@
       "approxCardinality": 4,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How horny have you been in the last 24 hours? (2hyrmvh)",
@@ -1202,7 +1321,8 @@
       "approxCardinality": 4,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How important is it that the pain is also sexually gratifying to the recipient? (b31aufk)",
@@ -1212,7 +1332,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How much of the porn or erotica you watch is violent? (joz3g52)",
@@ -1222,7 +1343,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "How old were you when you first experienced interest in abnormal body/body part-related things? (si89mua)",
@@ -1232,7 +1354,8 @@
       "approxCardinality": 10,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in age-related sexual interests? (489pmk6)",
@@ -1243,7 +1366,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in bestiality/creatures-related sexual interests? (w3xlgsv)",
@@ -1253,7 +1377,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in brutality-related sexual interests? (5rsjhm2)",
@@ -1263,7 +1388,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in clothing related sexual interests? (4kl54pc)",
@@ -1273,7 +1399,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in creepy/horror related sexual interests? (y9cxruq)",
@@ -1283,7 +1410,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in dirtiness related sexual interests? (l7wbfjh)",
@@ -1293,7 +1421,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in eagerness related sexual interests? (twg3prj)",
@@ -1304,7 +1433,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in genderplay related sexual interests? (3yixh1c)",
@@ -1315,7 +1445,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in gentleness related sexual interests? (j6jn9rl)",
@@ -1325,7 +1456,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in humiliation related sexual interests? (jebtk3s)",
@@ -1335,7 +1467,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in incest? (9f6vg9x)",
@@ -1345,7 +1478,8 @@
       "approxCardinality": 10,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced interest in pregnancy related sexual interests? (c2yvk62)",
@@ -1355,7 +1489,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in scenarios involving sex toys? (iob8ewb)",
@@ -1365,7 +1500,8 @@
       "approxCardinality": 10,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced interest in sensory related sexual interests? (yg5rwaa)",
@@ -1375,7 +1511,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in specific body parts (not including standard sexual body parts like breasts or genitals)? (71x4a7w)",
@@ -1385,7 +1522,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced interest in transformation related sexual interests? (ju7swdc)",
@@ -1396,7 +1534,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in vore related sexual interests? (58x0gp5)",
@@ -1406,7 +1545,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced interest in your appearance-based sexual interests? (6qqg60a)",
@@ -1416,7 +1556,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in bodily-secretions? (i2kfd9)",
@@ -1426,7 +1567,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in bondage? (tdxu7cp)",
@@ -1437,7 +1579,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in exhibitionism or voyeurism? (xwggkkr)",
@@ -1447,7 +1590,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in mental alteration? (nesc17f)",
@@ -1457,7 +1601,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in multiple partners or related scenarios? (hz27wpx)",
@@ -1467,7 +1612,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "LATE_ADDED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in mythical creatures? (xfj2rdq)",
@@ -1477,7 +1623,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in nonconsent? (bx4o14o)",
@@ -1487,7 +1634,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in power dynamics? (enrhyeb)",
@@ -1497,7 +1645,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in sadomasochism? (zh8c32k)",
@@ -1507,7 +1656,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in specific roles? (ce5t067)",
@@ -1517,7 +1667,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "How old were you when you first experienced sexual interest in your preferred object/objects? (3vnq7jt)",
@@ -1527,7 +1678,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "humiliation",
@@ -1537,7 +1689,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "humiliation2most",
@@ -1547,7 +1700,8 @@
       "approxCardinality": 23,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)",
@@ -1557,7 +1711,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "In erotic scenarios involving age gaps, I prefer to be ____ (6njm5tr)",
@@ -1568,7 +1723,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "In erotic scenarios involving nonconsent, you generally prefer when the nonconsenting person is:",
@@ -1578,7 +1734,8 @@
       "approxCardinality": 1,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "In general, I prefer when the person in bondage is",
@@ -1589,7 +1746,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "In general, it's most erotic when _____ wears the clothing you find erotic (eowvxbs)",
@@ -1599,7 +1757,8 @@
       "approxCardinality": 3,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "In general, the most erotic scenarios are: (6e7lhil)",
@@ -1609,7 +1768,8 @@
       "approxCardinality": 7,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "In general, you find it most erotic when the subject of humiliation is:",
@@ -1619,7 +1779,8 @@
       "approxCardinality": 1,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "In scenarios you find erotic, you tend to identify with (or imagine being): (irv6czg)",
@@ -1629,7 +1790,8 @@
       "approxCardinality": 4,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "incest",
@@ -1638,8 +1800,9 @@
       "nullRatio": 0.8436,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "inducefetish",
@@ -1649,7 +1812,8 @@
       "approxCardinality": 4,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "knowwhatarousesyou",
@@ -1659,7 +1823,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "lightbondage",
@@ -1670,7 +1835,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "marriage100blood",
@@ -1679,8 +1845,9 @@
       "nullRatio": 0.8453,
       "approxCardinality": 134,
       "tags": [
-        "demographic"
-      ]
+        "other"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "masterslave",
@@ -1690,7 +1857,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "mediumbondage",
@@ -1701,7 +1869,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "mentalalteration",
@@ -1711,7 +1880,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "mentalalteration2most",
@@ -1721,7 +1891,8 @@
       "approxCardinality": 10,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "mindbreak",
@@ -1731,7 +1902,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "multiplepartners",
@@ -1740,8 +1912,9 @@
       "nullRatio": 0.5959,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "My erotic fantasies involving toys typically involve ____ using the toys",
@@ -1751,7 +1924,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "mythical",
@@ -1760,8 +1934,9 @@
       "nullRatio": 0.7544,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "neuroticismvariable",
@@ -1773,7 +1948,8 @@
         "demographic",
         "ocean",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "nonconsent",
@@ -1783,7 +1959,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "nonconsent1most",
@@ -1793,7 +1970,8 @@
       "approxCardinality": 18,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "normalsex",
@@ -1803,7 +1981,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "obedience",
@@ -1813,7 +1992,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "objects",
@@ -1822,8 +2002,9 @@
       "nullRatio": 0.7917,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7eg)",
@@ -1833,7 +2014,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7eh)",
@@ -1843,7 +2025,8 @@
       "approxCardinality": 12,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ei)",
@@ -1853,7 +2036,8 @@
       "approxCardinality": 9,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ej)",
@@ -1863,7 +2047,8 @@
       "approxCardinality": 23,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ek)",
@@ -1873,7 +2058,8 @@
       "approxCardinality": 7,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7el)",
@@ -1883,7 +2069,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7em)",
@@ -1893,7 +2080,8 @@
       "approxCardinality": 20,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7en)",
@@ -1903,7 +2091,8 @@
       "approxCardinality": 20,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7eo)",
@@ -1913,7 +2102,8 @@
       "approxCardinality": 18,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ep)",
@@ -1923,7 +2113,8 @@
       "approxCardinality": 20,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ew)",
@@ -1933,7 +2124,8 @@
       "approxCardinality": 18,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ex)",
@@ -1943,7 +2135,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ey)",
@@ -1953,7 +2146,8 @@
       "approxCardinality": 21,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ez)",
@@ -1963,7 +2157,8 @@
       "approxCardinality": 10,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f0)",
@@ -1973,7 +2168,8 @@
       "approxCardinality": 16,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f1)",
@@ -1983,7 +2179,8 @@
       "approxCardinality": 24,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f2)",
@@ -1993,7 +2190,8 @@
       "approxCardinality": 24,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f3)",
@@ -2003,7 +2201,8 @@
       "approxCardinality": 12,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f4)",
@@ -2013,7 +2212,8 @@
       "approxCardinality": 20,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77h)",
@@ -2023,7 +2223,8 @@
       "approxCardinality": 12,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77i)",
@@ -2033,7 +2234,8 @@
       "approxCardinality": 16,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77j)",
@@ -2043,7 +2245,8 @@
       "approxCardinality": 20,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77k)",
@@ -2053,7 +2256,8 @@
       "approxCardinality": 32,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77l)",
@@ -2063,7 +2267,8 @@
       "approxCardinality": 14,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77m)",
@@ -2073,7 +2278,8 @@
       "approxCardinality": 20,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77n)",
@@ -2083,7 +2289,8 @@
       "approxCardinality": 9,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77o)",
@@ -2093,7 +2300,8 @@
       "approxCardinality": 11,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77p)",
@@ -2103,7 +2311,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Of these options, which one is the most erotic? (s4xytoy)",
@@ -2113,7 +2322,8 @@
       "approxCardinality": 11,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "older",
@@ -2123,7 +2333,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "opennessvariable",
@@ -2134,7 +2345,8 @@
       "tags": [
         "ocean",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "oralsexanimal",
@@ -2144,7 +2356,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "oralsexanimal2",
@@ -2154,7 +2367,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "otherfeel1most",
@@ -2164,7 +2378,8 @@
       "approxCardinality": 24,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "penetration",
@@ -2174,7 +2389,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "penetration2",
@@ -2184,7 +2400,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Personally, your preferred relationship style is: (4jib23m)",
@@ -2194,7 +2411,8 @@
       "approxCardinality": 2,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "politics",
@@ -2204,7 +2422,8 @@
       "approxCardinality": 3,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "pornhabit",
@@ -2214,7 +2433,8 @@
       "approxCardinality": 11,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "powerdynamic",
@@ -2224,7 +2444,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "powerdynamic2most",
@@ -2234,7 +2455,8 @@
       "approxCardinality": 18,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "powerlessnessvariable",
@@ -2244,7 +2466,8 @@
       "approxCardinality": 21,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "pregnancy",
@@ -2253,8 +2476,9 @@
       "nullRatio": 0.7984,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "pregnancy2most",
@@ -2264,7 +2488,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "progression",
@@ -2274,7 +2499,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "receivepain",
@@ -2284,7 +2510,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "regression",
@@ -2294,7 +2521,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "roles",
@@ -2303,8 +2531,9 @@
       "nullRatio": 0.5653,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "sadomasochism",
@@ -2314,7 +2543,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "secretions",
@@ -2323,8 +2553,9 @@
       "nullRatio": 0.796,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Select all body parts you find significantly erotic",
@@ -2334,7 +2565,8 @@
       "approxCardinality": 5280,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "sensory",
@@ -2343,8 +2575,9 @@
       "nullRatio": 0.7932,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "sexcount",
@@ -2354,7 +2587,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "spanking",
@@ -2363,8 +2597,9 @@
       "nullRatio": 0.6697,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "straightness",
@@ -2375,7 +2610,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "supernatural",
@@ -2385,7 +2621,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "teasing",
@@ -2394,8 +2631,9 @@
       "nullRatio": 0.2496,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "The thought of someone else admiring me while I am a man in the nude is: (g219v7x)",
@@ -2405,7 +2643,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "The thought of someone else admiring me while I am a woman in the nude is: (yf7onjn)",
@@ -2415,7 +2654,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "The type of erotic content you prefer tends to be more (2y636ej)",
@@ -2425,7 +2665,8 @@
       "approxCardinality": 5,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "The type of erotic content you prefer tends to be: (f98tjn5)",
@@ -2435,7 +2676,8 @@
       "approxCardinality": 4,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalanimals",
@@ -2445,7 +2687,8 @@
       "approxCardinality": 11,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalanimals2",
@@ -2455,7 +2698,8 @@
       "approxCardinality": 13,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalbodyhorror",
@@ -2465,7 +2709,8 @@
       "approxCardinality": 11,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalbodyparts",
@@ -2475,7 +2720,8 @@
       "approxCardinality": 29,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalbodypartsabnormal",
@@ -2485,7 +2731,8 @@
       "approxCardinality": 18,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalbondage",
@@ -2497,7 +2744,8 @@
         "demographic",
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalbrutal2",
@@ -2507,7 +2755,8 @@
       "approxCardinality": 17,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalclothingitems",
@@ -2517,7 +2766,8 @@
       "approxCardinality": 24,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalcreep2",
@@ -2527,7 +2777,8 @@
       "approxCardinality": 10,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totaldirty2",
@@ -2537,7 +2788,8 @@
       "approxCardinality": 7,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totaleager2",
@@ -2548,7 +2800,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalfetish1",
@@ -2559,7 +2812,8 @@
       "tags": [
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalfetish2",
@@ -2570,7 +2824,8 @@
       "tags": [
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "totalfetishcategory",
@@ -2581,7 +2836,8 @@
       "tags": [
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalgenderplay2",
@@ -2592,7 +2848,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalgentleness2",
@@ -2602,7 +2859,8 @@
       "approxCardinality": 10,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalhumiliation2",
@@ -2613,7 +2871,8 @@
       "tags": [
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalincest3",
@@ -2623,7 +2882,8 @@
       "approxCardinality": 9,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalmentalalteration2",
@@ -2633,7 +2893,8 @@
       "approxCardinality": 11,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "TotalMentalIllness",
@@ -2643,7 +2904,8 @@
       "approxCardinality": 2,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalmultiplepartners2",
@@ -2653,7 +2915,8 @@
       "approxCardinality": 20,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalmythical2",
@@ -2663,7 +2926,8 @@
       "approxCardinality": 21,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalnonconsent1",
@@ -2674,7 +2938,8 @@
       "tags": [
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalobjects2",
@@ -2684,7 +2949,8 @@
       "approxCardinality": 20,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalotherfeel1",
@@ -2694,7 +2960,8 @@
       "approxCardinality": 24,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalpowerdynamic2",
@@ -2704,7 +2971,8 @@
       "approxCardinality": 18,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalpregnancy2",
@@ -2714,7 +2982,8 @@
       "approxCardinality": 7,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "Totalprofession",
@@ -2724,7 +2993,8 @@
       "approxCardinality": 24,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalsadomasochism1",
@@ -2735,7 +3005,8 @@
       "tags": [
         "fetish",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalsecretions",
@@ -2745,7 +3016,8 @@
       "approxCardinality": 15,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalsensory2",
@@ -2755,7 +3027,8 @@
       "approxCardinality": 27,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalsexacts",
@@ -2765,7 +3038,8 @@
       "approxCardinality": 16,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Totalsexyrace",
@@ -2775,7 +3049,8 @@
       "approxCardinality": 10,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totaltoys2",
@@ -2785,7 +3060,8 @@
       "approxCardinality": 22,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totaltransform1",
@@ -2796,7 +3072,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totaltransform2",
@@ -2807,7 +3084,8 @@
       "tags": [
         "demographic",
         "derived"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Totalyoufeel",
@@ -2817,7 +3095,8 @@
       "approxCardinality": 24,
       "tags": [
         "derived"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "toys",
@@ -2826,8 +3105,9 @@
       "nullRatio": 0.4577,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "toys2most",
@@ -2837,7 +3117,8 @@
       "approxCardinality": 24,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "transform",
@@ -2847,7 +3128,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Uncommon things: Check all the following categories that contain a thing that arouses you.",
@@ -2857,7 +3139,8 @@
       "approxCardinality": 1728,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "violentporn",
@@ -2867,7 +3150,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "vore",
@@ -2876,8 +3160,9 @@
       "nullRatio": 0.9609,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "voyeurother",
@@ -2887,7 +3172,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "voyeurself",
@@ -2897,7 +3183,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "What kind of vore do you find erotic?",
@@ -2907,7 +3194,8 @@
       "approxCardinality": 39,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When I picture my own nude female breasts, buttocks, legs, or genitals, I find this: (qkw5ssz)",
@@ -2917,7 +3205,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When I picture my own nude male buttocks, legs, or genitals, I find this: (f77m7qu)",
@@ -2927,7 +3216,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When I picture myself as having a nude female body, I find this: (yqi5pre)",
@@ -2937,7 +3227,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When I picture myself with a nude male body, I find this: (dl5zw4l)",
@@ -2947,7 +3238,8 @@
       "approxCardinality": 6,
       "tags": [
         "demographic"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When it comes to bestiality, which of the following creatures do you find erotic?",
@@ -2957,7 +3249,8 @@
       "approxCardinality": 266,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When it comes to body horror, which of the following are erotic?",
@@ -2967,7 +3260,8 @@
       "approxCardinality": 83,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When it comes to necrophilia, it's most erotic when your role is:",
@@ -2977,7 +3271,8 @@
       "approxCardinality": 3,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When it comes to necrophilia, you generally prefer fantasies where the dead body is:",
@@ -2987,7 +3282,8 @@
       "approxCardinality": 2,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "When it comes to power dynamics, you tend to prefer scenarios that are more (xjfb7yy)",
@@ -2997,7 +3293,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Where are you currently at in your menstrual cycle? Options are based on a typical 28 day cycle, but cycle length can change (7ok2l1v)",
@@ -3007,7 +3304,8 @@
       "approxCardinality": 9,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "NOT_APPLICABLE"
     },
     {
       "name": "Which body parts are most erotic when extremely huge?",
@@ -3017,7 +3315,8 @@
       "approxCardinality": 308,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which body parts are most erotic when extremely small?",
@@ -3027,7 +3326,8 @@
       "approxCardinality": 117,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which body parts are most erotic when giant/oversized?",
@@ -3037,7 +3337,8 @@
       "approxCardinality": 382,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which describes you best? (cvc5b81)",
@@ -3047,7 +3348,8 @@
       "approxCardinality": 7,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Which of the following bodily secretions do you find erotic?",
@@ -3057,7 +3359,8 @@
       "approxCardinality": 653,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following body modifications do you find significantly erotic?",
@@ -3067,7 +3370,8 @@
       "approxCardinality": 504,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following body types do you find significantly erotic?",
@@ -3077,7 +3381,8 @@
       "approxCardinality": 54,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following body weights do you find most erotic? (1jq57nf)",
@@ -3087,7 +3392,8 @@
       "approxCardinality": 6,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following categories contains things you find erotic?",
@@ -3097,7 +3403,8 @@
       "approxCardinality": 7,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following categories of transformations do you find erotic?",
@@ -3108,7 +3415,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following disgust-oriented things do you find erotic?",
@@ -3118,7 +3426,8 @@
       "approxCardinality": 78,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic, in the context of humiliation?",
@@ -3128,7 +3437,8 @@
       "approxCardinality": 2481,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (26qr0sp)",
@@ -3138,7 +3448,8 @@
       "approxCardinality": 7,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (32snt5e)",
@@ -3148,7 +3459,8 @@
       "approxCardinality": 785,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (3hof3bj)",
@@ -3158,7 +3470,8 @@
       "approxCardinality": 1962,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (46pfeif)",
@@ -3168,7 +3481,8 @@
       "approxCardinality": 3270,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (5j281rq)",
@@ -3178,7 +3492,8 @@
       "approxCardinality": 204,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (5mhacm7)",
@@ -3188,7 +3503,8 @@
       "approxCardinality": 219,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (88ox5nl)",
@@ -3198,7 +3514,8 @@
       "approxCardinality": 2611,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (9d7qzaw)",
@@ -3208,7 +3525,8 @@
       "approxCardinality": 172,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (9fkr5dx)",
@@ -3218,7 +3536,8 @@
       "approxCardinality": 210,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (9kmxhci)",
@@ -3228,7 +3547,8 @@
       "approxCardinality": 871,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (a1m9v6u)",
@@ -3238,7 +3558,8 @@
       "approxCardinality": 197,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (afadhb)",
@@ -3248,7 +3569,8 @@
       "approxCardinality": 121,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (fnwke2d)",
@@ -3258,7 +3580,8 @@
       "approxCardinality": 2348,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (fv0xaot)",
@@ -3268,7 +3591,8 @@
       "approxCardinality": 7,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (g5qw0tc)",
@@ -3278,7 +3602,8 @@
       "approxCardinality": 2069,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (lb02f7w)",
@@ -3288,7 +3613,8 @@
       "approxCardinality": 198,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (lfolao)",
@@ -3298,7 +3624,8 @@
       "approxCardinality": 2821,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (m66m8ix)",
@@ -3308,7 +3635,8 @@
       "approxCardinality": 228,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (mfc7eve)",
@@ -3318,7 +3646,8 @@
       "approxCardinality": 361,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (npcvctu)",
@@ -3328,7 +3657,8 @@
       "approxCardinality": 1574,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (ovb55gx)",
@@ -3338,7 +3668,8 @@
       "approxCardinality": 324,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (rhb3fup)",
@@ -3348,7 +3679,8 @@
       "approxCardinality": 590,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (twppkp3)",
@@ -3358,7 +3690,8 @@
       "approxCardinality": 120,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (u661iml)",
@@ -3368,7 +3701,8 @@
       "approxCardinality": 270,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (uju0gwc)",
@@ -3378,7 +3712,8 @@
       "approxCardinality": 197,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (vqogs86)",
@@ -3388,7 +3723,8 @@
       "approxCardinality": 306,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (w1qo1g1)",
@@ -3398,7 +3734,8 @@
       "approxCardinality": 260,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (wddo7ee)",
@@ -3408,7 +3745,8 @@
       "approxCardinality": 218,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (xhe2co5)",
@@ -3418,7 +3756,8 @@
       "approxCardinality": 167,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (yf0rmix)",
@@ -3428,7 +3767,8 @@
       "approxCardinality": 1783,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (yftwuzf)",
@@ -3438,7 +3778,8 @@
       "approxCardinality": 370,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (ymvkzuu)",
@@ -3448,7 +3789,8 @@
       "approxCardinality": 2736,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find erotic? (zewlx2)",
@@ -3458,7 +3800,8 @@
       "approxCardinality": 118,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following do you find to be erotic?",
@@ -3468,7 +3811,8 @@
       "approxCardinality": 2774,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following drugs are erotic in sexual situations?",
@@ -3478,7 +3822,8 @@
       "approxCardinality": 112,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following is erotic?",
@@ -3488,7 +3833,8 @@
       "approxCardinality": 86,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following is the most severe for you? (trspees)",
@@ -3498,7 +3844,8 @@
       "approxCardinality": 17,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following messiness do you find erotic?",
@@ -3508,7 +3855,8 @@
       "approxCardinality": 72,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following nonconsent scenarios do you find erotic?",
@@ -3518,7 +3866,8 @@
       "approxCardinality": 3351,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following pairings do you find erotic?",
@@ -3528,7 +3877,8 @@
       "approxCardinality": 15,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following roles are erotic?",
@@ -3538,7 +3888,8 @@
       "approxCardinality": 4055,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following sensations do you find erotic?",
@@ -3548,7 +3899,8 @@
       "approxCardinality": 2705,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following sex acts do you find significantly erotic?",
@@ -3558,7 +3910,8 @@
       "approxCardinality": 4632,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Which of the following sexual positions do you find significantly erotic?",
@@ -3568,7 +3921,8 @@
       "approxCardinality": 132,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Which of the following types of mental alteration do you find erotic?",
@@ -3578,7 +3932,8 @@
       "approxCardinality": 343,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Which of the following types of sadomasochism do you find erotic?\"",
@@ -3588,7 +3943,8 @@
       "approxCardinality": 1755,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "whowears",
@@ -3598,7 +3954,8 @@
       "approxCardinality": 13,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "worshipped",
@@ -3607,8 +3964,9 @@
       "nullRatio": 0.2496,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "worshipping",
@@ -3617,8 +3975,9 @@
       "nullRatio": 0.2496,
       "approxCardinality": 6,
       "tags": [
-        "other"
-      ]
+        "fetish"
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "written",
@@ -3628,7 +3987,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "You ______ what arouses you (7mz0awx)",
@@ -3638,7 +3998,8 @@
       "approxCardinality": 5,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "You find raceplay to be: (fkk3ykn)",
@@ -3648,7 +4009,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "You find vore in which orifices to be erotic?",
@@ -3658,7 +4020,8 @@
       "approxCardinality": 49,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "You prefer it when the mentally altered person is:",
@@ -3668,7 +4031,8 @@
       "approxCardinality": 3,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "You're more sexually attracted to people whose gender identity ____ match their genitals (5b30vz2)",
@@ -3679,7 +4043,8 @@
       "tags": [
         "demographic",
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "youfeelmost",
@@ -3689,7 +4054,8 @@
       "approxCardinality": 24,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     },
     {
       "name": "Your preferred breast size in a partner is: (dnuiinj)",
@@ -3699,7 +4065,8 @@
       "approxCardinality": 6,
       "tags": [
         "other"
-      ]
+      ],
+      "nullMeaning": "GATED"
     },
     {
       "name": "Your sexual interests feel (44qhm16)",
@@ -3709,7 +4076,8 @@
       "approxCardinality": 7,
       "tags": [
         "fetish"
-      ]
+      ],
+      "nullMeaning": "UNKNOWN"
     }
   ]
 }

@@ -13,6 +13,7 @@ import { Route as SqlRouteImport } from './routes/sql'
 import { Route as RelationshipsRouteImport } from './routes/relationships'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as NotebookRouteImport } from './routes/notebook'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as ColumnsRouteImport } from './routes/columns'
 import { Route as AboutRouteImport } from './routes/about'
@@ -41,6 +42,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const NotebookRoute = NotebookRouteImport.update({
   id: '/notebook',
   path: '/notebook',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExploreRoute = ExploreRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
   '/explore': typeof ExploreRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
   '/explore': typeof ExploreRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
   '/explore': typeof ExploreRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
@@ -142,6 +151,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/columns'
     | '/explore'
+    | '/llms.txt'
     | '/notebook'
     | '/profile'
     | '/relationships'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/columns'
     | '/explore'
+    | '/llms.txt'
     | '/notebook'
     | '/profile'
     | '/relationships'
@@ -172,6 +183,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/columns'
     | '/explore'
+    | '/llms.txt'
     | '/notebook'
     | '/profile'
     | '/relationships'
@@ -188,6 +200,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ColumnsRoute: typeof ColumnsRoute
   ExploreRoute: typeof ExploreRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   NotebookRoute: typeof NotebookRoute
   ProfileRoute: typeof ProfileRoute
   RelationshipsRoute: typeof RelationshipsRoute
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       path: '/notebook'
       fullPath: '/notebook'
       preLoaderRoute: typeof NotebookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/explore': {
@@ -300,6 +320,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ColumnsRoute: ColumnsRoute,
   ExploreRoute: ExploreRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   NotebookRoute: NotebookRoute,
   ProfileRoute: ProfileRoute,
   RelationshipsRoute: RelationshipsRoute,

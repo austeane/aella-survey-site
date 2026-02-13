@@ -18,7 +18,7 @@ import { getSchema } from "@/lib/client/api";
 import { formatNumber, formatPercent, asNumber, asNullableNumber } from "@/lib/format";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
-import { shouldSuppressCell } from "@/lib/cell-hygiene";
+
 
 export const Route = createFileRoute("/")({
   component: DashboardPage,
@@ -452,15 +452,13 @@ function DashboardPage() {
                         id: "count",
                         header: "Count",
                         align: "right",
-                        cell: (row) =>
-                          shouldSuppressCell(row.count) ? "[suppressed]" : formatNumber(row.count),
+                        cell: (row) => formatNumber(row.count),
                       },
                       {
                         id: "pct",
                         header: "%",
                         align: "right",
-                        cell: (row) =>
-                          shouldSuppressCell(row.count) ? "[suppressed]" : formatPercent(row.percentage, 2),
+                        cell: (row) => formatPercent(row.percentage, 2),
                       },
                     ]}
                   />

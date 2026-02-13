@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
-import { MIN_CELL_COUNT, shouldSuppressCell } from "@/lib/cell-hygiene";
+
 import { addNotebookEntry } from "@/lib/notebook-store";
 import { buildWhereClause, quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
@@ -533,7 +533,7 @@ LIMIT 250
               rows={rows}
               topN={topN}
               normalization={normalization}
-              minCellCount={MIN_CELL_COUNT}
+
               onCellClick={setSelectedCell}
             />
           ) : (
@@ -547,10 +547,7 @@ LIMIT 250
                   id: "count",
                   header: "Count",
                   align: "right",
-                  cell: (row) =>
-                    shouldSuppressCell(row.count)
-                      ? "[suppressed]"
-                      : formatNumber(row.count),
+                  cell: (row) => formatNumber(row.count),
                 },
               ]}
               emptyMessage="No matching rows"

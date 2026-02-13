@@ -2,6 +2,24 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { SectionHeader } from "@/components/section-header";
 
+const CLAUDE_DESKTOP_MCP_CONFIG = `{
+  "mcpServers": {
+    "bks": {
+      "type": "streamable-http",
+      "url": "https://bks-mcp-server-production.up.railway.app/mcp"
+    }
+  }
+}`;
+
+const CURSOR_MCP_CONFIG = `{
+  "mcpServers": {
+    "bks": {
+      "transport": "streamable-http",
+      "url": "https://bks-mcp-server-production.up.railway.app/mcp"
+    }
+  }
+}`;
+
 export const Route = createFileRoute("/about")({
   component: AboutPage,
 });
@@ -206,12 +224,6 @@ function AboutPage() {
             likely stronger.
           </li>
           <li className="border-l-2 border-[var(--accent)] pl-3">
-            <strong>Small-cell suppression.</strong> This explorer suppresses
-            counts below 10 to prevent identification of small groups. If you
-            see "[suppressed]" in a table, the count was too low to display
-            safely.
-          </li>
-          <li className="border-l-2 border-[var(--accent)] pl-3">
             <strong>Missingness is informative.</strong> A column with 60% null
             values tells you something. The pattern of who answered may itself
             be meaningful. Check the missingness badges throughout the explorer.
@@ -246,12 +258,140 @@ function AboutPage() {
             </a>
           </p>
           <p>
+            <strong>Take the survey:</strong>{" "}
+            <a
+              href="https://www.guidedtrack.com/programs/u4m797m/run"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              GuidedTrack — Big Kink Survey
+            </a>
+          </p>
+          <p>
             <strong>Explorer built with:</strong>{" "}
             <span className="mono-value">
               TanStack Start, React, DuckDB-WASM, Tailwind
             </span>
           </p>
         </div>
+      </section>
+
+      <section className="editorial-panel space-y-5">
+        <SectionHeader number="06" title="For AI Agents" />
+
+        <p>
+          This explorer exposes both a REST API and an MCP server so AI clients
+          can inspect schema metadata, retrieve summaries, and run bounded
+          read-only queries against the same dataset that powers the UI.
+        </p>
+
+        <div className="space-y-2 border-l-2 border-[var(--accent)] pl-3">
+          <span className="mono-label text-[var(--ink-faded)]">MCP SERVER</span>
+          <a
+            href="https://bks-mcp-server-production.up.railway.app/mcp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mono-value text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+          >
+            https://bks-mcp-server-production.up.railway.app/mcp
+          </a>
+        </div>
+
+        <div className="space-y-2 border-l-2 border-[var(--rule)] pl-4">
+          <p>
+            <span className="mono-value">get_schema</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Return dataset row/column counts and column metadata.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">get_stats</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Compute typed summary statistics for one column.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">cross_tabulate</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Build an x/y cross-tab matrix with marginals.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">query_data</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Execute bounded read-only DuckDB SQL.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">search_columns</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Find columns by partial name.
+            </span>
+          </p>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <p className="mono-label text-[var(--ink-faded)]">
+              Claude Desktop config
+            </p>
+            <pre className="overflow-x-auto border border-[var(--rule)] bg-[var(--sidebar-bg)] p-4 text-sm leading-6 text-[var(--ink-light)]">
+              <code className="font-['JetBrains_Mono',monospace]">
+                {CLAUDE_DESKTOP_MCP_CONFIG}
+              </code>
+            </pre>
+          </div>
+
+          <div className="space-y-2">
+            <p className="mono-label text-[var(--ink-faded)]">Cursor config</p>
+            <pre className="overflow-x-auto border border-[var(--rule)] bg-[var(--sidebar-bg)] p-4 text-sm leading-6 text-[var(--ink-light)]">
+              <code className="font-['JetBrains_Mono',monospace]">
+                {CURSOR_MCP_CONFIG}
+              </code>
+            </pre>
+          </div>
+        </div>
+
+        <div className="space-y-2 border-l-2 border-[var(--rule)] pl-4">
+          <p className="mono-label text-[var(--ink-faded)]">
+            REST fallback endpoints
+          </p>
+          <p>
+            <span className="mono-value">GET /api/schema</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Dataset metadata + column definitions.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">POST /api/query</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Bounded read-only SQL query execution.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">GET /api/stats/:column</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Numeric/categorical summary stats for one field.
+            </span>
+          </p>
+          <p>
+            <span className="mono-value">GET /api/crosstab</span>
+            <span className="ml-2 text-[var(--ink-faded)]">
+              Grouped counts for two selected columns.
+            </span>
+          </p>
+        </div>
+
+        <p>
+          Machine-readable endpoint for agent discovery:{" "}
+          <a
+            href="/llms.txt"
+            className="mono-value text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+          >
+            /llms.txt
+          </a>
+        </p>
       </section>
     </div>
   );
