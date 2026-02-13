@@ -42,6 +42,7 @@ export const CaveatSchema = z.object({
 
 export const ColumnMetadataSchema = z.object({
   name: z.string(),
+  displayName: z.string().optional(),
   duckdbType: z.string(),
   logicalType: LogicalTypeSchema,
   nullRatio: z.number().min(0).max(1),

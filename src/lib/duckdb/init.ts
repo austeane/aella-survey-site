@@ -7,9 +7,36 @@ import duckdbEhWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js
 
 const PARQUET_URL = "/BKSPublic.parquet";
 
+export type DuckDBInitPhase =
+  | "idle"
+  | "downloading-wasm"
+  | "initializing"
+  | "loading-parquet"
+  | "ready";
+
+type PhaseListener = (phase: DuckDBInitPhase) => void;
+
 let dbPromise: Promise<duckdb.AsyncDuckDB> | null = null;
+let currentPhase: DuckDBInitPhase = "idle";
+const phaseListeners = new Set<PhaseListener>();
+
+function setPhase(phase: DuckDBInitPhase): void {
+  currentPhase = phase;
+  for (const listener of phaseListeners) {
+    listener(phase);
+  }
+}
+
+export function subscribeDuckDBPhase(listener: PhaseListener): () => void {
+  phaseListeners.add(listener);
+  listener(currentPhase);
+  return () => {
+    phaseListeners.delete(listener);
+  };
+}
 
 async function createDb(): Promise<duckdb.AsyncDuckDB> {
+  setPhase("downloading-wasm");
   const bundles: duckdb.DuckDBBundles = {
     mvp: {
       mainModule: duckdbMvpWasm,
@@ -26,8 +53,11 @@ async function createDb(): Promise<duckdb.AsyncDuckDB> {
   const logger = new duckdb.ConsoleLogger();
   const worker = new Worker(bundle.mainWorker!);
   const db = new duckdb.AsyncDuckDB(logger, worker);
+
+  setPhase("initializing");
   await db.instantiate(bundle.mainModule, bundle.pthreadWorker);
 
+  setPhase("loading-parquet");
   await db.registerFileURL("BKSPublic.parquet", PARQUET_URL, duckdb.DuckDBDataProtocol.HTTP, false);
 
   const conn = await db.connect();
@@ -36,12 +66,17 @@ async function createDb(): Promise<duckdb.AsyncDuckDB> {
   );
   await conn.close();
 
+  setPhase("ready");
   return db;
 }
 
 export function getDuckDB(): Promise<duckdb.AsyncDuckDB> {
   if (!dbPromise) {
-    dbPromise = createDb();
+    dbPromise = createDb().catch((error) => {
+      setPhase("idle");
+      dbPromise = null;
+      throw error;
+    });
   }
   return dbPromise;
 }

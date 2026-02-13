@@ -162,6 +162,14 @@ function NotebookPage() {
                       <span className="dateline">
                         {formatDateline(entry.createdAt)}
                       </span>
+                      {entry.sourceUrl && (entry.sourceUrl.startsWith("/") || entry.sourceUrl.startsWith("http")) ? (
+                        <a
+                          className="mono-value text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+                          href={entry.sourceUrl}
+                        >
+                          Open source
+                        </a>
+                      ) : null}
                     </div>
 
                     <p className="mono-value mt-1.5 text-[var(--ink-faded)]">

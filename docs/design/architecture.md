@@ -42,12 +42,12 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 ### UI Pages
 - `/about` — intro page: dataset background, methodology caveats, feature guide, credits (links to Aella's blog post)
 - `/` — dashboard with schema stats, global caveats, missingness histogram, tag breakdown, column inspector
-- `/explore` — cross-tab explorer with pivot matrix, Cramer's V, normalization modes, demographic filters, cell drilldown, notebook save
+- `/explore` — cross-tab explorer with pivot matrix, Cramer's V, normalization modes, demographic filters, value-label rendering, URL state sync, cell drilldown, notebook save
 - `/columns` — Column Atlas with search, tag filters, sort modes, Column Inspector panel, URL state sync
-- `/profile` — cohort builder with single/compare modes, percentile cards, over-indexing signals, small-N warnings, notebook save
-- `/relationships` — Relationship Finder with precomputed Cramer's V and Pearson correlations for 159 columns
+- `/profile` — cohort builder with single/compare modes, percentile cards, over-indexing signals, cohort rarity metric, URL state sync, notebook save
+- `/relationships` — Relationship Finder with precomputed Cramer's V and Pearson correlations for 159 columns, URL state sync
 - `/sql` — SQL console with templates, click-to-insert quoted identifiers, CSV export, notebook save
-- `/notebook` — Research Notebook with localStorage persistence, inline editing, JSON export
+- `/notebook` — Research Notebook with localStorage persistence, inline editing, source links, JSON export
 
 ### AI Discovery Route
 - `/llms.txt` — machine-readable AI integration docs generated from schema metadata (`getSchemaMetadata`, `listColumns`)
@@ -56,9 +56,11 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 - `/api/health`, `/api/schema`, `/api/query`, `/api/stats/$column`, `/api/crosstab`
 
 ## Shared Components
-- `src/components/pivot-matrix.tsx` — pivot table with normalization, marginals, small-cell suppression
+- `src/components/pivot-matrix.tsx` — pivot table with normalization, marginals, and bucket metadata for drilldown SQL
 - `src/components/column-inspector.tsx` — column detail panel with stats queries
+- `src/components/column-combobox.tsx` — searchable column picker used across major routes
 - `src/components/data-table.tsx` — generic editorial data table
+- `src/components/loading-skeleton.tsx` — phase-aware loading skeletons
 - `src/components/missingness-badge.tsx` — null meaning badge (GATED, LATE_ADDED, etc.)
 - `src/components/sample-size-display.tsx` — N/non-null/used display
 - `src/components/section-header.tsx` — numbered section headers
@@ -86,10 +88,12 @@ Note: `@duckdb/node-api` and Python `duckdb` are also available but require thei
 
 ## Key Libraries
 - `src/lib/notebook-store.ts` — localStorage CRUD for notebook entries
-- `src/lib/cell-hygiene.ts` — small-cell suppression (MIN_CELL_COUNT = 10)
 - `src/lib/format.ts` — number/percent formatting utilities
+- `src/lib/format-labels.ts` — shared value-label and column display-name formatting
 - `src/lib/schema/null-meaning.ts` — null meaning inference (NOT_APPLICABLE, GATED, LATE_ADDED, UNKNOWN)
 - `src/lib/schema/metadata.ts` — schema metadata access layer
 - `src/lib/schema/relationships.generated.json` — precomputed pairwise associations (3,065 entries)
+- `src/lib/duckdb/init.ts` — DuckDB initialization with phase callbacks (`idle -> downloading-wasm -> initializing -> loading-parquet -> ready`)
+- `src/lib/duckdb/provider.tsx` — React context exposing `db`, `loading`, `error`, and init `phase`
 - `src/lib/duckdb/use-query.ts` — React hook for DuckDB-WASM queries
 - `src/lib/duckdb/sql-helpers.ts` — SQL quoting and WHERE clause builder

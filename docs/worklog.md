@@ -2,6 +2,47 @@
 
 ## 2026-02-13
 
+### UX excellence plan implemented (all phases)
+
+**Plan document**: `docs/plans/active/ux-excellence.md`
+
+- Implemented pivot "Other" bucket SQL drill-down fix by carrying bucket metadata through `PivotCellDetail` and generating `IS NOT NULL` + `NOT IN (...)` predicates in Explore.
+- Added shared label/display-name utility module: `src/lib/format-labels.ts`.
+  - Centralized `formatValueWithLabel`, `candidateValueKeys`, and `getColumnDisplayName`.
+- Added `displayName` to metadata pipeline and contracts:
+  - `scripts/profile-schema.mjs` now generates `displayName`.
+  - `src/lib/schema/types.ts` and `src/lib/api/contracts.ts` updated.
+  - Regenerated `src/lib/schema/columns.generated.json`.
+- Built searchable combobox component (`src/components/column-combobox.tsx`) and replaced large column `<Select>` controls in:
+  - `src/routes/explore.tsx`
+  - `src/routes/profile.tsx`
+  - `src/routes/relationships.tsx`
+  - `src/routes/index.tsx`
+- Completed URL state coverage:
+  - Explore: `x`, `y`, `normalization`, `topN`, `filterColumn`, `filterValues`
+  - Profile: `mode`, `c0-c2`/`v0-v2`, `ac0-ac2`/`av0-av2`, `bc0-bc2`/`bv0-bv2`
+  - Relationships: `column`
+- Added notebook source URL support:
+  - `src/lib/notebook-store.ts` now stores optional `sourceUrl`
+  - Explore/Profile/SQL now write `sourceUrl`
+  - Notebook route renders `Open source` link
+- Polish items shipped:
+  - "Uniqueness Percentile" renamed to "Cohort Rarity" with note ("100% minus cohort share")
+  - Dashboard "Updated" dateline now uses `schema.dataset.generatedAt`
+  - Added cross-page links:
+    - Dashboard analysis-friendly columns -> Explore
+    - Column Inspector related columns -> Relationships
+    - About page "Try This" deep links
+- Added phase-aware loading UX:
+  - `src/lib/duckdb/init.ts` now emits `idle -> downloading-wasm -> initializing -> loading-parquet -> ready`
+  - `src/lib/duckdb/provider.tsx` exposes `phase`
+  - New `src/components/loading-skeleton.tsx`
+  - Replaced route-level "Loading schema metadata..." text in Explore/Profile/Dashboard with phase-aware skeletons
+- Validation:
+  - `pnpm check-types` pass
+  - `pnpm test --run` pass (130 tests)
+  - `pnpm build` pass
+
 ### AI agent documentation surface implemented
 
 **Plan document**: `docs/plans/completed/2026-02-13-ai-agents-docs.md`

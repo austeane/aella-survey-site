@@ -1,20 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
+import { ColumnCombobox } from "@/components/column-combobox";
 import { DataTable } from "@/components/data-table";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { MissingnessBadge } from "@/components/missingness-badge";
 import { SampleSizeDisplay } from "@/components/sample-size-display";
 import { SectionHeader } from "@/components/section-header";
 import { StatCard } from "@/components/stat-card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
+import { useDuckDB } from "@/lib/duckdb/provider";
+import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { formatNumber, formatPercent, asNumber, asNullableNumber } from "@/lib/format";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
@@ -39,6 +36,7 @@ const MISSINGNESS_BUCKETS: MissingnessBucket[] = [
 ];
 
 function DashboardPage() {
+  const { phase } = useDuckDB();
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
   const [selectedColumn, setSelectedColumn] = useState<string>("");
@@ -229,7 +227,11 @@ function DashboardPage() {
         <p className="page-subtitle">
           Dataset shape, caveats, missingness, and high-signal variables.
         </p>
-        <p className="dateline">Updated {new Date().toLocaleDateString("en-US")}</p>
+        {schema ? (
+          <p className="dateline">
+            Updated {new Date(schema.dataset.generatedAt).toLocaleDateString("en-US")}
+          </p>
+        ) : null}
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
@@ -277,7 +279,10 @@ function DashboardPage() {
                       header: "Column",
                       cell: (row) => (
                         <div className="space-y-1">
-                          <span>{row.name}</span>
+                          <span>{getColumnDisplayName(row)}</span>
+                          {row.displayName ? (
+                            <p className="mono-value text-[var(--ink-faded)]">{row.name}</p>
+                          ) : null}
                           <div>
                             <MissingnessBadge meaning={row.nullMeaning} />
                           </div>
@@ -334,7 +339,23 @@ function DashboardPage() {
                   rows={analysisFriendlyColumns}
                   rowKey={(row) => row.name}
                   columns={[
-                    { id: "name", header: "Column", cell: (row) => row.name },
+                    {
+                      id: "name",
+                      header: "Column",
+                      cell: (row) => (
+                        <Link
+                          to="/explore"
+                          search={{ x: row.name }}
+                          className="mono-value"
+                          style={{
+                            color: "var(--accent)",
+                            borderBottom: "1px solid var(--rule-light)",
+                          }}
+                        >
+                          {getColumnDisplayName(row)}
+                        </Link>
+                      ),
+                    },
                     {
                       id: "null",
                       header: "Null %",
@@ -364,7 +385,10 @@ function DashboardPage() {
                       header: "Column",
                       cell: (row) => (
                         <div className="space-y-1">
-                          <span>{row.name}</span>
+                          <span>{getColumnDisplayName(row)}</span>
+                          {row.displayName ? (
+                            <p className="mono-value text-[var(--ink-faded)]">{row.name}</p>
+                          ) : null}
                           <div>
                             <MissingnessBadge meaning={row.nullMeaning} />
                           </div>
@@ -388,24 +412,21 @@ function DashboardPage() {
 
             <label className="editorial-label max-w-[460px]">
               Column
-              <Select value={selectedColumn} onValueChange={setSelectedColumn}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a column" />
-                </SelectTrigger>
-                <SelectContent>
-                  {schema.columns.map((column) => (
-                    <SelectItem key={column.name} value={column.name}>
-                      {column.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ColumnCombobox
+                columns={schema.columns}
+                value={selectedColumn}
+                onValueChange={setSelectedColumn}
+                placeholder="Select a column"
+              />
             </label>
 
             {selectedMeta ? (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="mono-value">{selectedMeta.name}</span>
+                  <span className="mono-value">{getColumnDisplayName(selectedMeta)}</span>
+                  {selectedMeta.displayName ? (
+                    <span className="mono-value text-[var(--ink-faded)]">({selectedMeta.name})</span>
+                  ) : null}
                   <span className="null-badge">{selectedMeta.logicalType}</span>
                   <MissingnessBadge meaning={selectedMeta.nullMeaning} />
                 </div>
@@ -447,7 +468,15 @@ function DashboardPage() {
                     rows={stats.topValues}
                     rowKey={(row) => String(row.value ?? "NULL")}
                     columns={[
-                      { id: "value", header: "Value", cell: (row) => String(row.value ?? "NULL") },
+                      {
+                        id: "value",
+                        header: "Value",
+                        cell: (row) =>
+                          formatValueWithLabel(
+                            String(row.value ?? "NULL"),
+                            selectedMeta?.valueLabels,
+                          ),
+                      },
                       {
                         id: "count",
                         header: "Count",
@@ -468,7 +497,9 @@ function DashboardPage() {
           </section>
         </>
       ) : (
-        <section className="editorial-panel">Loading schema metadata...</section>
+        <section className="editorial-panel">
+          <LoadingSkeleton variant="panel" phase={phase} title="Loading schema metadata..." />
+        </section>
       )}
     </div>
   );

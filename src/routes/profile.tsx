@@ -1,7 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { ColumnCombobox } from "@/components/column-combobox";
 import { DataTable } from "@/components/data-table";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { SectionHeader } from "@/components/section-header";
 import { StatCard } from "@/components/stat-card";
 import { Button } from "@/components/ui/button";
@@ -15,12 +17,56 @@ import {
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 
+import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
 import { addNotebookEntry } from "@/lib/notebook-store";
 
 export const Route = createFileRoute("/profile")({
+  validateSearch: (
+    search,
+  ): {
+    mode?: Mode;
+    c0?: string;
+    c1?: string;
+    c2?: string;
+    v0?: string;
+    v1?: string;
+    v2?: string;
+    ac0?: string;
+    ac1?: string;
+    ac2?: string;
+    av0?: string;
+    av1?: string;
+    av2?: string;
+    bc0?: string;
+    bc1?: string;
+    bc2?: string;
+    bv0?: string;
+    bv1?: string;
+    bv2?: string;
+  } => ({
+    mode: search.mode === "compare" ? "compare" : search.mode === "single" ? "single" : undefined,
+    c0: typeof search.c0 === "string" ? search.c0 : undefined,
+    c1: typeof search.c1 === "string" ? search.c1 : undefined,
+    c2: typeof search.c2 === "string" ? search.c2 : undefined,
+    v0: typeof search.v0 === "string" ? search.v0 : undefined,
+    v1: typeof search.v1 === "string" ? search.v1 : undefined,
+    v2: typeof search.v2 === "string" ? search.v2 : undefined,
+    ac0: typeof search.ac0 === "string" ? search.ac0 : undefined,
+    ac1: typeof search.ac1 === "string" ? search.ac1 : undefined,
+    ac2: typeof search.ac2 === "string" ? search.ac2 : undefined,
+    av0: typeof search.av0 === "string" ? search.av0 : undefined,
+    av1: typeof search.av1 === "string" ? search.av1 : undefined,
+    av2: typeof search.av2 === "string" ? search.av2 : undefined,
+    bc0: typeof search.bc0 === "string" ? search.bc0 : undefined,
+    bc1: typeof search.bc1 === "string" ? search.bc1 : undefined,
+    bc2: typeof search.bc2 === "string" ? search.bc2 : undefined,
+    bv0: typeof search.bv0 === "string" ? search.bv0 : undefined,
+    bv1: typeof search.bv1 === "string" ? search.bv1 : undefined,
+    bv2: typeof search.bv2 === "string" ? search.bv2 : undefined,
+  }),
   component: ProfilePage,
 });
 
@@ -28,7 +74,7 @@ interface ProfileSummary {
   totalSize: number;
   cohortSize: number;
   cohortSharePercent: number;
-  uniquenessPercentile: number;
+  cohortRarity: number;
   percentileCards: Array<{
     metric: string;
     cohortMedian: number | null;
@@ -80,9 +126,13 @@ function getWarning(cohortSize: number) {
 }
 
 function ProfilePage() {
-  const { db } = useDuckDB();
+  const search = Route.useSearch();
+  const [initialSearch] = useState(search);
+  const navigate = useNavigate({ from: "/profile" });
+  const { db, phase } = useDuckDB();
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
+  const [searchReady, setSearchReady] = useState(false);
 
   const [mode, setMode] = useState<Mode>("single");
 
@@ -112,12 +162,21 @@ function ProfilePage() {
     void getSchema()
       .then((response) => {
         if (cancelled) return;
-        setSchema(response.data);
+        const nextSchema = response.data;
+        setSchema(nextSchema);
 
-        const demographicColumns = response.data.columns
+        const demographicColumns = nextSchema.columns
           .filter((c) => c.tags.includes("demographic") && c.logicalType === "categorical")
           .slice(0, 3)
           .map((c) => c.name);
+        const availableColumns = new Set(nextSchema.columns.map((column) => column.name));
+
+        const resolveColumn = (candidate: string | undefined, fallback: string) => {
+          if (candidate && availableColumns.has(candidate)) {
+            return candidate;
+          }
+          return fallback;
+        };
 
         const defaults: [string, string, string] = [
           demographicColumns[0] ?? "",
@@ -125,18 +184,110 @@ function ProfilePage() {
           demographicColumns[2] ?? "",
         ];
 
-        setSelectedColumns(defaults);
-        setColumnsA([...defaults]);
-        setColumnsB([...defaults]);
+        const initialSingleColumns: [string, string, string] = [
+          resolveColumn(initialSearch.c0, defaults[0]),
+          resolveColumn(initialSearch.c1, defaults[1]),
+          resolveColumn(initialSearch.c2, defaults[2]),
+        ];
+        const initialColumnsA: [string, string, string] = [
+          resolveColumn(initialSearch.ac0, defaults[0]),
+          resolveColumn(initialSearch.ac1, defaults[1]),
+          resolveColumn(initialSearch.ac2, defaults[2]),
+        ];
+        const initialColumnsB: [string, string, string] = [
+          resolveColumn(initialSearch.bc0, defaults[0]),
+          resolveColumn(initialSearch.bc1, defaults[1]),
+          resolveColumn(initialSearch.bc2, defaults[2]),
+        ];
+
+        setMode(initialSearch.mode === "compare" ? "compare" : "single");
+        setSelectedColumns(initialSingleColumns);
+        setColumnsA(initialColumnsA);
+        setColumnsB(initialColumnsB);
+
+        const initialSingleValues: Record<string, string> = {};
+        const initialValuesA: Record<string, string> = {};
+        const initialValuesB: Record<string, string> = {};
+
+        if (initialSingleColumns[0] && initialSearch.v0) initialSingleValues[initialSingleColumns[0]] = initialSearch.v0;
+        if (initialSingleColumns[1] && initialSearch.v1) initialSingleValues[initialSingleColumns[1]] = initialSearch.v1;
+        if (initialSingleColumns[2] && initialSearch.v2) initialSingleValues[initialSingleColumns[2]] = initialSearch.v2;
+
+        if (initialColumnsA[0] && initialSearch.av0) initialValuesA[initialColumnsA[0]] = initialSearch.av0;
+        if (initialColumnsA[1] && initialSearch.av1) initialValuesA[initialColumnsA[1]] = initialSearch.av1;
+        if (initialColumnsA[2] && initialSearch.av2) initialValuesA[initialColumnsA[2]] = initialSearch.av2;
+
+        if (initialColumnsB[0] && initialSearch.bv0) initialValuesB[initialColumnsB[0]] = initialSearch.bv0;
+        if (initialColumnsB[1] && initialSearch.bv1) initialValuesB[initialColumnsB[1]] = initialSearch.bv1;
+        if (initialColumnsB[2] && initialSearch.bv2) initialValuesB[initialColumnsB[2]] = initialSearch.bv2;
+
+        setSelectedValues(initialSingleValues);
+        setValuesA(initialValuesA);
+        setValuesB(initialValuesB);
+        setSearchReady(true);
       })
       .catch((error: Error) => {
-        if (!cancelled) setSchemaError(error.message);
+        if (!cancelled) {
+          setSchemaError(error.message);
+          setSearchReady(true);
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [initialSearch]);
+
+  useEffect(() => {
+    if (!searchReady) return;
+
+    const singleValue0 = selectedColumns[0] ? selectedValues[selectedColumns[0]] : undefined;
+    const singleValue1 = selectedColumns[1] ? selectedValues[selectedColumns[1]] : undefined;
+    const singleValue2 = selectedColumns[2] ? selectedValues[selectedColumns[2]] : undefined;
+
+    const valueA0 = columnsA[0] ? valuesA[columnsA[0]] : undefined;
+    const valueA1 = columnsA[1] ? valuesA[columnsA[1]] : undefined;
+    const valueA2 = columnsA[2] ? valuesA[columnsA[2]] : undefined;
+
+    const valueB0 = columnsB[0] ? valuesB[columnsB[0]] : undefined;
+    const valueB1 = columnsB[1] ? valuesB[columnsB[1]] : undefined;
+    const valueB2 = columnsB[2] ? valuesB[columnsB[2]] : undefined;
+
+    void navigate({
+      search: {
+        mode: mode === "compare" ? "compare" : undefined,
+        c0: mode === "single" ? selectedColumns[0] || undefined : undefined,
+        c1: mode === "single" ? selectedColumns[1] || undefined : undefined,
+        c2: mode === "single" ? selectedColumns[2] || undefined : undefined,
+        v0: mode === "single" ? singleValue0 || undefined : undefined,
+        v1: mode === "single" ? singleValue1 || undefined : undefined,
+        v2: mode === "single" ? singleValue2 || undefined : undefined,
+        ac0: mode === "compare" ? columnsA[0] || undefined : undefined,
+        ac1: mode === "compare" ? columnsA[1] || undefined : undefined,
+        ac2: mode === "compare" ? columnsA[2] || undefined : undefined,
+        av0: mode === "compare" ? valueA0 || undefined : undefined,
+        av1: mode === "compare" ? valueA1 || undefined : undefined,
+        av2: mode === "compare" ? valueA2 || undefined : undefined,
+        bc0: mode === "compare" ? columnsB[0] || undefined : undefined,
+        bc1: mode === "compare" ? columnsB[1] || undefined : undefined,
+        bc2: mode === "compare" ? columnsB[2] || undefined : undefined,
+        bv0: mode === "compare" ? valueB0 || undefined : undefined,
+        bv1: mode === "compare" ? valueB1 || undefined : undefined,
+        bv2: mode === "compare" ? valueB2 || undefined : undefined,
+      },
+      replace: true,
+    });
+  }, [
+    mode,
+    selectedColumns,
+    selectedValues,
+    columnsA,
+    valuesA,
+    columnsB,
+    valuesB,
+    navigate,
+    searchReady,
+  ]);
 
   // Load value options for single-cohort columns
   useEffect(() => {
@@ -250,6 +401,11 @@ function ProfilePage() {
     );
   }, [schema]);
 
+  const columnByName = useMemo(() => {
+    if (!schema) return new Map<string, SchemaData["columns"][number]>();
+    return new Map(schema.columns.map((column) => [column.name, column]));
+  }, [schema]);
+
   const filterPairs = useMemo(() => {
     return selectedColumns
       .map((column) => ({ column, value: selectedValues[column] }))
@@ -309,7 +465,7 @@ function ProfilePage() {
         const totalSize = asNumber(sizeRows[0]?.[0]);
         const cohortSize = asNumber(sizeRows[0]?.[1]);
         const cohortSharePercent = totalSize > 0 ? (cohortSize / totalSize) * 100 : 0;
-        const uniquenessPercentile = Math.max(0, Math.min(100, 100 - cohortSharePercent));
+        const cohortRarity = Math.max(0, Math.min(100, 100 - cohortSharePercent));
 
         const metricCandidates = [
           "totalfetishcategory",
@@ -439,7 +595,7 @@ function ProfilePage() {
           totalSize,
           cohortSize,
           cohortSharePercent,
-          uniquenessPercentile,
+          cohortRarity,
           percentileCards,
           overIndexing,
         };
@@ -531,32 +687,23 @@ function ProfilePage() {
       {[0, 1, 2].map((slot) => {
         const column = columns[slot] ?? "";
         const options = valueOptions[column] ?? [];
+        const columnMeta = availableDemographicColumns.find((item) => item.name === column);
 
         return (
           <div key={`slot-${slot}`} className="space-y-2 border border-[var(--rule)] bg-[var(--paper)] p-3">
             <label className="editorial-label">
               Field {slot + 1}
-              <Select
-                value={column || NONE}
+              <ColumnCombobox
+                columns={availableDemographicColumns}
+                value={column}
+                includeNoneOption
+                noneOptionLabel="None"
                 onValueChange={(value) => {
-                  const resolved = value === NONE ? "" : value;
                   const next = [...columns] as [string, string, string];
-                  next[slot] = resolved;
+                  next[slot] = value;
                   setColumns(next);
                 }}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a column" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NONE}>None</SelectItem>
-                  {availableDemographicColumns.map((item) => (
-                    <SelectItem key={item.name} value={item.name}>
-                      {item.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              />
             </label>
 
             <label className="editorial-label">
@@ -579,7 +726,7 @@ function ProfilePage() {
                   <SelectItem value={NONE}>None</SelectItem>
                   {options.map((option) => (
                     <SelectItem key={option} value={option}>
-                      {option}
+                      {formatValueWithLabel(option, columnMeta?.valueLabels)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -612,6 +759,7 @@ function ProfilePage() {
 
     addNotebookEntry({
       title: `Profile: ${filterDesc}`,
+      sourceUrl: window.location.href,
       queryDefinition: {
         type: "profile",
         params: {
@@ -735,7 +883,9 @@ function ProfilePage() {
           {runError ? <p className="alert alert--error">{runError}</p> : null}
         </section>
       ) : (
-        <section className="editorial-panel">Loading schema metadata...</section>
+        <section className="editorial-panel">
+          <LoadingSkeleton variant="panel" phase={phase} title="Loading schema metadata..." />
+        </section>
       )}
 
       {/* --- Single cohort results --- */}
@@ -757,9 +907,9 @@ function ProfilePage() {
               note={`N = ${formatNumber(summary.cohortSize)}`}
             />
             <StatCard
-              label="Uniqueness Percentile"
-              value={formatPercent(summary.uniquenessPercentile, 2)}
-              note={`N = ${formatNumber(summary.cohortSize)}`}
+              label="Cohort Rarity"
+              value={formatPercent(summary.cohortRarity, 2)}
+              note="100% minus cohort share"
             />
           </div>
 
@@ -804,8 +954,22 @@ function ProfilePage() {
               rows={summary.overIndexing}
               rowKey={(row, index) => `${row.columnName}-${row.value}-${index}`}
               columns={[
-                { id: "column", header: "Column", cell: (row) => row.columnName },
-                { id: "value", header: "Value", cell: (row) => row.value },
+                {
+                  id: "column",
+                  header: "Column",
+                  cell: (row) => {
+                    const columnMeta = columnByName.get(row.columnName);
+                    return columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
+                  },
+                },
+                {
+                  id: "value",
+                  header: "Value",
+                  cell: (row) => {
+                    const columnMeta = columnByName.get(row.columnName);
+                    return formatValueWithLabel(row.value, columnMeta?.valueLabels);
+                  },
+                },
                 {
                   id: "ratio",
                   header: "Lift",
@@ -939,8 +1103,22 @@ function ProfilePage() {
                 rows={comparison.a.overIndexing}
                 rowKey={(row, index) => `a-${row.columnName}-${row.value}-${index}`}
                 columns={[
-                  { id: "column", header: "Column", cell: (row) => row.columnName },
-                  { id: "value", header: "Value", cell: (row) => row.value },
+                  {
+                    id: "column",
+                    header: "Column",
+                    cell: (row) => {
+                      const columnMeta = columnByName.get(row.columnName);
+                      return columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
+                    },
+                  },
+                  {
+                    id: "value",
+                    header: "Value",
+                    cell: (row) => {
+                      const columnMeta = columnByName.get(row.columnName);
+                      return formatValueWithLabel(row.value, columnMeta?.valueLabels);
+                    },
+                  },
                   {
                     id: "ratio",
                     header: "Lift",
@@ -964,8 +1142,22 @@ function ProfilePage() {
                 rows={comparison.b.overIndexing}
                 rowKey={(row, index) => `b-${row.columnName}-${row.value}-${index}`}
                 columns={[
-                  { id: "column", header: "Column", cell: (row) => row.columnName },
-                  { id: "value", header: "Value", cell: (row) => row.value },
+                  {
+                    id: "column",
+                    header: "Column",
+                    cell: (row) => {
+                      const columnMeta = columnByName.get(row.columnName);
+                      return columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
+                    },
+                  },
+                  {
+                    id: "value",
+                    header: "Value",
+                    cell: (row) => {
+                      const columnMeta = columnByName.get(row.columnName);
+                      return formatValueWithLabel(row.value, columnMeta?.valueLabels);
+                    },
+                  },
                   {
                     id: "ratio",
                     header: "Lift",

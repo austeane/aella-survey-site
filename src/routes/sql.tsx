@@ -199,6 +199,7 @@ function SqlConsolePage() {
 
     addNotebookEntry({
       title: `SQL: ${sql.trim().slice(0, 60)}${sql.trim().length > 60 ? "..." : ""}`,
+      sourceUrl: window.location.href,
       queryDefinition: {
         type: "sql",
         params: { sql },

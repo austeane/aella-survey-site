@@ -1,9 +1,12 @@
 import { useMemo } from "react";
+import { Link } from "@tanstack/react-router";
 
 import { CAVEAT_DEFINITIONS } from "@/lib/schema/caveats";
 import { asNullableNumber, asNumber, formatNumber, formatPercent } from "@/lib/format";
+import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
+import relationshipData from "@/lib/schema/relationships.generated.json";
 import { MissingnessBadge } from "./missingness-badge";
 import { SampleSizeDisplay } from "./sample-size-display";
 import { ScrollArea } from "./ui/scroll-area";
@@ -22,46 +25,21 @@ interface CategoryRow {
   percentage: number;
 }
 
+interface Relationship {
+  column: string;
+  metric: string;
+  value: number;
+  n: number;
+}
+
+interface RelationshipData {
+  relationships: Record<string, Relationship[]>;
+}
+
+const relationshipsByColumn = (relationshipData as RelationshipData).relationships;
+
 function encodeSql(sql: string): string {
   return encodeURIComponent(sql);
-}
-
-function candidateValueKeys(value: string): string[] {
-  const trimmed = value.trim();
-  if (trimmed.length === 0) {
-    return [trimmed];
-  }
-
-  const candidates = new Set<string>([trimmed]);
-  const numeric = Number(trimmed);
-
-  if (Number.isFinite(numeric)) {
-    candidates.add(String(numeric));
-    if (Number.isInteger(numeric)) {
-      candidates.add(String(Math.trunc(numeric)));
-    }
-  }
-
-  if (/^-?\d+\.0+$/.test(trimmed)) {
-    candidates.add(trimmed.replace(/\.0+$/, ""));
-  }
-
-  return [...candidates];
-}
-
-function formatValueWithLabel(value: string, valueLabels?: Record<string, string>): string {
-  if (!valueLabels || value === "NULL") {
-    return value;
-  }
-
-  for (const key of candidateValueKeys(value)) {
-    const label = valueLabels[key];
-    if (label) {
-      return `${value} - ${label}`;
-    }
-  }
-
-  return value;
 }
 
 export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
@@ -179,6 +157,18 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
     return allColumns.find((candidate) => candidate.name !== column.name)?.name ?? null;
   }, [allColumns, column]);
 
+  const relatedColumns = useMemo(() => {
+    if (!column) return [];
+    const related = relationshipsByColumn[column.name] ?? [];
+    return related.slice(0, 3).map((item) => {
+      const meta = allColumns.find((candidate) => candidate.name === item.column);
+      return {
+        name: item.column,
+        displayName: meta ? getColumnDisplayName(meta) : item.column,
+      };
+    });
+  }, [allColumns, column]);
+
   if (!column) {
     return (
       <aside className="raised-panel">
@@ -218,7 +208,10 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
         title="Column Inspector"
         subtitle={
           <span className="flex flex-wrap items-center gap-2">
-            <span className="mono-value">{column.name}</span>
+            <span className="mono-value">{getColumnDisplayName(column)}</span>
+            {column.displayName ? (
+              <span className="mono-value text-[var(--ink-faded)]">({column.name})</span>
+            ) : null}
             <span className="null-badge">{column.logicalType}</span>
             <MissingnessBadge meaning={column.nullMeaning} />
           </span>
@@ -314,6 +307,26 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
             </article>
           ))}
         </ScrollArea>
+      </div>
+
+      <div>
+        <p className="mono-label">Related Columns</p>
+        {relatedColumns.length > 0 ? (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {relatedColumns.map((item) => (
+              <Link
+                key={item.name}
+                className="editorial-button"
+                to="/relationships"
+                search={{ column: item.name }}
+              >
+                {item.displayName}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <p className="section-subtitle">No precomputed related columns available.</p>
+        )}
       </div>
 
       <div>

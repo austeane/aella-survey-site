@@ -1,18 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
 
+import { ColumnCombobox } from "@/components/column-combobox";
 import { SectionHeader } from "@/components/section-header";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { getColumnDisplayName } from "@/lib/format-labels";
 import { formatNumber } from "@/lib/format";
+import schemaMetadata from "@/lib/schema/columns.generated.json";
 import relationshipData from "@/lib/schema/relationships.generated.json";
 
 export const Route = createFileRoute("/relationships")({
+  validateSearch: (search): { column?: string } => ({
+    column: typeof search.column === "string" ? search.column : undefined,
+  }),
   component: RelationshipsPage,
 });
 
@@ -31,6 +30,8 @@ type RelationshipData = {
 };
 
 const data = relationshipData as RelationshipData;
+const schemaColumns = (schemaMetadata as { columns: Array<{ name: string; displayName?: string }> }).columns;
+const schemaByName = new Map(schemaColumns.map((column) => [column.name, column]));
 
 const columnNames = Object.keys(data.relationships).sort((a, b) =>
   a.localeCompare(b)
@@ -50,7 +51,30 @@ function metricLabel(metric: string): string {
 }
 
 function RelationshipsPage() {
-  const [selectedColumn, setSelectedColumn] = useState(columnNames[0] ?? "");
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/relationships" });
+  const [selectedColumn, setSelectedColumn] = useState(
+    search.column && columnNames.includes(search.column) ? search.column : columnNames[0] ?? "",
+  );
+
+  useEffect(() => {
+    void navigate({
+      search: { column: selectedColumn || undefined },
+      replace: true,
+    });
+  }, [selectedColumn, navigate]);
+
+  const columnOptions = useMemo(
+    () =>
+      columnNames.map((name) => {
+        const column = schemaByName.get(name);
+        return {
+          name,
+          displayName: column ? getColumnDisplayName(column) : name,
+        };
+      }),
+    [],
+  );
 
   const relationships = useMemo(() => {
     if (!selectedColumn) return [];
@@ -61,6 +85,11 @@ function RelationshipsPage() {
     if (relationships.length === 0) return 1;
     return Math.max(...relationships.map((r) => r.value));
   }, [relationships]);
+
+  const selectedColumnDisplayName = useMemo(() => {
+    const column = schemaByName.get(selectedColumn);
+    return column ? getColumnDisplayName(column) : selectedColumn;
+  }, [selectedColumn]);
 
   return (
     <div className="page">
@@ -82,18 +111,12 @@ function RelationshipsPage() {
 
         <label className="editorial-label">
           Select a column to see its strongest associations
-          <Select value={selectedColumn} onValueChange={setSelectedColumn}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a column" />
-            </SelectTrigger>
-            <SelectContent>
-              {columnNames.map((name) => (
-                <SelectItem key={name} value={name}>
-                  {name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <ColumnCombobox
+            columns={columnOptions}
+            value={selectedColumn}
+            onValueChange={setSelectedColumn}
+            placeholder="Choose a column"
+          />
         </label>
       </section>
 
@@ -103,7 +126,7 @@ function RelationshipsPage() {
           title="Top Related Columns"
           subtitle={
             relationships.length > 0
-              ? `${relationships.length} associations for "${selectedColumn}"`
+              ? `${relationships.length} associations for "${selectedColumnDisplayName}"`
               : "No associations found for this column"
           }
         />
@@ -130,6 +153,7 @@ function RelationshipsPage() {
                   return (
                     <tr key={rel.column}>
                       <td>
+                        <div className="space-y-1">
                         <Link
                           to="/explore"
                           search={{ x: selectedColumn, y: rel.column }}
@@ -139,8 +163,10 @@ function RelationshipsPage() {
                             borderBottom: "1px solid var(--rule-light)",
                           }}
                         >
-                          {rel.column}
+                          {getColumnDisplayName(schemaByName.get(rel.column) ?? { name: rel.column })}
                         </Link>
+                        <p className="mono-value text-[var(--ink-faded)]">{rel.column}</p>
+                        </div>
                       </td>
                       <td>
                         <span className="null-badge">

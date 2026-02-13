@@ -215,6 +215,49 @@ function roundRatio(value) {
   return Math.round(value * 10000) / 10000;
 }
 
+function truncateDisplayName(value, maxLength = 60) {
+  if (value.length <= maxLength) {
+    return value;
+  }
+
+  return `${value.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
+function toTitleCaseIdentifier(value) {
+  const spaced = value
+    .replace(/[_-]+/g, " ")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!spaced) {
+    return value;
+  }
+
+  return spaced
+    .split(" ")
+    .map((token) => {
+      if (token.length <= 4 && /^[A-Z0-9]+$/.test(token)) {
+        return token;
+      }
+      return `${token.slice(0, 1).toUpperCase()}${token.slice(1)}`;
+    })
+    .join(" ");
+}
+
+function buildDisplayName(name) {
+  const quotedMatch = name.match(/^"(.+)"\s+\([^)]+\)$/);
+  if (quotedMatch) {
+    return truncateDisplayName(quotedMatch[1].trim());
+  }
+
+  if (/^[A-Za-z0-9_-]+$/.test(name)) {
+    return truncateDisplayName(toTitleCaseIdentifier(name));
+  }
+
+  return truncateDisplayName(name.replaceAll('"', "").trim());
+}
+
 async function main() {
   await stat(sourcePath);
 
@@ -254,6 +297,7 @@ async function main() {
 
     columns.push({
       name,
+      displayName: buildDisplayName(name),
       duckdbType,
       logicalType: inferLogicalType(name, duckdbType, approxCardinality),
       nullRatio: roundRatio(nullRatio),

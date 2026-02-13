@@ -6,6 +6,7 @@ export type NullMeaning = "GATED" | "LATE_ADDED" | "NOT_APPLICABLE" | "UNKNOWN";
 
 export interface ColumnMetadata {
   name: string;
+  displayName?: string;
   duckdbType: string;
   logicalType: LogicalType;
   nullRatio: number;

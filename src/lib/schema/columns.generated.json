@@ -2,13 +2,14 @@
   "dataset": {
     "name": "Big Kink Survey (Public Sample)",
     "sourcePath": "/Users/austin/dev/kink/data/BKSPublic.parquet",
-    "generatedAt": "2026-02-13T00:42:23.183Z",
+    "generatedAt": "2026-02-13T01:35:43.999Z",
     "rowCount": 15503,
     "columnCount": 365
   },
   "columns": [
     {
       "name": "\"Engaging with or fantasizing about what arouses me feels therapeutic or healing to me\" (vmq8jqw)",
+      "displayName": "Engaging with or fantasizing about what arouses me feels...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -20,6 +21,7 @@
     },
     {
       "name": "\"I am aroused by being dominant in sexual interactions\" (6w3xquw)",
+      "displayName": "I am aroused by being dominant in sexual interactions",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0333,
@@ -31,6 +33,7 @@
     },
     {
       "name": "\"I am aroused by being submissive in sexual interactions\" (xem7hbu)",
+      "displayName": "I am aroused by being submissive in sexual interactions",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0333,
@@ -43,6 +46,7 @@
     },
     {
       "name": "\"I am ashamed or embarrassed about at least some of what arouses me\" (7cw1ziu)",
+      "displayName": "I am ashamed or embarrassed about at least some of what a...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -54,6 +58,7 @@
     },
     {
       "name": "\"I can get aroused by a partner doing what I like, even if I know they aren't aroused by it themselves\" (aw1a1ss)",
+      "displayName": "I can get aroused by a partner doing what I like, even if...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -65,6 +70,7 @@
     },
     {
       "name": "\"I find {bodypartsmost}:\" (xw7vr7a)",
+      "displayName": "I find {bodypartsmost}:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6457,
@@ -76,6 +82,7 @@
     },
     {
       "name": "\"I find age-related things (beyond \"normal\" stuff like being attracted to people your own age) to be:\" (92qqx0)",
+      "displayName": "I find age-related things (beyond \"normal\" stuff like bei...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7276,
@@ -87,6 +94,7 @@
     },
     {
       "name": "\"I find anal sex (with a penis or penile toy):\" (jhvha2f)",
+      "displayName": "I find anal sex (with a penis or penile toy):",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0002,
@@ -98,6 +106,7 @@
     },
     {
       "name": "\"I find blowjobs:\" (yuc275j)",
+      "displayName": "I find blowjobs:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -109,6 +118,7 @@
     },
     {
       "name": "\"I find cunnilingus:\" (jn2b355)",
+      "displayName": "I find cunnilingus:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -120,6 +130,7 @@
     },
     {
       "name": "\"I find dirtytalking erotic\" (947wne3)",
+      "displayName": "I find dirtytalking erotic",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -131,6 +142,7 @@
     },
     {
       "name": "\"I find it erotic when two people of the opposite gender to me sexually interact with each other\" (fbqcymm)",
+      "displayName": "I find it erotic when two people of the opposite gender t...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0003,
@@ -143,6 +155,7 @@
     },
     {
       "name": "\"I find it most erotic when the subject of my genderplay interest is:\"",
+      "displayName": "I find it most erotic when the subject of my genderplay i...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8238,
@@ -155,6 +168,7 @@
     },
     {
       "name": "\"I find personal freeuse dynamics, arrangements where one partner can sexually \"use\" the other without asking or negotiating, to be erotic\" (kspot4h)",
+      "displayName": "I find personal freeuse dynamics, arrangements where one...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5832,
@@ -166,6 +180,7 @@
     },
     {
       "name": "\"I find primal play to be:\" (9rncgqc)",
+      "displayName": "I find primal play to be:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4361,
@@ -177,6 +192,7 @@
     },
     {
       "name": "\"I find psychological pain/torture to be:\" (9hy7wy3)",
+      "displayName": "I find psychological pain/torture to be:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6697,
@@ -188,6 +204,7 @@
     },
     {
       "name": "\"I find scenarios where I eagerly beg others to be:\" (jvrbyep)",
+      "displayName": "I find scenarios where I eagerly beg others to be:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2497,
@@ -200,6 +217,7 @@
     },
     {
       "name": "\"I find scenarios where others eagerly beg me to be:\" (stmm5eg)",
+      "displayName": "I find scenarios where others eagerly beg me to be:",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2497,
@@ -212,6 +230,7 @@
     },
     {
       "name": "\"I find situations erotic where transformations are ___\" (d14kddh)",
+      "displayName": "I find situations erotic where transformations are ___",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8883,
@@ -224,6 +243,7 @@
     },
     {
       "name": "\"I find the thought of existing (in *nonsexual* situations) as a biological *female* to be erotic\" (6w84yry)",
+      "displayName": "I find the thought of existing (in *nonsexual* situations...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.1762,
@@ -236,6 +256,7 @@
     },
     {
       "name": "\"I find the thought of existing (in *nonsexual* situations) as a biological *male* to be erotic\" (l7vpprx)",
+      "displayName": "I find the thought of existing (in *nonsexual* situations...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.1762,
@@ -248,6 +269,7 @@
     },
     {
       "name": "\"I find the thought of masturbating alone as a biological female, to be erotic\" (sgdpy8l)",
+      "displayName": "I find the thought of masturbating alone as a biological...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.1762,
@@ -260,6 +282,7 @@
     },
     {
       "name": "\"I find the thought of masturbating alone as a biological male, to be erotic\" (guwym9g)",
+      "displayName": "I find the thought of masturbating alone as a biological...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.1762,
@@ -272,6 +295,7 @@
     },
     {
       "name": "\"I sometimes find people who have clearly reached sexual maturity, but are not yet adults (e.g., ages 13-17), to be sexually attractive\" (kbpolw9)",
+      "displayName": "I sometimes find people who have clearly reached sexual m...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -284,6 +308,7 @@
     },
     {
       "name": "\"I usually don't leave romantic relationships unless there's a very serious violation\" (b7gzhvz)",
+      "displayName": "I usually don't leave romantic relationships unless there...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8295,
@@ -295,6 +320,7 @@
     },
     {
       "name": "\"I've acted upon or experimented with all the things that arouse me\" (41kpfir)",
+      "displayName": "I've acted upon or experimented with all the things that...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -306,6 +332,7 @@
     },
     {
       "name": "\"I've experienced a lot of sexual harrassment\" (3knd12d)",
+      "displayName": "I've experienced a lot of sexual harrassment",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5109,
@@ -317,6 +344,7 @@
     },
     {
       "name": "\"If my partner is aroused by something, I can also be aroused by it, even if I don't normally find it erotic\" (j5yb5lu)",
+      "displayName": "If my partner is aroused by something, I can also be arou...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -328,6 +356,7 @@
     },
     {
       "name": "\"In general, casual sexual hookups have been a ___ experience for me\" (ytp3gfm)",
+      "displayName": "In general, casual sexual hookups have been a ___ experie...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8295,
@@ -339,6 +368,7 @@
     },
     {
       "name": "\"In general, I prefer scenarios where receiver of the pain is:\" (8r5zld8)",
+      "displayName": "In general, I prefer scenarios where receiver of the pain...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6698,
@@ -350,6 +380,7 @@
     },
     {
       "name": "\"In general, I prefer scenarios where the intensity of the pain is:\" (m73c3q1)",
+      "displayName": "In general, I prefer scenarios where the intensity of the...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6698,
@@ -361,6 +392,7 @@
     },
     {
       "name": "\"In general, on average, the optimal amount of consent in my preferred erotic scenarios is:\" (b0ukpvo)",
+      "displayName": "In general, on average, the optimal amount of consent in...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0004,
@@ -374,6 +406,7 @@
     },
     {
       "name": "\"In general, when my romantic relationships end, who initiates the breakup?\" (y33ksrt)",
+      "displayName": "In general, when my romantic relationships end, who initi...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8296,
@@ -385,6 +418,7 @@
     },
     {
       "name": "\"It's most erotic when the altered body is\" (wdflfgk)",
+      "displayName": "It's most erotic when the altered body is",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8902,
@@ -396,6 +430,7 @@
     },
     {
       "name": "\"Scenarios where pain is given to genitals are arousing to me\" (bobe874)",
+      "displayName": "Scenarios where pain is given to genitals are arousing to me",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6698,
@@ -407,6 +442,7 @@
     },
     {
       "name": "\"To what extent do you agree with this statement: I am a narcissist. (1bqtk47)",
+      "displayName": "To what extent do you agree with this statement: I am a n...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.916,
@@ -418,6 +454,7 @@
     },
     {
       "name": "abnormalbody",
+      "displayName": "Abnormalbody",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8478,
@@ -429,6 +466,7 @@
     },
     {
       "name": "age",
+      "displayName": "Age",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -440,6 +478,7 @@
     },
     {
       "name": "agegap",
+      "displayName": "Agegap",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7329,
@@ -451,6 +490,7 @@
     },
     {
       "name": "agreeablenessvariable",
+      "displayName": "Agreeablenessvariable",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -463,6 +503,7 @@
     },
     {
       "name": "allrollidentity",
+      "displayName": "Allrollidentity",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2995,
@@ -474,6 +515,7 @@
     },
     {
       "name": "animals2",
+      "displayName": "Animals2",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9708,
@@ -485,6 +527,7 @@
     },
     {
       "name": "animated",
+      "displayName": "Animated",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0847,
@@ -496,6 +539,7 @@
     },
     {
       "name": "appearance",
+      "displayName": "Appearance",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.3414,
@@ -507,6 +551,7 @@
     },
     {
       "name": "Are you currently experiencing PMS symptoms? (g953661)",
+      "displayName": "Are you currently experiencing PMS symptoms? (g953661)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9518,
@@ -518,6 +563,7 @@
     },
     {
       "name": "Are you on hormonal birth control? This is the pill or any hormonal implant (pbj1u8c)",
+      "displayName": "Are you on hormonal birth control? This is the pill or an...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9005,
@@ -529,6 +575,7 @@
     },
     {
       "name": "As an adult, have you been the victim of sexual assault? (ld0srat)",
+      "displayName": "As an adult, have you been the victim of sexual assault?...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0002,
@@ -540,6 +587,7 @@
     },
     {
       "name": "ascore",
+      "displayName": "Ascore",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.3528,
@@ -551,6 +599,7 @@
     },
     {
       "name": "At what age did you begin watching porn or reading erotic content at least semiregularly? (ugf1hyy)",
+      "displayName": "At what age did you begin watching porn or reading erotic...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0853,
@@ -563,6 +612,7 @@
     },
     {
       "name": "At what age did you first begin (at least semiregularly) masturbating?",
+      "displayName": "At what age did you first begin (at least semiregularly)...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0003,
@@ -574,6 +624,7 @@
     },
     {
       "name": "badends",
+      "displayName": "Badends",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9478,
@@ -585,6 +636,7 @@
     },
     {
       "name": "bestiality",
+      "displayName": "Bestiality",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.902,
@@ -596,6 +648,7 @@
     },
     {
       "name": "biomale",
+      "displayName": "Biomale",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -607,6 +660,7 @@
     },
     {
       "name": "bmi",
+      "displayName": "Bmi",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -618,6 +672,7 @@
     },
     {
       "name": "bondageaverage",
+      "displayName": "Bondageaverage",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.4388,
@@ -631,6 +686,7 @@
     },
     {
       "name": "bondagemost",
+      "displayName": "Bondagemost",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4586,
@@ -643,6 +699,7 @@
     },
     {
       "name": "brutality",
+      "displayName": "Brutality",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9452,
@@ -654,6 +711,7 @@
     },
     {
       "name": "Can you have vaginal orgasms *without* clitoral stimulation? (hy7nsai)",
+      "displayName": "Can you have vaginal orgasms *without* clitoral stimulati...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8444,
@@ -665,6 +723,7 @@
     },
     {
       "name": "cgl",
+      "displayName": "Cgl",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.733,
@@ -676,6 +735,7 @@
     },
     {
       "name": "Check all that apply: Scenarios you find erotic tend to involve *the other person/people/creatures* feeling",
+      "displayName": "Check all that apply: Scenarios you find erotic tend to i...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.0224,
@@ -687,6 +747,7 @@
     },
     {
       "name": "Check all that apply: Scenarios you find erotic tend to involve *you* feeling",
+      "displayName": "Check all that apply: Scenarios you find erotic tend to i...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.0079,
@@ -698,6 +759,7 @@
     },
     {
       "name": "childhood_adversity",
+      "displayName": "Childhood Adversity",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -710,6 +772,7 @@
     },
     {
       "name": "childhood_gender_tolerance",
+      "displayName": "Childhood Gender Tolerance",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0007,
@@ -722,6 +785,7 @@
     },
     {
       "name": "clothing",
+      "displayName": "Clothing",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4673,
@@ -733,6 +797,7 @@
     },
     {
       "name": "Common things: Check all the following categories that contain a thing that arouses you.",
+      "displayName": "Common things: Check all the following categories that co...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.011,
@@ -744,6 +809,7 @@
     },
     {
       "name": "Compared to other people of your same gender and age range, you are (yh6d44s)",
+      "displayName": "Compared to other people of your same gender and age rang...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0002,
@@ -755,6 +821,7 @@
     },
     {
       "name": "consciensiousnessvariable",
+      "displayName": "Consciensiousnessvariable",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -767,6 +834,7 @@
     },
     {
       "name": "creepy",
+      "displayName": "Creepy",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9557,
@@ -778,6 +846,7 @@
     },
     {
       "name": "cunnilingus",
+      "displayName": "Cunnilingus",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -789,6 +858,7 @@
     },
     {
       "name": "dirty",
+      "displayName": "Dirty",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9686,
@@ -800,6 +870,7 @@
     },
     {
       "name": "Do you feel as though you've \"induced\" new fetishes into yourself through the use of porn or erotic content, that otherwise would not have existed for you?",
+      "displayName": "Do you feel as though you've induced new fetishes into yo...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -811,6 +882,7 @@
     },
     {
       "name": "Do you get mood-based PMS symptoms during your menstrual cycle?",
+      "displayName": "Do you get mood-based PMS symptoms during your menstrual...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7829,
@@ -822,6 +894,7 @@
     },
     {
       "name": "Do you have baby fever? (9stu9yy)",
+      "displayName": "Do you have baby fever? (9stu9yy)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9897,
@@ -833,6 +906,7 @@
     },
     {
       "name": "eagerness",
+      "displayName": "Eagerness",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2415,
@@ -845,6 +919,7 @@
     },
     {
       "name": "exhibitionother",
+      "displayName": "Exhibitionother",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5663,
@@ -856,6 +931,7 @@
     },
     {
       "name": "exhibitionself",
+      "displayName": "Exhibitionself",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5663,
@@ -867,6 +943,7 @@
     },
     {
       "name": "extremebondage",
+      "displayName": "Extremebondage",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4388,
@@ -879,6 +956,7 @@
     },
     {
       "name": "extroversionvariable",
+      "displayName": "Extroversionvariable",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -891,6 +969,7 @@
     },
     {
       "name": "For animal transformations, which of the following are the most erotic to you?",
+      "displayName": "For animal transformations, which of the following are th...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9574,
@@ -903,6 +982,7 @@
     },
     {
       "name": "For animal transformations, you prefer when the final result is ____? (yta91wx)",
+      "displayName": "For animal transformations, you prefer when the final res...",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9561,
@@ -915,6 +995,7 @@
     },
     {
       "name": "For aunt/uncle, niece/nephew incest fantasies, which is your preferred pairing",
+      "displayName": "For aunt/uncle, niece/nephew incest fantasies, which is y...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9198,
@@ -926,6 +1007,7 @@
     },
     {
       "name": "For blood (menstrual), which of the following do you find erotic?",
+      "displayName": "For blood (menstrual), which of the following do you find...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9821,
@@ -937,6 +1019,7 @@
     },
     {
       "name": "For blood (normal), which of the following do you find erotic?",
+      "displayName": "For blood (normal), which of the following do you find er...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9638,
@@ -948,6 +1031,7 @@
     },
     {
       "name": "For breast milk, which of the following do you find erotic?",
+      "displayName": "For breast milk, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9327,
@@ -959,6 +1043,7 @@
     },
     {
       "name": "For general body transformation, which of the following is erotic?",
+      "displayName": "For general body transformation, which of the following i...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.936,
@@ -971,6 +1056,7 @@
     },
     {
       "name": "For grandparent/grandchild incest fantasies, which is your preferred pairing",
+      "displayName": "For grandparent/grandchild incest fantasies, which is you...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9846,
@@ -982,6 +1068,7 @@
     },
     {
       "name": "For male ejaculate, which of the following do you find erotic?",
+      "displayName": "For male ejaculate, which of the following do you find er...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8965,
@@ -994,6 +1081,7 @@
     },
     {
       "name": "For parent/child incest fantasies, which are your preferred pairings",
+      "displayName": "For parent/child incest fantasies, which are your preferr...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8992,
@@ -1005,6 +1093,7 @@
     },
     {
       "name": "For precum, which of the following do you find erotic?",
+      "displayName": "For precum, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9169,
@@ -1016,6 +1105,7 @@
     },
     {
       "name": "For saliva, which of the following do you find erotic?",
+      "displayName": "For saliva, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9053,
@@ -1027,6 +1117,7 @@
     },
     {
       "name": "For scat (poop), which of the following do you find erotic?",
+      "displayName": "For scat (poop), which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9855,
@@ -1038,6 +1129,7 @@
     },
     {
       "name": "For sibling incest fantasies, which is your preferred pairing",
+      "displayName": "For sibling incest fantasies, which is your preferred pai...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8765,
@@ -1049,6 +1141,7 @@
     },
     {
       "name": "For smegma, which of the following do you find erotic?",
+      "displayName": "For smegma, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.993,
@@ -1060,6 +1153,7 @@
     },
     {
       "name": "For squirt, which of the following do you find erotic?",
+      "displayName": "For squirt, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8479,
@@ -1071,6 +1165,7 @@
     },
     {
       "name": "For sweat, which of the following do you find erotic?",
+      "displayName": "For sweat, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9382,
@@ -1082,6 +1177,7 @@
     },
     {
       "name": "For urine, which of the following do you find erotic?",
+      "displayName": "For urine, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9146,
@@ -1093,6 +1189,7 @@
     },
     {
       "name": "For vomit, which of the following do you find erotic?",
+      "displayName": "For vomit, which of the following do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9923,
@@ -1104,6 +1201,7 @@
     },
     {
       "name": "For Which of the following categories of abnormal body states do you find erotic?",
+      "displayName": "For Which of the following categories of abnormal body st...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8926,
@@ -1115,6 +1213,7 @@
     },
     {
       "name": "For Which of the following categories of genderswapped body states do you find erotic?",
+      "displayName": "For Which of the following categories of genderswapped bo...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.943,
@@ -1127,6 +1226,7 @@
     },
     {
       "name": "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)",
+      "displayName": "From the ages of 0-14, how often were you spanked as a fo...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0005,
@@ -1138,6 +1238,7 @@
     },
     {
       "name": "frustration",
+      "displayName": "Frustration",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.2496,
@@ -1149,6 +1250,7 @@
     },
     {
       "name": "fulltimepower",
+      "displayName": "Fulltimepower",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.436,
@@ -1160,6 +1262,7 @@
     },
     {
       "name": "futa",
+      "displayName": "Futa",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8238,
@@ -1171,6 +1274,7 @@
     },
     {
       "name": "genderplay",
+      "displayName": "Genderplay",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8176,
@@ -1182,6 +1286,7 @@
     },
     {
       "name": "genderswapped",
+      "displayName": "Genderswapped",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8902,
@@ -1193,6 +1298,7 @@
     },
     {
       "name": "gentleness",
+      "displayName": "Gentleness",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.43,
@@ -1204,6 +1310,7 @@
     },
     {
       "name": "gentleness2most",
+      "displayName": "Gentleness2most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4581,
@@ -1215,6 +1322,7 @@
     },
     {
       "name": "Getting catcalled on the street (or the thought of getting catcalled) feels more: (3qh0yh8)",
+      "displayName": "Getting catcalled on the street (or the thought of gettin...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6363,
@@ -1226,6 +1334,7 @@
     },
     {
       "name": "givepain",
+      "displayName": "Givepain",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6697,
@@ -1237,6 +1346,7 @@
     },
     {
       "name": "gratification",
+      "displayName": "Gratification",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9478,
@@ -1248,6 +1358,7 @@
     },
     {
       "name": "Have you ever had a sexual experience with someone else who did not want the experience? (2zafc2j)",
+      "displayName": "Have you ever had a sexual experience with someone else w...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0002,
@@ -1259,6 +1370,7 @@
     },
     {
       "name": "Have you paid for porn/erotic content? (pnltks8)",
+      "displayName": "Have you paid for porn/erotic content? (pnltks8)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -1270,6 +1382,7 @@
     },
     {
       "name": "highenergy",
+      "displayName": "Highenergy",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0261,
@@ -1281,6 +1394,7 @@
     },
     {
       "name": "How \"sexually liberated\" was your upbringing? (fs700v2)",
+      "displayName": "How sexually liberated was your upbringing? (fs700v2)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0005,
@@ -1293,6 +1407,7 @@
     },
     {
       "name": "How honest were you when answering this survey? (g1vao1y)",
+      "displayName": "How honest were you when answering this survey? (g1vao1y)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0002,
@@ -1304,6 +1419,7 @@
     },
     {
       "name": "How horny are you right now? (1jtj2nx)",
+      "displayName": "How horny are you right now? (1jtj2nx)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8247,
@@ -1315,6 +1431,7 @@
     },
     {
       "name": "How horny have you been in the last 24 hours? (2hyrmvh)",
+      "displayName": "How horny have you been in the last 24 hours? (2hyrmvh)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8247,
@@ -1326,6 +1443,7 @@
     },
     {
       "name": "How important is it that the pain is also sexually gratifying to the recipient? (b31aufk)",
+      "displayName": "How important is it that the pain is also sexually gratif...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6697,
@@ -1337,6 +1455,7 @@
     },
     {
       "name": "How much of the porn or erotica you watch is violent? (joz3g52)",
+      "displayName": "How much of the porn or erotica you watch is violent? (jo...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0852,
@@ -1348,6 +1467,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in abnormal body/body part-related things? (si89mua)",
+      "displayName": "How old were you when you first experienced interest in a...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8901,
@@ -1359,6 +1479,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in age-related sexual interests? (489pmk6)",
+      "displayName": "How old were you when you first experienced interest in a...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7329,
@@ -1371,6 +1492,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in bestiality/creatures-related sexual interests? (w3xlgsv)",
+      "displayName": "How old were you when you first experienced interest in b...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.915,
@@ -1382,6 +1504,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in brutality-related sexual interests? (5rsjhm2)",
+      "displayName": "How old were you when you first experienced interest in b...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9478,
@@ -1393,6 +1516,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in clothing related sexual interests? (4kl54pc)",
+      "displayName": "How old were you when you first experienced interest in c...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4777,
@@ -1404,6 +1528,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in creepy/horror related sexual interests? (y9cxruq)",
+      "displayName": "How old were you when you first experienced interest in c...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9592,
@@ -1415,6 +1540,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in dirtiness related sexual interests? (l7wbfjh)",
+      "displayName": "How old were you when you first experienced interest in d...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.974,
@@ -1426,6 +1552,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in eagerness related sexual interests? (twg3prj)",
+      "displayName": "How old were you when you first experienced interest in e...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.2497,
@@ -1438,6 +1565,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in genderplay related sexual interests? (3yixh1c)",
+      "displayName": "How old were you when you first experienced interest in g...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8238,
@@ -1450,6 +1578,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in gentleness related sexual interests? (j6jn9rl)",
+      "displayName": "How old were you when you first experienced interest in g...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4357,
@@ -1461,6 +1590,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in humiliation related sexual interests? (jebtk3s)",
+      "displayName": "How old were you when you first experienced interest in h...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7791,
@@ -1472,6 +1602,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in incest? (9f6vg9x)",
+      "displayName": "How old were you when you first experienced interest in i...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8453,
@@ -1483,6 +1614,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in pregnancy related sexual interests? (c2yvk62)",
+      "displayName": "How old were you when you first experienced interest in p...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8015,
@@ -1494,6 +1626,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in scenarios involving sex toys? (iob8ewb)",
+      "displayName": "How old were you when you first experienced interest in s...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4618,
@@ -1505,6 +1638,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in sensory related sexual interests? (yg5rwaa)",
+      "displayName": "How old were you when you first experienced interest in s...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8144,
@@ -1516,6 +1650,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in specific body parts (not including standard sexual body parts like breasts or genitals)? (71x4a7w)",
+      "displayName": "How old were you when you first experienced interest in s...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.5643,
@@ -1527,6 +1662,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in transformation related sexual interests? (ju7swdc)",
+      "displayName": "How old were you when you first experienced interest in t...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8882,
@@ -1539,6 +1675,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in vore related sexual interests? (58x0gp5)",
+      "displayName": "How old were you when you first experienced interest in v...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.967,
@@ -1550,6 +1687,7 @@
     },
     {
       "name": "How old were you when you first experienced interest in your appearance-based sexual interests? (6qqg60a)",
+      "displayName": "How old were you when you first experienced interest in y...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.3529,
@@ -1561,6 +1699,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in bodily-secretions? (i2kfd9)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8129,
@@ -1572,6 +1711,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in bondage? (tdxu7cp)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4389,
@@ -1584,6 +1724,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in exhibitionism or voyeurism? (xwggkkr)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.5665,
@@ -1595,6 +1736,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in mental alteration? (nesc17f)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8108,
@@ -1606,6 +1748,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in multiple partners or related scenarios? (hz27wpx)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6003,
@@ -1617,6 +1760,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in mythical creatures? (xfj2rdq)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7589,
@@ -1628,6 +1772,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in nonconsent? (bx4o14o)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6472,
@@ -1639,6 +1784,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in power dynamics? (enrhyeb)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4362,
@@ -1650,6 +1796,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in sadomasochism? (zh8c32k)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6698,
@@ -1661,6 +1808,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in specific roles? (ce5t067)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.581,
@@ -1672,6 +1820,7 @@
     },
     {
       "name": "How old were you when you first experienced sexual interest in your preferred object/objects? (3vnq7jt)",
+      "displayName": "How old were you when you first experienced sexual intere...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8011,
@@ -1683,6 +1832,7 @@
     },
     {
       "name": "humiliation",
+      "displayName": "Humiliation",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7711,
@@ -1694,6 +1844,7 @@
     },
     {
       "name": "humiliation2most",
+      "displayName": "Humiliation2most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.789,
@@ -1705,6 +1856,7 @@
     },
     {
       "name": "If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)",
+      "displayName": "If you tried very hard, could you stop being aroused by s...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -1716,6 +1868,7 @@
     },
     {
       "name": "In erotic scenarios involving age gaps, I prefer to be ____ (6njm5tr)",
+      "displayName": "In erotic scenarios involving age gaps, I prefer to be __...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7701,
@@ -1728,6 +1881,7 @@
     },
     {
       "name": "In erotic scenarios involving nonconsent, you generally prefer when the nonconsenting person is:",
+      "displayName": "In erotic scenarios involving nonconsent, you generally p...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6473,
@@ -1739,6 +1893,7 @@
     },
     {
       "name": "In general, I prefer when the person in bondage is",
+      "displayName": "In general, I prefer when the person in bondage is",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4389,
@@ -1751,6 +1906,7 @@
     },
     {
       "name": "In general, it's most erotic when _____ wears the clothing you find erotic (eowvxbs)",
+      "displayName": "In general, it's most erotic when _____ wears the clothin...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4778,
@@ -1762,6 +1918,7 @@
     },
     {
       "name": "In general, the most erotic scenarios are: (6e7lhil)",
+      "displayName": "In general, the most erotic scenarios are: (6e7lhil)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0262,
@@ -1773,6 +1930,7 @@
     },
     {
       "name": "In general, you find it most erotic when the subject of humiliation is:",
+      "displayName": "In general, you find it most erotic when the subject of h...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7792,
@@ -1784,6 +1942,7 @@
     },
     {
       "name": "In scenarios you find erotic, you tend to identify with (or imagine being): (irv6czg)",
+      "displayName": "In scenarios you find erotic, you tend to identify with (...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0262,
@@ -1795,6 +1954,7 @@
     },
     {
       "name": "incest",
+      "displayName": "Incest",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8436,
@@ -1806,6 +1966,7 @@
     },
     {
       "name": "inducefetish",
+      "displayName": "Inducefetish",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.1133,
@@ -1817,6 +1978,7 @@
     },
     {
       "name": "knowwhatarousesyou",
+      "displayName": "Knowwhatarousesyou",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -1828,6 +1990,7 @@
     },
     {
       "name": "lightbondage",
+      "displayName": "Lightbondage",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4387,
@@ -1840,6 +2003,7 @@
     },
     {
       "name": "marriage100blood",
+      "displayName": "Marriage100blood",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8453,
@@ -1851,6 +2015,7 @@
     },
     {
       "name": "masterslave",
+      "displayName": "Masterslave",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.436,
@@ -1862,6 +2027,7 @@
     },
     {
       "name": "mediumbondage",
+      "displayName": "Mediumbondage",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4388,
@@ -1874,6 +2040,7 @@
     },
     {
       "name": "mentalalteration",
+      "displayName": "Mentalalteration",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8051,
@@ -1885,6 +2052,7 @@
     },
     {
       "name": "mentalalteration2most",
+      "displayName": "Mentalalteration2most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8209,
@@ -1896,6 +2064,7 @@
     },
     {
       "name": "mindbreak",
+      "displayName": "Mindbreak",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.436,
@@ -1907,6 +2076,7 @@
     },
     {
       "name": "multiplepartners",
+      "displayName": "Multiplepartners",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5959,
@@ -1918,6 +2088,7 @@
     },
     {
       "name": "My erotic fantasies involving toys typically involve ____ using the toys",
+      "displayName": "My erotic fantasies involving toys typically involve ____...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.462,
@@ -1929,6 +2100,7 @@
     },
     {
       "name": "mythical",
+      "displayName": "Mythical",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7544,
@@ -1940,6 +2112,7 @@
     },
     {
       "name": "neuroticismvariable",
+      "displayName": "Neuroticismvariable",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -1953,6 +2126,7 @@
     },
     {
       "name": "nonconsent",
+      "displayName": "Nonconsent",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6386,
@@ -1964,6 +2138,7 @@
     },
     {
       "name": "nonconsent1most",
+      "displayName": "Nonconsent1most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6685,
@@ -1975,6 +2150,7 @@
     },
     {
       "name": "normalsex",
+      "displayName": "Normalsex",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -1986,6 +2162,7 @@
     },
     {
       "name": "obedience",
+      "displayName": "Obedience",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.436,
@@ -1997,6 +2174,7 @@
     },
     {
       "name": "objects",
+      "displayName": "Objects",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7917,
@@ -2008,6 +2186,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7eg)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7eg)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.3299,
@@ -2019,6 +2198,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7eh)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7eh)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8774,
@@ -2030,6 +2210,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ei)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ei)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4583,
@@ -2041,6 +2222,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ej)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ej)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7891,
@@ -2052,6 +2234,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ek)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ek)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9251,
@@ -2063,6 +2246,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7el)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7el)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8209,
@@ -2074,6 +2258,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7em)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7em)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.625,
@@ -2085,6 +2270,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7en)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7en)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7686,
@@ -2096,6 +2282,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7eo)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7eo)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6685,
@@ -2107,6 +2294,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ep)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ep)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.853,
@@ -2118,6 +2306,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ew)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ew)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4658,
@@ -2129,6 +2318,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ex)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ex)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8716,
@@ -2140,6 +2330,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ey)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ey)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.659,
@@ -2151,6 +2342,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7ez)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7ez)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8507,
@@ -2162,6 +2354,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f0)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7f0)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6948,
@@ -2173,6 +2366,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f1)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7f1)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.82,
@@ -2184,6 +2378,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f2)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7f2)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4804,
@@ -2195,6 +2390,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f3)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7f3)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9023,
@@ -2206,6 +2402,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (35jn7f4)",
+      "displayName": "Of these options, which one is the most erotic? (35jn7f4)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.96,
@@ -2217,6 +2414,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77h)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77h)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9808,
@@ -2228,6 +2426,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77i)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77i)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8346,
@@ -2239,6 +2438,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77j)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77j)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9005,
@@ -2250,6 +2450,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77k)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77k)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.5706,
@@ -2261,6 +2462,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77l)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77l)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9634,
@@ -2272,6 +2474,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77m)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77m)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.6795,
@@ -2283,6 +2486,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77n)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77n)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9676,
@@ -2294,6 +2498,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77o)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77o)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9928,
@@ -2305,6 +2510,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (i73h77p)",
+      "displayName": "Of these options, which one is the most erotic? (i73h77p)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.986,
@@ -2316,6 +2522,7 @@
     },
     {
       "name": "Of these options, which one is the most erotic? (s4xytoy)",
+      "displayName": "Of these options, which one is the most erotic? (s4xytoy)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.94,
@@ -2327,6 +2534,7 @@
     },
     {
       "name": "older",
+      "displayName": "Older",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7329,
@@ -2338,6 +2546,7 @@
     },
     {
       "name": "opennessvariable",
+      "displayName": "Opennessvariable",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -2350,6 +2559,7 @@
     },
     {
       "name": "oralsexanimal",
+      "displayName": "Oralsexanimal",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9151,
@@ -2361,6 +2571,7 @@
     },
     {
       "name": "oralsexanimal2",
+      "displayName": "Oralsexanimal2",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9152,
@@ -2372,6 +2583,7 @@
     },
     {
       "name": "otherfeel1most",
+      "displayName": "Otherfeel1most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0561,
@@ -2383,6 +2595,7 @@
     },
     {
       "name": "penetration",
+      "displayName": "Penetration",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.915,
@@ -2394,6 +2607,7 @@
     },
     {
       "name": "penetration2",
+      "displayName": "Penetration2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.915,
@@ -2405,6 +2619,7 @@
     },
     {
       "name": "Personally, your preferred relationship style is: (4jib23m)",
+      "displayName": "Personally, your preferred relationship style is: (4jib23m)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0002,
@@ -2416,6 +2631,7 @@
     },
     {
       "name": "politics",
+      "displayName": "Politics",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -2427,6 +2643,7 @@
     },
     {
       "name": "pornhabit",
+      "displayName": "Pornhabit",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -2438,6 +2655,7 @@
     },
     {
       "name": "powerdynamic",
+      "displayName": "Powerdynamic",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4324,
@@ -2449,6 +2667,7 @@
     },
     {
       "name": "powerdynamic2most",
+      "displayName": "Powerdynamic2most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4658,
@@ -2460,6 +2679,7 @@
     },
     {
       "name": "powerlessnessvariable",
+      "displayName": "Powerlessnessvariable",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -2471,6 +2691,7 @@
     },
     {
       "name": "pregnancy",
+      "displayName": "Pregnancy",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7984,
@@ -2482,6 +2703,7 @@
     },
     {
       "name": "pregnancy2most",
+      "displayName": "Pregnancy2most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8716,
@@ -2493,6 +2715,7 @@
     },
     {
       "name": "progression",
+      "displayName": "Progression",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.733,
@@ -2504,6 +2727,7 @@
     },
     {
       "name": "receivepain",
+      "displayName": "Receivepain",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6697,
@@ -2515,6 +2739,7 @@
     },
     {
       "name": "regression",
+      "displayName": "Regression",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.733,
@@ -2526,6 +2751,7 @@
     },
     {
       "name": "roles",
+      "displayName": "Roles",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5653,
@@ -2537,6 +2763,7 @@
     },
     {
       "name": "sadomasochism",
+      "displayName": "Sadomasochism",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6635,
@@ -2548,6 +2775,7 @@
     },
     {
       "name": "secretions",
+      "displayName": "Secretions",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.796,
@@ -2559,6 +2787,7 @@
     },
     {
       "name": "Select all body parts you find significantly erotic",
+      "displayName": "Select all body parts you find significantly erotic",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.5664,
@@ -2570,6 +2799,7 @@
     },
     {
       "name": "sensory",
+      "displayName": "Sensory",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.7932,
@@ -2581,6 +2811,7 @@
     },
     {
       "name": "sexcount",
+      "displayName": "Sexcount",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0155,
@@ -2592,6 +2823,7 @@
     },
     {
       "name": "spanking",
+      "displayName": "Spanking",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.6697,
@@ -2603,6 +2835,7 @@
     },
     {
       "name": "straightness",
+      "displayName": "Straightness",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -2615,6 +2848,7 @@
     },
     {
       "name": "supernatural",
+      "displayName": "Supernatural",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4113,
@@ -2626,6 +2860,7 @@
     },
     {
       "name": "teasing",
+      "displayName": "Teasing",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2496,
@@ -2637,6 +2872,7 @@
     },
     {
       "name": "The thought of someone else admiring me while I am a man in the nude is: (g219v7x)",
+      "displayName": "The thought of someone else admiring me while I am a man...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9687,
@@ -2648,6 +2884,7 @@
     },
     {
       "name": "The thought of someone else admiring me while I am a woman in the nude is: (yf7onjn)",
+      "displayName": "The thought of someone else admiring me while I am a woma...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9414,
@@ -2659,6 +2896,7 @@
     },
     {
       "name": "The type of erotic content you prefer tends to be more (2y636ej)",
+      "displayName": "The type of erotic content you prefer tends to be more (2...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0847,
@@ -2670,6 +2908,7 @@
     },
     {
       "name": "The type of erotic content you prefer tends to be: (f98tjn5)",
+      "displayName": "The type of erotic content you prefer tends to be: (f98tjn5)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0848,
@@ -2681,6 +2920,7 @@
     },
     {
       "name": "Totalanimals",
+      "displayName": "Totalanimals",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9187,
@@ -2692,6 +2932,7 @@
     },
     {
       "name": "Totalanimals2",
+      "displayName": "Totalanimals2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9724,
@@ -2703,6 +2944,7 @@
     },
     {
       "name": "Totalbodyhorror",
+      "displayName": "Totalbodyhorror",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9913,
@@ -2714,6 +2956,7 @@
     },
     {
       "name": "Totalbodyparts",
+      "displayName": "Totalbodyparts",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.5663,
@@ -2725,6 +2968,7 @@
     },
     {
       "name": "Totalbodypartsabnormal",
+      "displayName": "Totalbodypartsabnormal",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8926,
@@ -2736,6 +2980,7 @@
     },
     {
       "name": "Totalbondage",
+      "displayName": "Totalbondage",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.442,
@@ -2749,6 +2994,7 @@
     },
     {
       "name": "Totalbrutal2",
+      "displayName": "Totalbrutal2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9563,
@@ -2760,6 +3006,7 @@
     },
     {
       "name": "Totalclothingitems",
+      "displayName": "Totalclothingitems",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.6729,
@@ -2771,6 +3018,7 @@
     },
     {
       "name": "Totalcreep2",
+      "displayName": "Totalcreep2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9607,
@@ -2782,6 +3030,7 @@
     },
     {
       "name": "Totaldirty2",
+      "displayName": "Totaldirty2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9766,
@@ -2793,6 +3042,7 @@
     },
     {
       "name": "Totaleager2",
+      "displayName": "Totaleager2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.2714,
@@ -2805,6 +3055,7 @@
     },
     {
       "name": "Totalfetish1",
+      "displayName": "Totalfetish1",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.0108,
@@ -2817,6 +3068,7 @@
     },
     {
       "name": "Totalfetish2",
+      "displayName": "Totalfetish2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.3392,
@@ -2829,6 +3081,7 @@
     },
     {
       "name": "totalfetishcategory",
+      "displayName": "Totalfetishcategory",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
@@ -2841,6 +3094,7 @@
     },
     {
       "name": "Totalgenderplay2",
+      "displayName": "Totalgenderplay2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8411,
@@ -2853,6 +3107,7 @@
     },
     {
       "name": "Totalgentleness2",
+      "displayName": "Totalgentleness2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.4393,
@@ -2864,6 +3119,7 @@
     },
     {
       "name": "Totalhumiliation2",
+      "displayName": "Totalhumiliation2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.7807,
@@ -2876,6 +3132,7 @@
     },
     {
       "name": "Totalincest3",
+      "displayName": "Totalincest3",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8992,
@@ -2887,6 +3144,7 @@
     },
     {
       "name": "Totalmentalalteration2",
+      "displayName": "Totalmentalalteration2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8119,
@@ -2898,6 +3156,7 @@
     },
     {
       "name": "TotalMentalIllness",
+      "displayName": "Total Mental Illness",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -2909,6 +3168,7 @@
     },
     {
       "name": "Totalmultiplepartners2",
+      "displayName": "Totalmultiplepartners2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.6034,
@@ -2920,6 +3180,7 @@
     },
     {
       "name": "Totalmythical2",
+      "displayName": "Totalmythical2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.7608,
@@ -2931,6 +3192,7 @@
     },
     {
       "name": "Totalnonconsent1",
+      "displayName": "Totalnonconsent1",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.6507,
@@ -2943,6 +3205,7 @@
     },
     {
       "name": "Totalobjects2",
+      "displayName": "Totalobjects2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8226,
@@ -2954,6 +3217,7 @@
     },
     {
       "name": "Totalotherfeel1",
+      "displayName": "Totalotherfeel1",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.0221,
@@ -2965,6 +3229,7 @@
     },
     {
       "name": "Totalpowerdynamic2",
+      "displayName": "Totalpowerdynamic2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.4452,
@@ -2976,6 +3241,7 @@
     },
     {
       "name": "Totalpregnancy2",
+      "displayName": "Totalpregnancy2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8052,
@@ -2987,6 +3253,7 @@
     },
     {
       "name": "Totalprofession",
+      "displayName": "Totalprofession",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.6524,
@@ -2998,6 +3265,7 @@
     },
     {
       "name": "Totalsadomasochism1",
+      "displayName": "Totalsadomasochism1",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.6753,
@@ -3010,6 +3278,7 @@
     },
     {
       "name": "Totalsecretions",
+      "displayName": "Totalsecretions",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8131,
@@ -3021,6 +3290,7 @@
     },
     {
       "name": "Totalsensory2",
+      "displayName": "Totalsensory2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8156,
@@ -3032,6 +3302,7 @@
     },
     {
       "name": "Totalsexacts",
+      "displayName": "Totalsexacts",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.0161,
@@ -3043,6 +3314,7 @@
     },
     {
       "name": "Totalsexyrace",
+      "displayName": "Totalsexyrace",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8353,
@@ -3054,6 +3326,7 @@
     },
     {
       "name": "Totaltoys2",
+      "displayName": "Totaltoys2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.4662,
@@ -3065,6 +3338,7 @@
     },
     {
       "name": "Totaltransform1",
+      "displayName": "Totaltransform1",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8902,
@@ -3077,6 +3351,7 @@
     },
     {
       "name": "Totaltransform2",
+      "displayName": "Totaltransform2",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.9574,
@@ -3089,6 +3364,7 @@
     },
     {
       "name": "Totalyoufeel",
+      "displayName": "Totalyoufeel",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.0078,
@@ -3100,6 +3376,7 @@
     },
     {
       "name": "toys",
+      "displayName": "Toys",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4577,
@@ -3111,6 +3388,7 @@
     },
     {
       "name": "toys2most",
+      "displayName": "Toys2most",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4802,
@@ -3122,6 +3400,7 @@
     },
     {
       "name": "transform",
+      "displayName": "Transform",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8798,
@@ -3133,6 +3412,7 @@
     },
     {
       "name": "Uncommon things: Check all the following categories that contain a thing that arouses you.",
+      "displayName": "Uncommon things: Check all the following categories that...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.3392,
@@ -3144,6 +3424,7 @@
     },
     {
       "name": "violentporn",
+      "displayName": "Violentporn",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0848,
@@ -3155,6 +3436,7 @@
     },
     {
       "name": "vore",
+      "displayName": "Vore",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9609,
@@ -3166,6 +3448,7 @@
     },
     {
       "name": "voyeurother",
+      "displayName": "Voyeurother",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5663,
@@ -3177,6 +3460,7 @@
     },
     {
       "name": "voyeurself",
+      "displayName": "Voyeurself",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.5663,
@@ -3188,6 +3472,7 @@
     },
     {
       "name": "What kind of vore do you find erotic?",
+      "displayName": "What kind of vore do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9697,
@@ -3199,6 +3484,7 @@
     },
     {
       "name": "When I picture my own nude female breasts, buttocks, legs, or genitals, I find this: (qkw5ssz)",
+      "displayName": "When I picture my own nude female breasts, buttocks, legs...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.941,
@@ -3210,6 +3496,7 @@
     },
     {
       "name": "When I picture my own nude male buttocks, legs, or genitals, I find this: (f77m7qu)",
+      "displayName": "When I picture my own nude male buttocks, legs, or genita...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9684,
@@ -3221,6 +3508,7 @@
     },
     {
       "name": "When I picture myself as having a nude female body, I find this: (yqi5pre)",
+      "displayName": "When I picture myself as having a nude female body, I fin...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8775,
@@ -3232,6 +3520,7 @@
     },
     {
       "name": "When I picture myself with a nude male body, I find this: (dl5zw4l)",
+      "displayName": "When I picture myself with a nude male body, I find this:...",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.9217,
@@ -3243,6 +3532,7 @@
     },
     {
       "name": "When it comes to bestiality, which of the following creatures do you find erotic?",
+      "displayName": "When it comes to bestiality, which of the following creat...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9187,
@@ -3254,6 +3544,7 @@
     },
     {
       "name": "When it comes to body horror, which of the following are erotic?",
+      "displayName": "When it comes to body horror, which of the following are...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9913,
@@ -3265,6 +3556,7 @@
     },
     {
       "name": "When it comes to necrophilia, it's most erotic when your role is:",
+      "displayName": "When it comes to necrophilia, it's most erotic when your...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9826,
@@ -3276,6 +3568,7 @@
     },
     {
       "name": "When it comes to necrophilia, you generally prefer fantasies where the dead body is:",
+      "displayName": "When it comes to necrophilia, you generally prefer fantas...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9826,
@@ -3287,6 +3580,7 @@
     },
     {
       "name": "When it comes to power dynamics, you tend to prefer scenarios that are more (xjfb7yy)",
+      "displayName": "When it comes to power dynamics, you tend to prefer scena...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4361,
@@ -3298,6 +3592,7 @@
     },
     {
       "name": "Where are you currently at in your menstrual cycle? Options are based on a typical 28 day cycle, but cycle length can change (7ok2l1v)",
+      "displayName": "Where are you currently at in your menstrual cycle? Optio...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9087,
@@ -3309,6 +3604,7 @@
     },
     {
       "name": "Which body parts are most erotic when extremely huge?",
+      "displayName": "Which body parts are most erotic when extremely huge?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9657,
@@ -3320,6 +3616,7 @@
     },
     {
       "name": "Which body parts are most erotic when extremely small?",
+      "displayName": "Which body parts are most erotic when extremely small?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9902,
@@ -3331,6 +3628,7 @@
     },
     {
       "name": "Which body parts are most erotic when giant/oversized?",
+      "displayName": "Which body parts are most erotic when giant/oversized?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9578,
@@ -3342,6 +3640,7 @@
     },
     {
       "name": "Which describes you best? (cvc5b81)",
+      "displayName": "Which describes you best? (cvc5b81)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0263,
@@ -3353,6 +3652,7 @@
     },
     {
       "name": "Which of the following bodily secretions do you find erotic?",
+      "displayName": "Which of the following bodily secretions do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8131,
@@ -3364,6 +3664,7 @@
     },
     {
       "name": "Which of the following body modifications do you find significantly erotic?",
+      "displayName": "Which of the following body modifications do you find sig...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.4034,
@@ -3375,6 +3676,7 @@
     },
     {
       "name": "Which of the following body types do you find significantly erotic?",
+      "displayName": "Which of the following body types do you find significant...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4637,
@@ -3386,6 +3688,7 @@
     },
     {
       "name": "Which of the following body weights do you find most erotic? (1jq57nf)",
+      "displayName": "Which of the following body weights do you find most erot...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.3528,
@@ -3397,6 +3700,7 @@
     },
     {
       "name": "Which of the following categories contains things you find erotic?",
+      "displayName": "Which of the following categories contains things you fin...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.5914,
@@ -3408,6 +3712,7 @@
     },
     {
       "name": "Which of the following categories of transformations do you find erotic?",
+      "displayName": "Which of the following categories of transformations do y...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8902,
@@ -3420,6 +3725,7 @@
     },
     {
       "name": "Which of the following disgust-oriented things do you find erotic?",
+      "displayName": "Which of the following disgust-oriented things do you fin...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9766,
@@ -3431,6 +3737,7 @@
     },
     {
       "name": "Which of the following do you find erotic, in the context of humiliation?",
+      "displayName": "Which of the following do you find erotic, in the context...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.7808,
@@ -3442,6 +3749,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (26qr0sp)",
+      "displayName": "Which of the following do you find erotic? (26qr0sp)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.776,
@@ -3453,6 +3761,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (32snt5e)",
+      "displayName": "Which of the following do you find erotic? (32snt5e)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8932,
@@ -3464,6 +3773,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (3hof3bj)",
+      "displayName": "Which of the following do you find erotic? (3hof3bj)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8489,
@@ -3475,6 +3785,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (46pfeif)",
+      "displayName": "Which of the following do you find erotic? (46pfeif)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.677,
@@ -3486,6 +3797,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (5j281rq)",
+      "displayName": "Which of the following do you find erotic? (5j281rq)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8534,
@@ -3497,6 +3809,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (5mhacm7)",
+      "displayName": "Which of the following do you find erotic? (5mhacm7)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.878,
@@ -3508,6 +3821,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (88ox5nl)",
+      "displayName": "Which of the following do you find erotic? (88ox5nl)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.7546,
@@ -3519,6 +3833,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (9d7qzaw)",
+      "displayName": "Which of the following do you find erotic? (9d7qzaw)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8756,
@@ -3530,6 +3845,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (9fkr5dx)",
+      "displayName": "Which of the following do you find erotic? (9fkr5dx)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9034,
@@ -3541,6 +3857,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (9kmxhci)",
+      "displayName": "Which of the following do you find erotic? (9kmxhci)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9147,
@@ -3552,6 +3869,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (a1m9v6u)",
+      "displayName": "Which of the following do you find erotic? (a1m9v6u)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9541,
@@ -3563,6 +3881,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (afadhb)",
+      "displayName": "Which of the following do you find erotic? (afadhb)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9764,
@@ -3574,6 +3893,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (fnwke2d)",
+      "displayName": "Which of the following do you find erotic? (fnwke2d)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.7682,
@@ -3585,6 +3905,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (fv0xaot)",
+      "displayName": "Which of the following do you find erotic? (fv0xaot)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7142,
@@ -3596,6 +3917,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (g5qw0tc)",
+      "displayName": "Which of the following do you find erotic? (g5qw0tc)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.7918,
@@ -3607,6 +3929,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (lb02f7w)",
+      "displayName": "Which of the following do you find erotic? (lb02f7w)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9118,
@@ -3618,6 +3941,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (lfolao)",
+      "displayName": "Which of the following do you find erotic? (lfolao)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.6746,
@@ -3629,6 +3953,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (m66m8ix)",
+      "displayName": "Which of the following do you find erotic? (m66m8ix)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8891,
@@ -3640,6 +3965,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (mfc7eve)",
+      "displayName": "Which of the following do you find erotic? (mfc7eve)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.6901,
@@ -3651,6 +3977,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (npcvctu)",
+      "displayName": "Which of the following do you find erotic? (npcvctu)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8461,
@@ -3662,6 +3989,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (ovb55gx)",
+      "displayName": "Which of the following do you find erotic? (ovb55gx)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9755,
@@ -3673,6 +4001,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (rhb3fup)",
+      "displayName": "Which of the following do you find erotic? (rhb3fup)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9294,
@@ -3684,6 +4013,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (twppkp3)",
+      "displayName": "Which of the following do you find erotic? (twppkp3)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9753,
@@ -3695,6 +4025,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (u661iml)",
+      "displayName": "Which of the following do you find erotic? (u661iml)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.7613,
@@ -3706,6 +4037,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (uju0gwc)",
+      "displayName": "Which of the following do you find erotic? (uju0gwc)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9318,
@@ -3717,6 +4049,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (vqogs86)",
+      "displayName": "Which of the following do you find erotic? (vqogs86)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.6783,
@@ -3728,6 +4061,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (w1qo1g1)",
+      "displayName": "Which of the following do you find erotic? (w1qo1g1)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8506,
@@ -3739,6 +4073,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (wddo7ee)",
+      "displayName": "Which of the following do you find erotic? (wddo7ee)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9809,
@@ -3750,6 +4085,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (xhe2co5)",
+      "displayName": "Which of the following do you find erotic? (xhe2co5)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.9142,
@@ -3761,6 +4097,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (yf0rmix)",
+      "displayName": "Which of the following do you find erotic? (yf0rmix)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8587,
@@ -3772,6 +4109,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (yftwuzf)",
+      "displayName": "Which of the following do you find erotic? (yftwuzf)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.5813,
@@ -3783,6 +4121,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (ymvkzuu)",
+      "displayName": "Which of the following do you find erotic? (ymvkzuu)",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8142,
@@ -3794,6 +4133,7 @@
     },
     {
       "name": "Which of the following do you find erotic? (zewlx2)",
+      "displayName": "Which of the following do you find erotic? (zewlx2)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9843,
@@ -3805,6 +4145,7 @@
     },
     {
       "name": "Which of the following do you find to be erotic?",
+      "displayName": "Which of the following do you find to be erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.4422,
@@ -3816,6 +4157,7 @@
     },
     {
       "name": "Which of the following drugs are erotic in sexual situations?",
+      "displayName": "Which of the following drugs are erotic in sexual situati...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9142,
@@ -3827,6 +4169,7 @@
     },
     {
       "name": "Which of the following is erotic?",
+      "displayName": "Which of the following is erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8052,
@@ -3838,6 +4181,7 @@
     },
     {
       "name": "Which of the following is the most severe for you? (trspees)",
+      "displayName": "Which of the following is the most severe for you? (trspees)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.7052,
@@ -3849,6 +4193,7 @@
     },
     {
       "name": "Which of the following messiness do you find erotic?",
+      "displayName": "Which of the following messiness do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.9919,
@@ -3860,6 +4205,7 @@
     },
     {
       "name": "Which of the following nonconsent scenarios do you find erotic?",
+      "displayName": "Which of the following nonconsent scenarios do you find e...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.6507,
@@ -3871,6 +4217,7 @@
     },
     {
       "name": "Which of the following pairings do you find erotic?",
+      "displayName": "Which of the following pairings do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8473,
@@ -3882,6 +4229,7 @@
     },
     {
       "name": "Which of the following roles are erotic?",
+      "displayName": "Which of the following roles are erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.6525,
@@ -3893,6 +4241,7 @@
     },
     {
       "name": "Which of the following sensations do you find erotic?",
+      "displayName": "Which of the following sensations do you find erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.8156,
@@ -3904,6 +4253,7 @@
     },
     {
       "name": "Which of the following sex acts do you find significantly erotic?",
+      "displayName": "Which of the following sex acts do you find significantly...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.0163,
@@ -3915,6 +4265,7 @@
     },
     {
       "name": "Which of the following sexual positions do you find significantly erotic?",
+      "displayName": "Which of the following sexual positions do you find signi...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.0148,
@@ -3926,6 +4277,7 @@
     },
     {
       "name": "Which of the following types of mental alteration do you find erotic?",
+      "displayName": "Which of the following types of mental alteration do you...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.812,
@@ -3937,6 +4289,7 @@
     },
     {
       "name": "Which of the following types of sadomasochism do you find erotic?\"",
+      "displayName": "Which of the following types of sadomasochism do you find...",
       "duckdbType": "VARCHAR",
       "logicalType": "text",
       "nullRatio": 0.6753,
@@ -3948,6 +4301,7 @@
     },
     {
       "name": "whowears",
+      "displayName": "Whowears",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.4776,
@@ -3959,6 +4313,7 @@
     },
     {
       "name": "worshipped",
+      "displayName": "Worshipped",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2496,
@@ -3970,6 +4325,7 @@
     },
     {
       "name": "worshipping",
+      "displayName": "Worshipping",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.2496,
@@ -3981,6 +4337,7 @@
     },
     {
       "name": "written",
+      "displayName": "Written",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.0848,
@@ -3992,6 +4349,7 @@
     },
     {
       "name": "You ______ what arouses you (7mz0awx)",
+      "displayName": "You ______ what arouses you (7mz0awx)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0001,
@@ -4003,6 +4361,7 @@
     },
     {
       "name": "You find raceplay to be: (fkk3ykn)",
+      "displayName": "You find raceplay to be: (fkk3ykn)",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0.8787,
@@ -4014,6 +4373,7 @@
     },
     {
       "name": "You find vore in which orifices to be erotic?",
+      "displayName": "You find vore in which orifices to be erotic?",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.969,
@@ -4025,6 +4385,7 @@
     },
     {
       "name": "You prefer it when the mentally altered person is:",
+      "displayName": "You prefer it when the mentally altered person is:",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.8109,
@@ -4036,6 +4397,7 @@
     },
     {
       "name": "You're more sexually attracted to people whose gender identity ____ match their genitals (5b30vz2)",
+      "displayName": "You're more sexually attracted to people whose gender ide...",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.001,
@@ -4048,6 +4410,7 @@
     },
     {
       "name": "youfeelmost",
+      "displayName": "Youfeelmost",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0341,
@@ -4059,6 +4422,7 @@
     },
     {
       "name": "Your preferred breast size in a partner is: (dnuiinj)",
+      "displayName": "Your preferred breast size in a partner is: (dnuiinj)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.4471,
@@ -4070,6 +4434,7 @@
     },
     {
       "name": "Your sexual interests feel (44qhm16)",
+      "displayName": "Your sexual interests feel (44qhm16)",
       "duckdbType": "VARCHAR",
       "logicalType": "categorical",
       "nullRatio": 0.0003,

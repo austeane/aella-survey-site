@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 
 import { formatNumber, formatPercent } from "@/lib/format";
+import { formatValueWithLabel } from "@/lib/format-labels";
 
 type PrimitiveValue = string | number | boolean | null;
 
@@ -15,6 +16,10 @@ export interface PivotInputRow {
 export interface PivotCellDetail {
   x: string;
   y: string;
+  xIsOther: boolean;
+  yIsOther: boolean;
+  topXValues: string[];
+  topYValues: string[];
   count: number;
   rowPercent: number;
   columnPercent: number;
@@ -28,6 +33,8 @@ interface PivotMatrixProps {
   rows: PivotInputRow[];
   topN: number;
   normalization: PivotNormalization;
+  xValueLabels?: Record<string, string>;
+  yValueLabels?: Record<string, string>;
   onCellClick?: (detail: PivotCellDetail) => void;
 }
 
@@ -68,6 +75,8 @@ export function PivotMatrix({
   rows,
   topN,
   normalization,
+  xValueLabels,
+  yValueLabels,
   onCellClick,
 }: PivotMatrixProps) {
   const matrix = useMemo(() => {
@@ -130,6 +139,8 @@ export function PivotMatrix({
     return {
       xLabels,
       yLabels,
+      topX,
+      topY,
       cellCounts,
       rowTotals,
       columnTotals,
@@ -149,7 +160,7 @@ export function PivotMatrix({
             <th>Y \ X</th>
             {matrix.xLabels.map((xValue) => (
               <th key={xValue} className="numeric">
-                {xValue}
+                {formatValueWithLabel(xValue, xValueLabels)}
               </th>
             ))}
             <th className="numeric">Row Total</th>
@@ -161,13 +172,17 @@ export function PivotMatrix({
 
             return (
               <tr key={yValue}>
-                <td>{yValue}</td>
+                <td>{formatValueWithLabel(yValue, yValueLabels)}</td>
                 {matrix.xLabels.map((xValue) => {
                   const count = matrix.cellCounts.get(`${yValue}\u0000${xValue}`) ?? 0;
                   const columnTotal = matrix.columnTotals.get(xValue) ?? 0;
                   const detail: PivotCellDetail = {
                     x: xValue,
                     y: yValue,
+                    xIsOther: xValue === "Other",
+                    yIsOther: yValue === "Other",
+                    topXValues: matrix.topX,
+                    topYValues: matrix.topY,
                     count,
                     rowPercent: rowTotal > 0 ? (count / rowTotal) * 100 : 0,
                     columnPercent: columnTotal > 0 ? (count / columnTotal) * 100 : 0,

@@ -209,7 +209,41 @@ function AboutPage() {
       </section>
 
       <section className="editorial-panel space-y-5">
-        <SectionHeader number="04" title="Caveats & Interpretation" />
+        <SectionHeader number="04" title="Try This" />
+
+        <div className="space-y-3 border-l-2 border-[var(--rule)] pl-4">
+          <div>
+            <Link
+              to="/explore"
+              search={{ x: "straightness", y: "politics" }}
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              Explore orientation vs politics
+            </Link>
+          </div>
+          <div>
+            <Link
+              to="/explore"
+              search={{ x: "gender", y: "relationshipstyle" }}
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              Compare gender and relationship style
+            </Link>
+          </div>
+          <div>
+            <Link
+              to="/relationships"
+              search={{ column: "straightness" }}
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              Jump to strongest associations for straightness
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="editorial-panel space-y-5">
+        <SectionHeader number="05" title="Caveats & Interpretation" />
 
         <ul className="list-none space-y-3 pl-0">
           <li className="border-l-2 border-[var(--accent)] pl-3">
@@ -232,7 +266,7 @@ function AboutPage() {
       </section>
 
       <section className="editorial-panel space-y-5">
-        <SectionHeader number="05" title="Credits & Links" />
+        <SectionHeader number="06" title="Credits & Links" />
 
         <div className="space-y-3">
           <p>
@@ -278,7 +312,7 @@ function AboutPage() {
       </section>
 
       <section className="editorial-panel space-y-5">
-        <SectionHeader number="06" title="For AI Agents" />
+        <SectionHeader number="07" title="For AI Agents" />
 
         <p>
           This explorer exposes both a REST API and an MCP server so AI clients

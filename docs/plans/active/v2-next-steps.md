@@ -134,7 +134,7 @@ The BKS Explorer is deployed and functional at https://bks-explorer-production.u
 Current status after this pass:
 
 - `nullMeaning` is now supported end-to-end in contracts/types/schema metadata derivation.
-- `displayName` mapping is still not implemented.
+- `displayName` mapping is now implemented end-to-end via `scripts/profile-schema.mjs` and `columns.generated.json`.
 - `description` enrichment is still not implemented.
 - `group` sub-tag metadata is still not implemented.
 
@@ -581,16 +581,16 @@ These can be refined with manual overrides in a separate mapping file if needed.
 
 ### 4.2 Add `displayName` to Column Metadata
 
-Status: Deferred.
+Status: Implemented.
 
-Many columns have long names like `"Engaging with or fantasizing about what arouses me feels therapeutic or healing to me" (vmq8jqw)`. Adding a short `displayName` (e.g., "Therapeutic arousal") improves UI readability.
+Many columns have long names like `"Engaging with or fantasizing about what arouses me feels therapeutic or healing to me" (vmq8jqw)`. A short `displayName` is now generated and consumed by combobox/dropdown UI for readability.
 
 **Approach**: Generate from column name by:
 1. Stripping the `(id)` suffix
 2. Truncating to ~40 characters with ellipsis if needed
 3. Manual overrides for key columns (demographics, OCEAN, derived scores)
 
-Store in a separate `src/lib/schema/display-names.ts` mapping file rather than regenerating the full JSON.
+Implementation now lives in `scripts/profile-schema.mjs` and is persisted directly in `src/lib/schema/columns.generated.json`.
 
 ### 4.3 Update Contracts and Types
 
@@ -635,7 +635,7 @@ nullMeaning?: "GATED" | "LATE_ADDED" | "NOT_APPLICABLE" | "UNKNOWN";
 | `src/routes/relationships.tsx` | 3 | Relationship Finder page |
 | `scripts/precompute-relationships.ts` | 3 | Build-time relationship computation |
 | `src/lib/schema/relationships.generated.json` | 3 | Precomputed relationship data |
-| `src/lib/schema/display-names.ts` | 4 | Short display names for columns |
+| `src/lib/format-labels.ts` | 4 | Shared value label + column display formatting |
 | `src/routes/notebook.tsx` | 4 | Exploration Notebook page |
 | `src/lib/notebook-store.ts` | 4 | localStorage notebook persistence |
 | `src/lib/cell-hygiene.ts` | 4 | Small-cell suppression utilities |

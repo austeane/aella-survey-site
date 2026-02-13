@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { ColumnCombobox } from "@/components/column-combobox";
 import { DataTable } from "@/components/data-table";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { MissingnessBadge } from "@/components/missingness-badge";
 import { PivotMatrix, type PivotCellDetail, type PivotNormalization } from "@/components/pivot-matrix";
 import { SampleSizeDisplay } from "@/components/sample-size-display";
@@ -18,15 +20,41 @@ import {
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 
+import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { addNotebookEntry } from "@/lib/notebook-store";
+import { useDuckDB } from "@/lib/duckdb/provider";
 import { buildWhereClause, quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
 
 export const Route = createFileRoute("/explore")({
-  validateSearch: (search) => ({
+  validateSearch: (
+    search,
+  ): {
+    x?: string;
+    y?: string;
+    normalization?: PivotNormalization;
+    topN?: number;
+    filterColumn?: string;
+    filterValues?: string;
+  } => ({
     x: typeof search.x === "string" ? search.x : undefined,
     y: typeof search.y === "string" ? search.y : undefined,
+    normalization:
+      search.normalization === "count" ||
+      search.normalization === "row" ||
+      search.normalization === "column" ||
+      search.normalization === "overall"
+        ? search.normalization
+        : undefined,
+    topN:
+      typeof search.topN === "number"
+        ? search.topN
+        : typeof search.topN === "string" && Number.isFinite(Number(search.topN))
+          ? Number(search.topN)
+          : undefined,
+    filterColumn: typeof search.filterColumn === "string" ? search.filterColumn : undefined,
+    filterValues: typeof search.filterValues === "string" ? search.filterValues : undefined,
   }),
   component: ExplorePage,
 });
@@ -37,7 +65,6 @@ const NORMALIZATION_OPTIONS: Array<{ value: PivotNormalization; label: string }>
   { value: "column", label: "Column %" },
   { value: "overall", label: "Overall %" },
 ];
-const NONE_FILTER = "__none_filter__";
 
 function associationLabel(cramersV: number): string {
   if (cramersV < 0.1) return "negligible";
@@ -97,9 +124,13 @@ function computeCramersV(rows: Array<{ x: string; y: string; count: number }>): 
 
 function ExplorePage() {
   const search = Route.useSearch();
+  const [initialSearch] = useState(search);
+  const navigate = useNavigate({ from: "/explore" });
+  const { phase } = useDuckDB();
 
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
+  const [searchReady, setSearchReady] = useState(false);
 
   const [xColumn, setXColumn] = useState("");
   const [yColumn, setYColumn] = useState("");
@@ -122,34 +153,75 @@ function ExplorePage() {
         setSchema(nextSchema);
 
         const preferredX =
-          (search.x ? nextSchema.columns.find((c) => c.name === search.x) : undefined) ??
+          (initialSearch.x ? nextSchema.columns.find((c) => c.name === initialSearch.x) : undefined) ??
           nextSchema.columns.find((c) => c.name === "straightness") ??
           nextSchema.columns[0];
 
         const preferredY =
-          (search.y ? nextSchema.columns.find((c) => c.name === search.y) : undefined) ??
+          (initialSearch.y ? nextSchema.columns.find((c) => c.name === initialSearch.y) : undefined) ??
           nextSchema.columns.find((c) => c.name === "politics") ??
           nextSchema.columns[1];
 
         setXColumn(preferredX?.name ?? "");
         setYColumn(preferredY?.name ?? "");
+        setNormalization(initialSearch.normalization ?? "count");
+        setTopN(
+          Number.isFinite(initialSearch.topN)
+            ? Math.max(3, Math.min(30, Math.trunc(initialSearch.topN ?? 12)))
+            : 12,
+        );
+
+        const requestedFilter = initialSearch.filterColumn
+          ? nextSchema.columns.find((column) => column.name === initialSearch.filterColumn)
+          : undefined;
 
         const firstDemoFilter = nextSchema.columns.find(
           (c) => c.tags.includes("demographic") && c.logicalType === "categorical",
         );
-        setFilterColumn(firstDemoFilter?.name ?? "");
+        const selectedFilter = requestedFilter?.name ?? firstDemoFilter?.name ?? "";
+        setFilterColumn(selectedFilter);
+
+        const initialFilterValues =
+          selectedFilter && initialSearch.filterValues
+            ? initialSearch.filterValues.split(",").map((value) => value.trim()).filter(Boolean)
+            : [];
+        setSelectedFilterValues(initialFilterValues);
+        setSearchReady(true);
       })
       .catch((error: Error) => {
-        if (!cancelled) setSchemaError(error.message);
+        if (!cancelled) {
+          setSchemaError(error.message);
+          setSearchReady(true);
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [search.x, search.y]);
+  }, [initialSearch]);
+
+  useEffect(() => {
+    if (!searchReady) return;
+
+    void navigate({
+      search: {
+        x: xColumn || undefined,
+        y: yColumn || undefined,
+        normalization: normalization !== "count" ? normalization : undefined,
+        topN: topN !== 12 ? topN : undefined,
+        filterColumn: filterColumn || undefined,
+        filterValues: selectedFilterValues.length > 0 ? selectedFilterValues.join(",") : undefined,
+      },
+      replace: true,
+    });
+  }, [xColumn, yColumn, normalization, topN, filterColumn, selectedFilterValues, navigate, searchReady]);
 
   const xMeta = useMemo(() => schema?.columns.find((c) => c.name === xColumn) ?? null, [schema, xColumn]);
   const yMeta = useMemo(() => schema?.columns.find((c) => c.name === yColumn) ?? null, [schema, yColumn]);
+  const filterMeta = useMemo(
+    () => schema?.columns.find((c) => c.name === filterColumn) ?? null,
+    [schema, filterColumn],
+  );
 
   const isPivotable =
     xMeta != null &&
@@ -179,10 +251,6 @@ function ExplorePage() {
       count: asNumber(r[1]),
     }));
   }, [filterOptionsQuery.data]);
-
-  useEffect(() => {
-    setSelectedFilterValues([]);
-  }, [filterColumn]);
 
   const queryFilters = useMemo(() => {
     if (!filterColumn || selectedFilterValues.length === 0) return undefined;
@@ -286,6 +354,27 @@ function ExplorePage() {
   const sqlForCell = useMemo(() => {
     if (!selectedCell || !xColumn || !yColumn) return null;
 
+    const predicateForCell = (
+      columnName: string,
+      value: string,
+      isOther: boolean,
+      topValues: string[],
+    ): string[] => {
+      const quotedColumn = quoteIdentifier(columnName);
+      if (!isOther) {
+        return [`${quotedColumn} = ${quoteLiteral(value)}`];
+      }
+
+      const predicates = [`${quotedColumn} IS NOT NULL`];
+      if (topValues.length > 0) {
+        predicates.push(
+          `${quotedColumn} NOT IN (${topValues.map((item) => quoteLiteral(item)).join(", ")})`,
+        );
+      }
+
+      return predicates;
+    };
+
     const predicates: string[] = [];
     if (queryFilters) {
       for (const [columnName, rawValue] of Object.entries(queryFilters)) {
@@ -299,8 +388,12 @@ function ExplorePage() {
       }
     }
 
-    predicates.push(`${quoteIdentifier(xColumn)} = ${quoteLiteral(selectedCell.x)}`);
-    predicates.push(`${quoteIdentifier(yColumn)} = ${quoteLiteral(selectedCell.y)}`);
+    predicates.push(
+      ...predicateForCell(xColumn, selectedCell.x, selectedCell.xIsOther, selectedCell.topXValues),
+    );
+    predicates.push(
+      ...predicateForCell(yColumn, selectedCell.y, selectedCell.yIsOther, selectedCell.topYValues),
+    );
 
     return `
 SELECT *
@@ -319,6 +412,7 @@ LIMIT 250
 
     addNotebookEntry({
       title: `Cross-tab: ${xColumn} × ${yColumn}`,
+      sourceUrl: window.location.href,
       queryDefinition: {
         type: "crosstab",
         params: {
@@ -357,56 +451,38 @@ LIMIT 250
           <div className="grid gap-4 lg:grid-cols-2">
             <label className="editorial-label">
               X Column
-              <Select value={xColumn} onValueChange={setXColumn}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select X" />
-                </SelectTrigger>
-                <SelectContent>
-                  {schema.columns.map((column) => (
-                    <SelectItem key={column.name} value={column.name}>
-                      {column.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ColumnCombobox
+                columns={schema.columns}
+                value={xColumn}
+                onValueChange={setXColumn}
+                placeholder="Select X"
+              />
               {xMeta ? <MissingnessBadge meaning={xMeta.nullMeaning} /> : null}
             </label>
 
             <label className="editorial-label">
               Y Column
-              <Select value={yColumn} onValueChange={setYColumn}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Y" />
-                </SelectTrigger>
-                <SelectContent>
-                  {schema.columns.map((column) => (
-                    <SelectItem key={column.name} value={column.name}>
-                      {column.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ColumnCombobox
+                columns={schema.columns}
+                value={yColumn}
+                onValueChange={setYColumn}
+                placeholder="Select Y"
+              />
               {yMeta ? <MissingnessBadge meaning={yMeta.nullMeaning} /> : null}
             </label>
 
             <label className="editorial-label">
               Optional Demographic Filter
-              <Select
-                value={filterColumn || NONE_FILTER}
-                onValueChange={(value) => setFilterColumn(value === NONE_FILTER ? "" : value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="None" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NONE_FILTER}>None</SelectItem>
-                  {demographicColumns.map((column) => (
-                    <SelectItem key={column.name} value={column.name}>
-                      {column.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ColumnCombobox
+                columns={demographicColumns}
+                value={filterColumn}
+                includeNoneOption
+                noneOptionLabel="None"
+                onValueChange={(value) => {
+                  setFilterColumn(value);
+                  setSelectedFilterValues([]);
+                }}
+              />
             </label>
 
             <label className="editorial-label">
@@ -469,7 +545,9 @@ LIMIT 250
                       key={option.value}
                       className="flex items-center justify-between border border-[var(--rule)] bg-[var(--paper)] px-2.5 py-2"
                     >
-                      <span className="mono-value truncate pr-2">{option.value}</span>
+                      <span className="mono-value truncate pr-2">
+                        {formatValueWithLabel(option.value, filterMeta?.valueLabels)}
+                      </span>
                       <span className="mono-value text-[var(--ink-faded)]">{formatNumber(option.count)}</span>
                       <Checkbox
                         className="ml-3"
@@ -492,7 +570,9 @@ LIMIT 250
           ) : null}
         </section>
       ) : (
-        <section className="editorial-panel">Loading schema metadata...</section>
+        <section className="editorial-panel">
+          <LoadingSkeleton variant="panel" phase={phase} title="Loading schema metadata..." />
+        </section>
       )}
 
       <section className="editorial-panel space-y-4">
@@ -533,7 +613,8 @@ LIMIT 250
               rows={rows}
               topN={topN}
               normalization={normalization}
-
+              xValueLabels={xMeta?.valueLabels}
+              yValueLabels={yMeta?.valueLabels}
               onCellClick={setSelectedCell}
             />
           ) : (
@@ -541,8 +622,16 @@ LIMIT 250
               rows={rows}
               rowKey={(row, index) => `${row.x}-${row.y}-${index}`}
               columns={[
-                { id: "x", header: xColumn || "X", cell: (row) => row.x },
-                { id: "y", header: yColumn || "Y", cell: (row) => row.y },
+                {
+                  id: "x",
+                  header: xMeta ? getColumnDisplayName(xMeta) : xColumn || "X",
+                  cell: (row) => formatValueWithLabel(row.x, xMeta?.valueLabels),
+                },
+                {
+                  id: "y",
+                  header: yMeta ? getColumnDisplayName(yMeta) : yColumn || "Y",
+                  cell: (row) => formatValueWithLabel(row.y, yMeta?.valueLabels),
+                },
                 {
                   id: "count",
                   header: "Count",
@@ -558,8 +647,14 @@ LIMIT 250
         {selectedCell ? (
           <aside className="raised-panel space-y-2">
             <SectionHeader number="03" title="Selected Cell" />
-            <p className="mono-value">{xColumn}: {selectedCell.x}</p>
-            <p className="mono-value">{yColumn}: {selectedCell.y}</p>
+            <p className="mono-value">
+              {xMeta ? getColumnDisplayName(xMeta) : xColumn}:{" "}
+              {formatValueWithLabel(selectedCell.x, xMeta?.valueLabels)}
+            </p>
+            <p className="mono-value">
+              {yMeta ? getColumnDisplayName(yMeta) : yColumn}:{" "}
+              {formatValueWithLabel(selectedCell.y, yMeta?.valueLabels)}
+            </p>
             <p className="mono-value">Count: {formatNumber(selectedCell.count)}</p>
             <p className="mono-value">% of row: {formatPercent(selectedCell.rowPercent, 2)}</p>
             <p className="mono-value">% of column: {formatPercent(selectedCell.columnPercent, 2)}</p>

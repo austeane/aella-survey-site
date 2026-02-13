@@ -1,6 +1,7 @@
 export interface NotebookEntry {
   id: string;
   title: string;
+  sourceUrl?: string;
   queryDefinition: {
     type: "crosstab" | "profile" | "sql" | "stats";
     params: Record<string, unknown>;

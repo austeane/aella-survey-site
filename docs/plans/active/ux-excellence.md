@@ -1,5 +1,20 @@
 # UX Excellence Plan — BKS Explorer
 
+**Status:** Implemented in code on 2026-02-13.
+
+## Implementation Status
+
+- [x] Phase 1: "Other" pivot cell SQL fix
+- [x] Phase 2A: Value labels surfaced across Explore/Profile/Dashboard/Pivot Matrix
+- [x] Phase 2B: `displayName` added to schema metadata, API contracts, and UI selectors
+- [x] Phase 3: Searchable column combobox implemented and integrated
+- [x] Phase 4A: URL state completed for Explore, Profile, and Relationships
+- [x] Phase 4B: Notebook entries now store and render source URLs
+- [x] Phase 5A: "Uniqueness Percentile" renamed to "Cohort Rarity" with explanatory note
+- [x] Phase 5B: Dashboard "Updated" date now uses dataset metadata timestamp
+- [x] Phase 5C: Cross-page navigation links added (Dashboard, Column Inspector, About examples)
+- [x] Phase 5D: DuckDB init phases + loading skeleton component integrated
+
 ## Context
 
 A UX review of the production site identified 10 improvement areas. Two were excluded by the user (privacy mode and SQL safe mode — anyone exploring this data knows what they're doing). Small-cell suppression was already removed in a prior change. This plan covers the remaining 8 improvements, grouped into 5 phases ordered by impact: correctness, readability, shareability, polish.
@@ -149,3 +164,10 @@ After each phase:
 2. `pnpm test --run` — all tests pass
 3. `pnpm dev` — manual smoke test of affected pages
 4. After all phases: `pnpm build` + deploy to Railway, verify prod
+
+## Verification Results (2026-02-13)
+
+- `pnpm check-types` — pass
+- `pnpm test --run` — pass (130 tests)
+- `pnpm build` — pass
+- Manual `pnpm dev` and Railway deploy verification remain as follow-up runtime checks
