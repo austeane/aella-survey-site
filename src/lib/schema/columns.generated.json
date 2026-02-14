@@ -2,7 +2,7 @@
   "dataset": {
     "name": "Big Kink Survey (Public Sample)",
     "sourcePath": "/Users/austin/dev/kink/data/BKSPublic.parquet",
-    "generatedAt": "2026-02-14T08:31:28.846Z",
+    "generatedAt": "2026-02-14T11:07:13.376Z",
     "rowCount": 15503,
     "columnCount": 365
   },
@@ -587,7 +587,7 @@
     },
     {
       "name": "ascore",
-      "displayName": "A-Score",
+      "displayName": "A-Score (undocumented)",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.3528,
@@ -648,7 +648,7 @@
     },
     {
       "name": "biomale",
-      "displayName": "Sex (biological male)",
+      "displayName": "Biological Sex",
       "duckdbType": "DOUBLE",
       "logicalType": "categorical",
       "nullRatio": 0,
@@ -2003,7 +2003,7 @@
     },
     {
       "name": "marriage100blood",
-      "displayName": "Marriage for Bloodline",
+      "displayName": "Incest Preference: Marriage vs Blood",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0.8453,
@@ -2679,7 +2679,7 @@
     },
     {
       "name": "powerlessnessvariable",
-      "displayName": "Powerlessness",
+      "displayName": "Powerlessness (personality)",
       "duckdbType": "DOUBLE",
       "logicalType": "numeric",
       "nullRatio": 0,
