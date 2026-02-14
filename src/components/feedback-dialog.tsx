@@ -2,6 +2,8 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
 
+const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 type Status = "idle" | "sending" | "sent" | "error";
 
 export function FeedbackDialog({
@@ -33,7 +35,7 @@ export function FeedbackDialog({
 
     setStatus("sending");
     try {
-      const res = await fetch("/api/feedback", {
+      const res = await fetch(`${API_BASE}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
