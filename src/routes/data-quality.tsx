@@ -11,7 +11,8 @@ import { StatCard } from "@/components/stat-card";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { useDuckDB } from "@/lib/duckdb/provider";
-import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip, stripHashSuffix } from "@/lib/format-labels";
+import { ColumnNameTooltip } from "@/components/column-name-tooltip";
+import { formatValueWithLabel, getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
 import { formatNumber, formatPercent, asNumber, asNullableNumber } from "@/lib/format";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
@@ -295,7 +296,9 @@ function DashboardPage() {
                       header: "Question",
                       cell: (row) => (
                         <div className="space-y-1">
-                          <span title={getColumnTooltip(row)}>{getColumnDisplayName(row)}</span>
+                          <ColumnNameTooltip column={row}>
+                            <span>{getColumnDisplayName(row)}</span>
+                          </ColumnNameTooltip>
                           {row.displayName ? (
                             <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
                           ) : null}
@@ -359,18 +362,19 @@ function DashboardPage() {
                       id: "name",
                       header: "Question",
                       cell: (row) => (
-                        <Link
-                          to="/explore"
-                          search={{ x: row.name }}
-                          className="mono-value"
-                          title={getColumnTooltip(row)}
-                          style={{
-                            color: "var(--accent)",
-                            borderBottom: "1px solid var(--rule-light)",
-                          }}
-                        >
-                          {getColumnDisplayName(row)}
-                        </Link>
+                        <ColumnNameTooltip column={row}>
+                          <Link
+                            to="/explore"
+                            search={{ x: row.name }}
+                            className="mono-value"
+                            style={{
+                              color: "var(--accent)",
+                              borderBottom: "1px solid var(--rule-light)",
+                            }}
+                          >
+                            {getColumnDisplayName(row)}
+                          </Link>
+                        </ColumnNameTooltip>
                       ),
                     },
                     {
@@ -402,7 +406,9 @@ function DashboardPage() {
                       header: "Question",
                       cell: (row) => (
                         <div className="space-y-1">
-                          <span title={getColumnTooltip(row)}>{getColumnDisplayName(row)}</span>
+                          <ColumnNameTooltip column={row}>
+                            <span>{getColumnDisplayName(row)}</span>
+                          </ColumnNameTooltip>
                           {row.displayName ? (
                             <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
                           ) : null}
@@ -440,7 +446,9 @@ function DashboardPage() {
             {selectedMeta ? (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="mono-value" title={getColumnTooltip(selectedMeta)}>{getColumnDisplayName(selectedMeta)}</span>
+                  <ColumnNameTooltip column={selectedMeta}>
+                    <span className="mono-value">{getColumnDisplayName(selectedMeta)}</span>
+                  </ColumnNameTooltip>
                   {selectedMeta.displayName ? (
                     <span className="mono-value text-[var(--ink-faded)]">({stripHashSuffix(selectedMeta.name)})</span>
                   ) : null}

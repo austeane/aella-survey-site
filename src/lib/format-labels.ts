@@ -60,9 +60,6 @@ export function getColumnDisplayName(column: ColumnWithDisplayName): string {
 
 export function getColumnTooltip(column: ColumnWithDisplayName): string {
   const display = getColumnDisplayName(column);
-  const raw = stripHashSuffix(column.name);
-  if (column.displayName && raw !== display) {
-    return `${display}\n(${raw})`;
-  }
-  return display;
+  const full = stripHashSuffix(column.name);
+  return full.length > display.length ? full : display;
 }

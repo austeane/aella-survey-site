@@ -18,7 +18,8 @@ import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 
-import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip } from "@/lib/format-labels";
+import { ColumnNameTooltip } from "@/components/column-name-tooltip";
+import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
@@ -974,7 +975,8 @@ function ProfilePage() {
                   cell: (row) => {
                     const columnMeta = columnByName.get(row.metric);
                     const name = columnMeta ? getColumnDisplayName(columnMeta) : row.metric;
-                    return <span title={columnMeta ? getColumnTooltip(columnMeta) : row.metric}>{name}</span>;
+                    if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
+                    return name;
                   },
                 },
                 {
@@ -1011,7 +1013,8 @@ function ProfilePage() {
                   cell: (row) => {
                     const columnMeta = columnByName.get(row.columnName);
                     const name = columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
-                    return <span title={columnMeta ? getColumnTooltip(columnMeta) : row.columnName}>{name}</span>;
+                    if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
+                    return name;
                   },
                 },
                 {
@@ -1111,7 +1114,8 @@ function ProfilePage() {
                   cell: (row) => {
                     const columnMeta = columnByName.get(row.metric);
                     const name = columnMeta ? getColumnDisplayName(columnMeta) : row.metric;
-                    return <span title={columnMeta ? getColumnTooltip(columnMeta) : row.metric}>{name}</span>;
+                    if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
+                    return name;
                   },
                 },
                 {
@@ -1169,7 +1173,8 @@ function ProfilePage() {
                     cell: (row) => {
                       const columnMeta = columnByName.get(row.columnName);
                       const name = columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
-                      return <span title={columnMeta ? getColumnTooltip(columnMeta) : row.columnName}>{name}</span>;
+                      if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
+                    return name;
                     },
                   },
                   {
@@ -1209,7 +1214,8 @@ function ProfilePage() {
                     cell: (row) => {
                       const columnMeta = columnByName.get(row.columnName);
                       const name = columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
-                      return <span title={columnMeta ? getColumnTooltip(columnMeta) : row.columnName}>{name}</span>;
+                      if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
+                    return name;
                     },
                   },
                   {

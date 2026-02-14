@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import { ColumnCombobox } from "@/components/column-combobox";
 import { SectionHeader } from "@/components/section-header";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
-import { getColumnDisplayName, getColumnTooltip } from "@/lib/format-labels";
+import { ColumnNameTooltip } from "@/components/column-name-tooltip";
+import { getColumnDisplayName } from "@/lib/format-labels";
 import { formatNumber } from "@/lib/format";
 import schemaMetadata from "@/lib/schema/columns.generated.json";
 import relationshipData from "@/lib/schema/relationships.generated.json";
@@ -162,20 +163,19 @@ function RelationshipsPage() {
                   return (
                     <tr key={rel.column}>
                       <td>
-                        <div>
-                        <Link
-                          to="/explore"
-                          search={{ x: selectedColumn, y: rel.column }}
-                          className="mono-value"
-                          title={getColumnTooltip(schemaByName.get(rel.column) ?? { name: rel.column })}
-                          style={{
-                            color: "var(--accent)",
-                            borderBottom: "1px solid var(--rule-light)",
-                          }}
-                        >
-                          {getColumnDisplayName(schemaByName.get(rel.column) ?? { name: rel.column })}
-                        </Link>
-                        </div>
+                        <ColumnNameTooltip column={schemaByName.get(rel.column) ?? { name: rel.column }}>
+                          <Link
+                            to="/explore"
+                            search={{ x: selectedColumn, y: rel.column }}
+                            className="mono-value"
+                            style={{
+                              color: "var(--accent)",
+                              borderBottom: "1px solid var(--rule-light)",
+                            }}
+                          >
+                            {getColumnDisplayName(schemaByName.get(rel.column) ?? { name: rel.column })}
+                          </Link>
+                        </ColumnNameTooltip>
                       </td>
                       <td>
                         <span className="null-badge">
