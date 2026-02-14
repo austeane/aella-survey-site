@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { CAVEAT_DEFINITIONS } from "@/lib/schema/caveats";
 import { asNullableNumber, asNumber, formatNumber, formatPercent } from "@/lib/format";
-import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
+import { formatValueWithLabel, getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
 import relationshipData from "@/lib/schema/relationships.generated.json";
@@ -217,7 +217,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
           <span className="flex flex-wrap items-center gap-2">
             <span className="mono-value">{getColumnDisplayName(column)}</span>
             {column.displayName ? (
-              <span className="mono-value text-[var(--ink-faded)]">({column.name})</span>
+              <span className="mono-value text-[var(--ink-faded)]">({stripHashSuffix(column.name)})</span>
             ) : null}
             <span className="null-badge">{LOGICAL_TYPE_LABELS[column.logicalType] ?? column.logicalType}</span>
             {column.nullMeaning && column.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={column.nullMeaning} /> : null}
@@ -236,12 +236,12 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
             <DataTable
               rows={[
                 { label: "Min", value: numericStats.min },
-                { label: "P25", value: numericStats.p25 },
+                { label: "25th percentile", value: numericStats.p25 },
                 { label: "Median", value: numericStats.median },
-                { label: "P75", value: numericStats.p75 },
+                { label: "75th percentile", value: numericStats.p75 },
                 { label: "Max", value: numericStats.max },
                 { label: "Mean", value: numericStats.mean },
-                { label: "Stddev", value: numericStats.stddev },
+                { label: "Spread", value: numericStats.stddev },
               ]}
               rowKey={(row) => row.label}
               columns={[
@@ -272,7 +272,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
               {
                 id: "value",
                 header: "Value",
-                cell: (row) => formatValueWithLabel(row.value, column.valueLabels),
+                cell: (row) => formatValueWithLabel(row.value, column.valueLabels, true),
               },
               {
                 id: "count",
@@ -296,13 +296,14 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
       )}
 
       <div>
-        <p className="mono-label">Missingness Context</p>
+        <p className="mono-label">Missing Answers</p>
         <div className="space-y-2">
           <p className="mono-value">Missing answers: {formatPercent(column.nullRatio * 100, 1)}</p>
-          <p className="mono-value">
-            Missing-answer reason:{" "}
-            {column.nullMeaning && column.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={column.nullMeaning} /> : "No special flag"}
-          </p>
+          {column.nullMeaning && column.nullMeaning !== "UNKNOWN" ? (
+            <p className="mono-value">
+              Missing-answer reason: <MissingnessBadge meaning={column.nullMeaning} />
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -320,7 +321,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
       </div>
 
       <div>
-        <p className="mono-label">Related Columns</p>
+        <p className="mono-label">Related Questions</p>
         {relatedColumns.length > 0 ? (
           <div className="mt-2 flex flex-wrap gap-2">
             {relatedColumns.map((item) => (
@@ -335,7 +336,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
             ))}
           </div>
         ) : (
-          <p className="section-subtitle">No precomputed related columns available.</p>
+          <p className="section-subtitle">No precomputed related questions available.</p>
         )}
       </div>
 

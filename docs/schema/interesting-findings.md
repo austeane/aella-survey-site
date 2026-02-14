@@ -1,28 +1,28 @@
 # Interesting Findings
 
-Generated: 2026-02-14T08:43:23.382927+00:00
+Generated: 2026-02-14T10:26:34.551985+00:00
 
 ## Featured Presets
 
 | ID | Question | Rows | Chart | Evidence | Home? |
 |---|---|---:|---|---|---|
 | `pain-gender` | Are men and women different on giving vs receiving pain? | 2 | grouped-bar | `robust` | yes |
-| `spanking-childhood` | Do people spanked more often as kids report different adult S/M interest? | 6 | bar | `robust` | yes |
+| `spanking-childhood` | Do people who were spanked more as kids show different sadomasochism interest as adults? | 3 | bar | `supported` | yes |
 | `partner-count-openness` | Do people with more partners report different openness scores? | 5 | bar | `supported` | yes |
-| `fixity-breadth` | How does arousal fixity relate to total kink breadth? | 5 | bar | `robust` | yes |
-| `honesty-breadth` | How does self-reported honesty relate to kink breadth? | 2 | bar | `supported` | yes |
-| `dom-sub-quadrants` | How do dominant and submissive arousal scores vary across gender-orientation quadrants? | 4 | grouped-bar | `robust` | yes |
-| `politics-breadth` | How does political leaning relate to total fetish-category count? | 3 | bar | `tiny` | no |
-| `orientation-breadth` | How much does orientation shift total kink breadth? | 2 | bar | `tiny` | no |
-| `horny-state-breadth` | Does being horny right now change reported kink breadth? | 4 | bar | `exploratory` | no |
-| `neuroticism-pain-direction` | Does neuroticism change receiving-vs-giving pain direction? | 3 | grouped-bar | `supported` | yes |
+| `fixity-breadth` | Do people whose kinks feel more permanent have a wider variety of interests? | 5 | bar | `robust` | yes |
+| `honesty-breadth` | Do people who say they're more honest report more kinks? | 2 | bar | `supported` | yes |
+| `dom-sub-quadrants` | How do dominant and submissive interests differ across gender and orientation groups? | 4 | grouped-bar | `robust` | yes |
+| `politics-breadth` | How does political leaning relate to how many kinks someone has? | 3 | bar | `tiny` | no |
+| `orientation-breadth` | How much does sexual orientation affect the number of kinks someone has? | 2 | bar | `tiny` | no |
+| `horny-state-breadth` | Does being horny right now change the number of kinks someone reports? | 4 | bar | `exploratory` | no |
+| `neuroticism-pain-direction` | Does anxiety change whether someone prefers receiving or giving pain? | 3 | grouped-bar | `supported` | yes |
 
 ## Preset Details
 
 ### Who likes giving vs receiving pain?
 
 - ID: `pain-gender`
-- Caption: Women report higher receiving-pain interest while men report higher giving-pain interest in the responder subset.
+- Caption: Women report higher interest in receiving pain, while men report higher interest in giving pain (among people who answered both questions).
 - Evidence tier: `robust`
 - Effect size note: Large in responder subset (wave-2: d≈0.62 pre-imputation, much smaller under zero-imputation)
 - Home recommended: yes
@@ -47,21 +47,25 @@ SELECT
 ### Does childhood spanking predict adult S/M interest?
 
 - ID: `spanking-childhood`
-- Caption: The strongest bivariate pattern in the current curated set: higher childhood spanking bins map to higher S/M interest.
-- Evidence tier: `robust`
-- Effect size note: Large signal in wave-2 controls (R^2≈0.107)
+- Caption: People who report more childhood spanking also report higher sadomasochism interest as adults.
+- Evidence tier: `supported`
+- Effect size note: Direction is clear in this dataset; interpreted as correlation only.
 - Home recommended: yes
-- Risk flags: `gated_selection_bias`
-  - Uses gated columns; effect sizes are inflated among responders.
-- Curation notes: Direction remains stable in multivariate checks; still responder-biased due gating.
+- Risk flags: `none`
+- Curation notes: Uses the direct childhood-discipline question rather than the adult spanking-arousal item.
 - SQL:
 ```sql
 SELECT
-          cast(cast("spanking" AS INTEGER) AS VARCHAR) AS name,
+          "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)" AS name,
           round(avg("sadomasochism")::DOUBLE, 2) AS value,
-          cast("spanking" AS INTEGER) AS sort_order
+          CASE "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)"
+            WHEN 'Never' THEN 1
+            WHEN 'Sometimes' THEN 2
+            WHEN 'Often' THEN 3
+            ELSE 99
+          END AS sort_order
         FROM data
-        WHERE "spanking" IS NOT NULL
+        WHERE "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)" IS NOT NULL
           AND "sadomasochism" IS NOT NULL
         GROUP BY 1, 3
         ORDER BY sort_order
@@ -70,7 +74,7 @@ SELECT
 ### Partner count and personality openness
 
 - ID: `partner-count-openness`
-- Caption: Openness rises monotonically across partner-count bins, but the absolute effect is small.
+- Caption: Openness rises steadily as partner count increases, but the overall difference is small.
 - Evidence tier: `supported`
 - Effect size note: Small but consistent (wave-2: d≈0.22 top vs bottom bins)
 - Home recommended: yes
@@ -110,7 +114,14 @@ SELECT
 - SQL:
 ```sql
 SELECT
-          cast("If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)" AS VARCHAR) AS name,
+          CASE cast("If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)" AS VARCHAR)
+            WHEN 'With little effort, yes' THEN 'Little effort'
+            WHEN 'With some effort, yes' THEN 'Some effort'
+            WHEN 'With a lot of effort, yes' THEN 'Lots of effort'
+            WHEN 'With an extreme amount of effort, maybe' THEN 'Extreme effort'
+            WHEN 'Impossible' THEN 'Impossible'
+            ELSE cast("If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)" AS VARCHAR)
+          END AS name,
           round(avg("totalfetishcategory")::DOUBLE, 2) AS value,
           CASE cast("If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)" AS VARCHAR)
             WHEN 'With little effort, yes' THEN 1
@@ -130,7 +141,7 @@ SELECT
 ### Do more honest respondents report more kinks?
 
 - ID: `honesty-breadth`
-- Caption: Respondents who report being totally honest show higher average kink breadth than mostly-honest respondents.
+- Caption: People who say they're totally honest report a wider range of kinks than those who say they're mostly honest.
 - Evidence tier: `supported`
 - Effect size note: Small-to-moderate and directionally useful as a response-validity signal
 - Home recommended: yes
@@ -157,7 +168,7 @@ SELECT
 ### Which gender-orientation groups are dom-leaning vs sub-leaning?
 
 - ID: `dom-sub-quadrants`
-- Caption: Straight men are the only quadrant where dominant arousal exceeds submissive arousal.
+- Caption: Straight men are the only group where dominant interest exceeds submissive interest.
 - Evidence tier: `robust`
 - Effect size note: Large quadrant separation in swarm wave-1/8 and wave-2 clustering
 - Home recommended: yes
@@ -195,7 +206,7 @@ SELECT
 ### Do politics predict total kink breadth?
 
 - ID: `politics-breadth`
-- Caption: Differences exist but are modest; politics is a weak predictor compared with gender and personality axes.
+- Caption: Differences exist but are modest - politics matters much less than gender or personality.
 - Evidence tier: `tiny`
 - Effect size note: Wave-2: statistically significant in some models but practically small
 - Home recommended: no
@@ -223,7 +234,7 @@ SELECT
 ### Do straight and non-straight groups differ in kink breadth?
 
 - ID: `orientation-breadth`
-- Caption: Orientation differences are real but small relative to role-direction differences.
+- Caption: Orientation differences are real but small compared to dominant-vs-submissive differences.
 - Evidence tier: `tiny`
 - Effect size note: Wave-2: survives controls but small (d≈0.07)
 - Home recommended: no
@@ -250,7 +261,7 @@ SELECT
 ### How much does current arousal state shift responses?
 
 - ID: `horny-state-breadth`
-- Caption: Current arousal state strongly shifts self-reported kink scores in the late-added subsample.
+- Caption: Being horny right now noticeably shifts how many kinks people report (based on a smaller group who saw this question).
 - Evidence tier: `exploratory`
 - Effect size note: Large shift but based on late-added question (N~2.7k)
 - Home recommended: no
@@ -280,7 +291,7 @@ SELECT
 ### Neuroticism and pain-direction preference
 
 - ID: `neuroticism-pain-direction`
-- Caption: Higher neuroticism bins tilt more toward receiving pain than giving pain.
+- Caption: People with higher anxiety scores lean more toward receiving pain than giving pain.
 - Evidence tier: `supported`
 - Effect size note: Wave-1 top personality signal; wave-2 recommends gating caveat
 - Home recommended: yes
@@ -327,7 +338,7 @@ WITH binned AS (
 - How fixed are people's arousal patterns over time? -> `fixity-breadth`
 - Do people with more partners score higher on openness? -> `partner-count-openness`
 - How much do politics or orientation actually matter? -> `politics-breadth`
-- What is connected to straightness overall? -> `/relationships?column=straightness`
+- What is connected to sexual orientation? -> `/relationships?column=straightness`
 
 ## Defaults By Page
 

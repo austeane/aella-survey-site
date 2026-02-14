@@ -1,6 +1,6 @@
 # Big Kink Survey Explorer
 
-Interactive research explorer for the Big Kink Survey (~15.5k rows, 365 columns). Based on Aella's publicly released anonymized dataset. Serves both human users (browser UI with DuckDB-WASM) and AI agents (REST API + MCP server).
+Interactive research explorer for the Big Kink Survey (~15.5k row anonymized subsample of a ~970k-respondent survey, 365 columns). Based on Aella's publicly released anonymized dataset. Serves both human users (browser UI with DuckDB-WASM) and AI agents (REST API + MCP server).
 
 ## Stack
 - TanStack Start + React, Tailwind v4, Vite 7 + Nitro

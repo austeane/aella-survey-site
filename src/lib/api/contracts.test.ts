@@ -453,7 +453,7 @@ describe("SchemaDataSchema", () => {
         definitions: [
           {
             key: "gated_missingness",
-            title: "Gated Missingness",
+            title: "Skip-Logic Questions",
             description: "desc",
             guidance: "guidance",
           },

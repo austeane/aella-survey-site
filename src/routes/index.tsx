@@ -251,9 +251,19 @@ function HomePage() {
       <header className="page-header">
         <h1 className="page-title">The Big Kink Survey</h1>
         <p className="page-subtitle">
-          What 15,000 people revealed about desire, personality, and identity.
+          What ~970,000 people were asked — and what 15,000 answers revealed about desire, personality, and identity.
         </p>
-        <p className="dateline">Based on 15,503 anonymized survey responses.</p>
+        <p className="dateline">
+          Based on 15,503 anonymized responses from a{" "}
+          <a
+            href="https://aella.substack.com/p/heres-my-big-kink-survey-dataset"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+          >
+            ~970,000-respondent survey
+          </a>.
+        </p>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
@@ -319,22 +329,9 @@ function HomePage() {
                 <p className="mono-value text-[var(--ink-faded)]">Sample size: N = {formatNumber(featuredSampleSize)}</p>
               ) : null}
               {selectedPreset.wave2 ? (
-                <>
-                  <p className="mono-value text-[var(--ink-faded)]">
-                    Evidence: {selectedPreset.wave2.evidenceTier}.
-                  </p>
-                  <details>
-                    <summary className="mono-value cursor-pointer text-[var(--ink-faded)]">Method details</summary>
-                    <div className="mt-2 space-y-2">
-                      <p className="mono-value text-[var(--ink-faded)]">{selectedPreset.wave2.effectSizeNote}</p>
-                      {selectedPreset.wave2.riskNotes.length > 0 ? (
-                        <p className="mono-value text-[var(--ink-faded)]">
-                          Data notes: {selectedPreset.wave2.riskNotes.join(" ")}
-                        </p>
-                      ) : null}
-                    </div>
-                  </details>
-                </>
+                <p className="mono-value text-[var(--ink-faded)]">
+                  Confidence: {selectedPreset.wave2.evidenceTier === "robust" ? "high" : selectedPreset.wave2.evidenceTier === "supported" ? "moderate" : selectedPreset.wave2.evidenceTier === "tiny" ? "low" : "preliminary"}.
+                </p>
               ) : null}
             </div>
 
@@ -458,15 +455,34 @@ function HomePage() {
       <section className="editorial-panel space-y-4">
         <SectionHeader number="04" title="About the Data" />
         <p>
-          This public sample includes 15,503 respondents and 365 columns. Responses are anonymized and include
-          intentional noise, so use patterns directionally rather than as exact population estimates.
+          The original survey collected ~970,000 responses. This public dataset is a 15,503-respondent anonymized
+          subsample — limited to ages 18–32 in Western countries, with noise injection and binning to protect privacy.
+          Use patterns directionally rather than as exact population estimates.
         </p>
         <p className="mono-value text-[var(--ink-faded)]">
-          Tip: use Data Quality for schema diagnostics and missing-answer context before making strong claims.
+          Tip: use Data Quality to see which questions have missing answers before making strong claims.
         </p>
-        <Link to="/data-quality" className="editorial-button">
-          Open Data Quality
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link to="/data-quality" className="editorial-button">
+            Open Data Quality
+          </Link>
+          <a
+            href="https://aella.substack.com/p/heres-my-big-kink-survey-dataset"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="editorial-button"
+          >
+            Read about the dataset
+          </a>
+          <a
+            href="https://www.guidedtrack.com/programs/u4m797m/run"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="editorial-button"
+          >
+            Take the survey
+          </a>
+        </div>
       </section>
     </div>
   );

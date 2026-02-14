@@ -115,13 +115,13 @@ function getWarning(cohortSize: number) {
   if (cohortSize < 30) {
     return {
       kind: "critical" as const,
-      message: "N < 30: Too small for reliable comparisons.",
+      message: "Fewer than 30 people - too few for meaningful results.",
     };
   }
   if (cohortSize < 100) {
     return {
       kind: "warn" as const,
-      message: "N < 100: Treat patterns as unstable.",
+      message: "Fewer than 100 people - results may not be reliable.",
     };
   }
   return null;
@@ -630,7 +630,7 @@ function ProfilePage() {
       }
     } else {
       if (filterPairsA.length === 0 || filterPairsB.length === 0 || !db) {
-        setRunError("Select at least one demographic value for each cohort.");
+        setRunError("Select at least one value for each group.");
         return;
       }
 
@@ -684,8 +684,9 @@ function ProfilePage() {
     values: Record<string, string>,
     setValues: React.Dispatch<React.SetStateAction<Record<string, string>>>,
     valueOptions: Record<string, string[]>,
+    layout: "grid" | "stack" = "grid",
   ) => (
-    <div className="grid gap-4 md:grid-cols-3">
+    <div className={layout === "stack" ? "flex flex-col gap-3" : "grid gap-4 md:grid-cols-3"}>
       {[0, 1, 2].map((slot) => {
         const column = columns[slot] ?? "";
         const options = valueOptions[column] ?? [];
@@ -894,15 +895,15 @@ function ProfilePage() {
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-3 border border-[var(--rule)] p-4">
                 <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                  Cohort A
+                  Group A
                 </p>
-                {renderFilterSlots(columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA)}
+                {renderFilterSlots(columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA, "stack")}
               </div>
               <div className="space-y-3 border border-[var(--rule)] p-4">
                 <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                  Cohort B
+                  Group B
                 </p>
-                {renderFilterSlots(columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB)}
+                {renderFilterSlots(columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB, "stack")}
               </div>
             </div>
           )}
@@ -942,16 +943,16 @@ function ProfilePage() {
 
           <div className="stat-grid grid-cols-1 md:grid-cols-4">
             <StatCard label="Dataset Size" value={formatNumber(summary.totalSize)} />
-            <StatCard label="Cohort Size" value={formatNumber(summary.cohortSize)} />
+            <StatCard label="Group Size" value={formatNumber(summary.cohortSize)} />
             <StatCard
-              label="Cohort Share"
+              label="Group Share"
               value={formatPercent(summary.cohortSharePercent, 2)}
               note={`N = ${formatNumber(summary.cohortSize)}`}
             />
             <StatCard
-              label="Cohort Rarity"
+              label="How Uncommon"
               value={formatPercent(summary.cohortRarity, 2)}
-              note="100% minus cohort share"
+              note="of people are not in this group"
             />
           </div>
 
@@ -962,7 +963,7 @@ function ProfilePage() {
           ) : null}
 
           <div className="raised-panel space-y-3">
-            <SectionHeader number="03" title="Percentile Snapshot" />
+            <SectionHeader number="03" title="How This Group Compares" />
             <DataTable
               rows={summary.percentileCards}
               rowKey={(row) => row.metric}
@@ -977,13 +978,13 @@ function ProfilePage() {
                 },
                 {
                   id: "cohort",
-                  header: "Cohort Median",
+                  header: "Group Median",
                   align: "right",
                   cell: (row) => row.cohortMedian == null ? "n/a" : row.cohortMedian.toFixed(3),
                 },
                 {
                   id: "global",
-                  header: "Global Percentile",
+                  header: "Ranking vs. Everyone",
                   align: "right",
                   cell: (row) => row.globalPercentile == null ? "n/a" : formatPercent(row.globalPercentile, 2),
                 },
@@ -998,7 +999,7 @@ function ProfilePage() {
           </div>
 
           <div className="raised-panel space-y-3">
-            <SectionHeader number="04" title="Most Unusually Common Signals" />
+            <SectionHeader number="04" title="What Makes This Group Different" />
             <DataTable
               rows={summary.overIndexing}
               rowKey={(row, index) => `${row.columnName}-${row.value}-${index}`}
@@ -1027,7 +1028,7 @@ function ProfilePage() {
                 },
                 {
                   id: "cohort",
-                  header: "Cohort % (N)",
+                  header: "Group % (N)",
                   align: "right",
                   cell: (row) =>
                     `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
@@ -1040,7 +1041,7 @@ function ProfilePage() {
                     `${formatPercent(row.globalPct, 2)} (N=${formatNumber(row.globalCount)})`,
                 },
               ]}
-              emptyMessage="No over-indexing values met the N >= 30 thresholds"
+              emptyMessage="No distinctive traits found - need at least 30 people in a category to show results"
             />
           </div>
         </section>
@@ -1060,13 +1061,13 @@ function ProfilePage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Cohort A
+                Group A
               </p>
               <div className="stat-grid grid-cols-1 md:grid-cols-3">
                 <StatCard label="Dataset Size" value={formatNumber(comparison.a.totalSize)} />
-                <StatCard label="Cohort Size" value={formatNumber(comparison.a.cohortSize)} />
+                <StatCard label="Group Size" value={formatNumber(comparison.a.cohortSize)} />
                 <StatCard
-                  label="Cohort Share"
+                  label="Group Share"
                   value={formatPercent(comparison.a.cohortSharePercent, 2)}
                   note={`N = ${formatNumber(comparison.a.cohortSize)}`}
                 />
@@ -1075,13 +1076,13 @@ function ProfilePage() {
             </div>
             <div className="space-y-2">
               <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Cohort B
+                Group B
               </p>
               <div className="stat-grid grid-cols-1 md:grid-cols-3">
                 <StatCard label="Dataset Size" value={formatNumber(comparison.b.totalSize)} />
-                <StatCard label="Cohort Size" value={formatNumber(comparison.b.cohortSize)} />
+                <StatCard label="Group Size" value={formatNumber(comparison.b.cohortSize)} />
                 <StatCard
-                  label="Cohort Share"
+                  label="Group Share"
                   value={formatPercent(comparison.b.cohortSharePercent, 2)}
                   note={`N = ${formatNumber(comparison.b.cohortSize)}`}
                 />
@@ -1095,7 +1096,7 @@ function ProfilePage() {
             <SectionHeader number="03" title="Median Comparison" />
             {comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30 ? (
               <p className="alert alert--critical">
-                One or both cohorts have N &lt; 30. Delta values are unreliable at this sample size.
+                One or both groups have fewer than 30 people.
               </p>
             ) : null}
             <DataTable
@@ -1112,23 +1113,23 @@ function ProfilePage() {
                 },
                 {
                   id: "medianA",
-                  header: "Cohort A Median",
+                  header: "Group A Median",
                   align: "right",
                   cell: (row) => row.medianA == null ? "n/a" : row.medianA.toFixed(3),
                 },
                 {
                   id: "medianB",
-                  header: "Cohort B Median",
+                  header: "Group B Median",
                   align: "right",
                   cell: (row) => row.medianB == null ? "n/a" : row.medianB.toFixed(3),
                 },
                 {
                   id: "delta",
-                  header: "Delta (B - A)",
+                  header: "Difference",
                   align: "right",
                   cell: (row) => {
                     if (comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30) {
-                      return "n/a (N<30)";
+                      return "n/a (fewer than 30 people)";
                     }
                     if (row.delta == null) return "n/a";
                     const sign = row.delta > 0 ? "+" : "";
@@ -1154,7 +1155,7 @@ function ProfilePage() {
           {/* Over-indexing side by side */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="raised-panel space-y-3">
-              <SectionHeader number="04a" title="Group A Unusually Common" />
+              <SectionHeader number="04a" title="What Makes Group A Different" />
               <DataTable
                 rows={comparison.a.overIndexing}
                 rowKey={(row, index) => `a-${row.columnName}-${row.value}-${index}`}
@@ -1183,17 +1184,17 @@ function ProfilePage() {
                   },
                   {
                     id: "cohort",
-                    header: "Cohort % (N)",
+                    header: "Group % (N)",
                     align: "right",
                     cell: (row) =>
                       `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
                   },
                 ]}
-                emptyMessage="No over-indexing values met the N >= 30 thresholds"
+                emptyMessage="No distinctive traits found - need at least 30 people in a category to show results"
               />
             </div>
             <div className="raised-panel space-y-3">
-              <SectionHeader number="04b" title="Group B Unusually Common" />
+              <SectionHeader number="04b" title="What Makes Group B Different" />
               <DataTable
                 rows={comparison.b.overIndexing}
                 rowKey={(row, index) => `b-${row.columnName}-${row.value}-${index}`}
@@ -1222,13 +1223,13 @@ function ProfilePage() {
                   },
                   {
                     id: "cohort",
-                    header: "Cohort % (N)",
+                    header: "Group % (N)",
                     align: "right",
                     cell: (row) =>
                       `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
                   },
                 ]}
-                emptyMessage="No over-indexing values met the N >= 30 thresholds"
+                emptyMessage="No distinctive traits found - need at least 30 people in a category to show results"
               />
             </div>
           </div>

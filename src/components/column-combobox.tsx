@@ -1,7 +1,7 @@
 import { ChevronDown } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { getColumnDisplayName } from "@/lib/format-labels";
+import { getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
@@ -49,7 +49,7 @@ export function ColumnCombobox({
     const mapped = columns.map((column) => ({
       value: column.name,
       displayName: getColumnDisplayName(column),
-      secondary: column.name,
+      secondary: stripHashSuffix(column.name),
     }));
 
     if (!includeNoneOption) {

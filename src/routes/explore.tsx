@@ -64,8 +64,8 @@ export const Route = createFileRoute("/explore")({
 
 const NORMALIZATION_OPTIONS: Array<{ value: PivotNormalization; label: string }> = [
   { value: "count", label: "Counts" },
-  { value: "row", label: "Row %" },
-  { value: "column", label: "Column %" },
+  { value: "row", label: "Row % (within each row)" },
+  { value: "column", label: "Column % (within each column)" },
   { value: "overall", label: "Overall %" },
 ];
 
@@ -83,7 +83,7 @@ function ControlHelp({ text }: { text: string }) {
 }
 
 function associationLabel(cramersV: number): string {
-  if (cramersV < 0.1) return "negligible";
+  if (cramersV < 0.1) return "very weak";
   if (cramersV < 0.3) return "weak";
   if (cramersV < 0.5) return "moderate";
   return "strong";
@@ -590,7 +590,7 @@ LIMIT 250
                   </p>
                 ) : null}
                 <details>
-                  <summary className="mono-value cursor-pointer text-[var(--ink-faded)]">Show advanced detail table</summary>
+                  <summary className="mono-value cursor-pointer text-[var(--ink-faded)]">Show data table</summary>
                   <div className="mt-2">
                     <DataTable
                       rows={rows}
@@ -661,7 +661,7 @@ LIMIT 250
 
           {association ? (
             <p className="mono-value">
-              Connection strength: {association.value.toFixed(3)} ({associationLabel(association.value)}) | N used: {formatNumber(association.nUsed)}
+              How related: {associationLabel(association.value)} ({association.value.toFixed(2)}) - based on {formatNumber(association.nUsed)} responses
             </p>
           ) : null}
 
@@ -689,10 +689,10 @@ LIMIT 250
 
               <div className="flex flex-wrap gap-2 pt-1">
                 <Link to="/profile" className="editorial-button">
-                  Open this cohort in Profile
+                  Open this group in Profile
                 </Link>
                 <a href={sqlHref} className="editorial-button">
-                  Generate SQL for this cohort
+                  Open in SQL Console
                 </a>
               </div>
             </aside>
@@ -771,7 +771,7 @@ LIMIT 250
                   <label className="editorial-label">
                     <div className="flex items-center gap-2">
                       <span>How to count</span>
-                      <ControlHelp text="Counts, row %, column %, or overall %." />
+                      <ControlHelp text="Row % means percentage within each row. Column % means percentage within each column." />
                     </div>
                     <Select value={normalization} onValueChange={(value) => setNormalization(value as PivotNormalization)}>
                       <SelectTrigger>
@@ -789,7 +789,7 @@ LIMIT 250
 
                   <label className="editorial-label">
                     <div className="flex items-center gap-2">
-                      <span>Show top N categories per axis</span>
+                      <span>Maximum categories to show</span>
                       <ControlHelp text="Keeps charts readable by collapsing the long tail into “Other”." />
                     </div>
                     <Input

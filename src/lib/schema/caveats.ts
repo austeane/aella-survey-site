@@ -57,9 +57,9 @@ export const CAVEAT_DEFINITIONS: Record<CaveatKey, CaveatDefinition> = {
   },
   gated_missingness: {
     key: "gated_missingness",
-    title: "Gated Missingness",
+    title: "Skip-Logic Questions",
     description:
-      "Many questions are shown only after prerequisite answers. Missing values may be structural, not random.",
+      "Many questions are shown only after earlier answers. Missing values may happen because people never saw the question.",
     guidance:
       "When domain-appropriate, consider NA as implicit zero or not-applicable rather than unknown.",
   },
@@ -67,7 +67,7 @@ export const CAVEAT_DEFINITIONS: Record<CaveatKey, CaveatDefinition> = {
     key: "late_added_questions",
     title: "Late-Added Questions",
     description:
-      "Some questions were added later in survey history, which can create cohort-related missingness.",
+      "Some questions were added later, so earlier respondents never saw them.",
     guidance:
       "Compare missingness rates before assuming behavioral differences.",
   },

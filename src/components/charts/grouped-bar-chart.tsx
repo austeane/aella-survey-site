@@ -43,7 +43,7 @@ export function GroupedBarChart({
     <ResponsiveContainer width="100%" height={height}>
       <RechartsBarChart
         data={data}
-        margin={{ top: 8, right: 12, bottom: xLabel ? 32 : 8, left: yLabel ? 48 : 8 }}
+        margin={{ top: 8, right: 12, bottom: xLabel ? 52 : 24, left: yLabel ? 48 : 8 }}
       >
         <CartesianGrid vertical={false} {...GRID_STYLE} />
         <XAxis
@@ -54,7 +54,7 @@ export function GroupedBarChart({
               ? {
                   value: xLabel,
                   position: "insideBottom",
-                  offset: -20,
+                  offset: -4,
                   style: { ...AXIS_STYLE.tick, fontSize: 10 },
                 }
               : undefined

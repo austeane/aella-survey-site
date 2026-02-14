@@ -6,14 +6,18 @@ interface MissingnessBadgeProps {
 }
 
 const LABELS: Record<NullMeaning, string> = {
-  GATED: "Gated",
-  LATE_ADDED: "Late Added",
+  GATED: "Not shown to everyone",
+  LATE_ADDED: "Added mid-survey",
   NOT_APPLICABLE: "N/A",
   UNKNOWN: "Unknown",
 };
 
 export function MissingnessBadge({ meaning }: MissingnessBadgeProps) {
   const resolved = meaning ?? "UNKNOWN";
+  if (resolved === "UNKNOWN") {
+    return null;
+  }
+
   const variant =
     resolved === "GATED"
       ? "accent"

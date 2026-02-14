@@ -67,7 +67,7 @@ export function SimpleBarChart({
           itemStyle={TOOLTIP_STYLE.itemStyle}
           cursor={{ fill: CHART_COLORS.ruleLight }}
         />
-        <Bar dataKey="value" fill={color} radius={0} maxBarSize={64} />
+        <Bar dataKey="value" name={yLabel ?? "Value"} fill={color} radius={0} maxBarSize={64} />
       </RechartsBarChart>
     </ResponsiveContainer>
   );

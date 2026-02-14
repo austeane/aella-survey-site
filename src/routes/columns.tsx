@@ -17,7 +17,7 @@ import {
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
-import { getColumnDisplayName } from "@/lib/format-labels";
+import { getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
 import { formatNumber, formatPercent } from "@/lib/format";
 
 export const Route = createFileRoute("/columns")({
@@ -237,7 +237,7 @@ function ColumnsPage() {
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <span className="mono-value text-[var(--ink)]">{getColumnDisplayName(column)}</span>
-                      {column.displayName ? <p className="mono-value text-[var(--ink-faded)]">{column.name}</p> : null}
+                      {column.displayName ? <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(column.name)}</p> : null}
                     </div>
                     <div className="flex flex-wrap items-center gap-1">
                       <span className="null-badge">{LOGICAL_TYPE_LABELS[column.logicalType] ?? column.logicalType}</span>

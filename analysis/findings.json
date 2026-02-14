@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+  "generatedAt": "2026-02-14T10:26:34.551985+00:00",
   "sourceParquet": "/Users/austin/dev/kink/data/BKSPublic.parquet",
   "featuredPresets": [
     {
@@ -7,7 +7,7 @@
       "title": "Who likes giving vs receiving pain?",
       "shortTitle": "Pain & Gender",
       "question": "Are men and women different on giving vs receiving pain?",
-      "caption": "Women report higher receiving-pain interest while men report higher giving-pain interest in the responder subset.",
+      "caption": "Women report higher interest in receiving pain, while men report higher interest in giving pain (among people who answered both questions).",
       "sql": "SELECT\n          CASE WHEN \"biomale\" = 1 THEN 'Men' ELSE 'Women' END AS group_key,\n          round(avg(\"receivepain\")::DOUBLE, 2) AS \"Receive pain\",\n          round(avg(\"givepain\")::DOUBLE, 2) AS \"Give pain\"\n        FROM data\n        WHERE \"biomale\" IS NOT NULL\n          AND \"receivepain\" IS NOT NULL\n          AND \"givepain\" IS NOT NULL\n        GROUP BY 1\n        ORDER BY 1",
       "rowCount": 2,
       "outputColumns": [
@@ -33,7 +33,7 @@
       "xLabel": "Sex",
       "yLabel": "Average interest (0-5)",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "robust",
         "effectSizeNote": "Large in responder subset (wave-2: d\u22480.62 pre-imputation, much smaller under zero-imputation)",
@@ -65,10 +65,10 @@
       "id": "spanking-childhood",
       "title": "Does childhood spanking predict adult S/M interest?",
       "shortTitle": "Childhood -> Kinks?",
-      "question": "Do people spanked more often as kids report different adult S/M interest?",
-      "caption": "The strongest bivariate pattern in the current curated set: higher childhood spanking bins map to higher S/M interest.",
-      "sql": "SELECT\n          cast(cast(\"spanking\" AS INTEGER) AS VARCHAR) AS name,\n          round(avg(\"sadomasochism\")::DOUBLE, 2) AS value,\n          cast(\"spanking\" AS INTEGER) AS sort_order\n        FROM data\n        WHERE \"spanking\" IS NOT NULL\n          AND \"sadomasochism\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
-      "rowCount": 6,
+      "question": "Do people who were spanked more as kids show different sadomasochism interest as adults?",
+      "caption": "People who report more childhood spanking also report higher sadomasochism interest as adults.",
+      "sql": "SELECT\n          \"From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)\" AS name,\n          round(avg(\"sadomasochism\")::DOUBLE, 2) AS value,\n          CASE \"From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)\"\n            WHEN 'Never' THEN 1\n            WHEN 'Sometimes' THEN 2\n            WHEN 'Often' THEN 3\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)\" IS NOT NULL\n          AND \"sadomasochism\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 3,
       "outputColumns": [
         "name",
         "value",
@@ -76,54 +76,35 @@
       ],
       "outputPreview": [
         {
-          "name": "0",
-          "value": 3.33,
-          "sort_order": 0
-        },
-        {
-          "name": "1",
-          "value": 2.84,
+          "name": "Never",
+          "value": 3.32,
           "sort_order": 1
         },
         {
-          "name": "2",
-          "value": 2.74,
+          "name": "Sometimes",
+          "value": 3.42,
           "sort_order": 2
         },
         {
-          "name": "3",
-          "value": 2.99,
+          "name": "Often",
+          "value": 3.42,
           "sort_order": 3
-        },
-        {
-          "name": "4",
-          "value": 3.36,
-          "sort_order": 4
-        },
-        {
-          "name": "5",
-          "value": 4.11,
-          "sort_order": 5
         }
       ],
-      "exploreX": "spanking",
+      "exploreX": "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)",
       "exploreY": "sadomasochism",
       "chartType": "bar",
       "xLabel": "Childhood spanking frequency",
       "yLabel": "Average S/M interest (0-5)",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
-        "evidenceTier": "robust",
-        "effectSizeNote": "Large signal in wave-2 controls (R^2\u22480.107)",
-        "riskFlags": [
-          "gated_selection_bias"
-        ],
-        "riskNotes": [
-          "Uses gated columns; effect sizes are inflated among responders."
-        ],
+        "evidenceTier": "supported",
+        "effectSizeNote": "Direction is clear in this dataset; interpreted as correlation only.",
+        "riskFlags": [],
+        "riskNotes": [],
         "recommendedForHome": true,
-        "curationNotes": "Direction remains stable in multivariate checks; still responder-biased due gating."
+        "curationNotes": "Uses the direct childhood-discipline question rather than the adult spanking-arousal item."
       }
     },
     {
@@ -131,7 +112,7 @@
       "title": "Partner count and personality openness",
       "shortTitle": "Partners & Openness",
       "question": "Do people with more partners report different openness scores?",
-      "caption": "Openness rises monotonically across partner-count bins, but the absolute effect is small.",
+      "caption": "Openness rises steadily as partner count increases, but the overall difference is small.",
       "sql": "SELECT\n          cast(\"sexcount\" AS VARCHAR) AS name,\n          round(avg(\"opennessvariable\")::DOUBLE, 2) AS value,\n          CASE cast(\"sexcount\" AS VARCHAR)\n            WHEN '0' THEN 1\n            WHEN '1-2' THEN 2\n            WHEN '3-7' THEN 3\n            WHEN '8-20' THEN 4\n            WHEN '21+' THEN 5\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"sexcount\" IS NOT NULL\n          AND \"opennessvariable\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 5,
       "outputColumns": [
@@ -172,7 +153,7 @@
       "xLabel": "Number of partners",
       "yLabel": "Average openness score",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "supported",
         "effectSizeNote": "Small but consistent (wave-2: d\u22480.22 top vs bottom bins)",
@@ -190,9 +171,9 @@
       "id": "fixity-breadth",
       "title": "Could you stop being aroused by a kink?",
       "shortTitle": "How fixed are kinks?",
-      "question": "How does arousal fixity relate to total kink breadth?",
+      "question": "Do people whose kinks feel more permanent have a wider variety of interests?",
       "caption": "People who report that changing arousal is impossible show the broadest kink repertoires.",
-      "sql": "SELECT\n          cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n            WHEN 'With little effort, yes' THEN 1\n            WHEN 'With some effort, yes' THEN 2\n            WHEN 'With a lot of effort, yes' THEN 3\n            WHEN 'With an extreme amount of effort, maybe' THEN 4\n            WHEN 'Impossible' THEN 5\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "sql": "SELECT\n          CASE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n            WHEN 'With little effort, yes' THEN 'Little effort'\n            WHEN 'With some effort, yes' THEN 'Some effort'\n            WHEN 'With a lot of effort, yes' THEN 'Lots of effort'\n            WHEN 'With an extreme amount of effort, maybe' THEN 'Extreme effort'\n            WHEN 'Impossible' THEN 'Impossible'\n            ELSE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n          END AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n            WHEN 'With little effort, yes' THEN 1\n            WHEN 'With some effort, yes' THEN 2\n            WHEN 'With a lot of effort, yes' THEN 3\n            WHEN 'With an extreme amount of effort, maybe' THEN 4\n            WHEN 'Impossible' THEN 5\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 5,
       "outputColumns": [
         "name",
@@ -201,22 +182,22 @@
       ],
       "outputPreview": [
         {
-          "name": "With little effort, yes",
+          "name": "Little effort",
           "value": 8.5,
           "sort_order": 1
         },
         {
-          "name": "With some effort, yes",
+          "name": "Some effort",
           "value": 9.28,
           "sort_order": 2
         },
         {
-          "name": "With a lot of effort, yes",
+          "name": "Lots of effort",
           "value": 10.0,
           "sort_order": 3
         },
         {
-          "name": "With an extreme amount of effort, maybe",
+          "name": "Extreme effort",
           "value": 10.83,
           "sort_order": 4
         },
@@ -230,9 +211,9 @@
       "exploreY": "totalfetishcategory",
       "chartType": "bar",
       "xLabel": "Self-reported arousal fixity",
-      "yLabel": "Average number of fetish categories",
+      "yLabel": "Average number of kink categories",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "robust",
         "effectSizeNote": "Large practical spread (~30% breadth gap from lowest to highest fixity)",
@@ -250,8 +231,8 @@
       "id": "honesty-breadth",
       "title": "Do more honest respondents report more kinks?",
       "shortTitle": "Do people lie?",
-      "question": "How does self-reported honesty relate to kink breadth?",
-      "caption": "Respondents who report being totally honest show higher average kink breadth than mostly-honest respondents.",
+      "question": "Do people who say they're more honest report more kinks?",
+      "caption": "People who say they're totally honest report a wider range of kinks than those who say they're mostly honest.",
       "sql": "SELECT\n          cast(\"How honest were you when answering this survey? (g1vao1y)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"How honest were you when answering this survey? (g1vao1y)\" AS VARCHAR)\n            WHEN 'Mostly honest' THEN 1\n            WHEN 'Totally honest' THEN 2\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"How honest were you when answering this survey? (g1vao1y)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 2,
       "outputColumns": [
@@ -275,9 +256,9 @@
       "exploreY": "totalfetishcategory",
       "chartType": "bar",
       "xLabel": "Self-reported survey honesty",
-      "yLabel": "Average number of fetish categories",
+      "yLabel": "Average number of kink categories",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "supported",
         "effectSizeNote": "Small-to-moderate and directionally useful as a response-validity signal",
@@ -295,8 +276,8 @@
       "id": "dom-sub-quadrants",
       "title": "Which gender-orientation groups are dom-leaning vs sub-leaning?",
       "shortTitle": "Dom vs Sub",
-      "question": "How do dominant and submissive arousal scores vary across gender-orientation quadrants?",
-      "caption": "Straight men are the only quadrant where dominant arousal exceeds submissive arousal.",
+      "question": "How do dominant and submissive interests differ across gender and orientation groups?",
+      "caption": "Straight men are the only group where dominant interest exceeds submissive interest.",
       "sql": "SELECT\n          CASE\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Straight' THEN 'Straight men'\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Not straight' THEN 'Non-straight men'\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Straight' THEN 'Straight women'\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Not straight' THEN 'Non-straight women'\n            ELSE 'Other'\n          END AS group_key,\n          round(avg(\"\"\"I am aroused by being dominant in sexual interactions\"\" (6w3xquw)\")::DOUBLE, 2) AS \"Dominant arousal\",\n          round(avg(\"\"\"I am aroused by being submissive in sexual interactions\"\" (xem7hbu)\")::DOUBLE, 2) AS \"Submissive arousal\",\n          CASE\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Straight' THEN 1\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Not straight' THEN 2\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Not straight' THEN 3\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Straight' THEN 4\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"biomale\" IS NOT NULL\n          AND \"straightness\" IS NOT NULL\n          AND \"\"\"I am aroused by being dominant in sexual interactions\"\" (6w3xquw)\" IS NOT NULL\n          AND \"\"\"I am aroused by being submissive in sexual interactions\"\" (xem7hbu)\" IS NOT NULL\n        GROUP BY 1, 4\n        ORDER BY sort_order",
       "rowCount": 4,
       "outputColumns": [
@@ -337,7 +318,7 @@
       "xLabel": "Gender x orientation",
       "yLabel": "Average arousal score (-3 to 3)",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "robust",
         "effectSizeNote": "Large quadrant separation in swarm wave-1/8 and wave-2 clustering",
@@ -367,8 +348,8 @@
       "id": "politics-breadth",
       "title": "Do politics predict total kink breadth?",
       "shortTitle": "Politics & Kinks",
-      "question": "How does political leaning relate to total fetish-category count?",
-      "caption": "Differences exist but are modest; politics is a weak predictor compared with gender and personality axes.",
+      "question": "How does political leaning relate to how many kinks someone has?",
+      "caption": "Differences exist but are modest - politics matters much less than gender or personality.",
       "sql": "SELECT\n          cast(\"politics\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"politics\" AS VARCHAR)\n            WHEN 'Liberal' THEN 1\n            WHEN 'Moderate' THEN 2\n            WHEN 'Conservative' THEN 3\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"politics\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 3,
       "outputColumns": [
@@ -397,9 +378,9 @@
       "exploreY": "totalfetishcategory",
       "chartType": "bar",
       "xLabel": "Political leaning",
-      "yLabel": "Average number of fetish categories",
+      "yLabel": "Average number of kink categories",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "tiny",
         "effectSizeNote": "Wave-2: statistically significant in some models but practically small",
@@ -417,8 +398,8 @@
       "id": "orientation-breadth",
       "title": "Do straight and non-straight groups differ in kink breadth?",
       "shortTitle": "Orientation & Kinks",
-      "question": "How much does orientation shift total kink breadth?",
-      "caption": "Orientation differences are real but small relative to role-direction differences.",
+      "question": "How much does sexual orientation affect the number of kinks someone has?",
+      "caption": "Orientation differences are real but small compared to dominant-vs-submissive differences.",
       "sql": "SELECT\n          cast(\"straightness\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"straightness\" AS VARCHAR)\n            WHEN 'Straight' THEN 1\n            WHEN 'Not straight' THEN 2\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"straightness\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 2,
       "outputColumns": [
@@ -442,9 +423,9 @@
       "exploreY": "totalfetishcategory",
       "chartType": "bar",
       "xLabel": "Orientation",
-      "yLabel": "Average number of fetish categories",
+      "yLabel": "Average number of kink categories",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "tiny",
         "effectSizeNote": "Wave-2: survives controls but small (d\u22480.07)",
@@ -462,8 +443,8 @@
       "id": "horny-state-breadth",
       "title": "How much does current arousal state shift responses?",
       "shortTitle": "Mood & Arousal",
-      "question": "Does being horny right now change reported kink breadth?",
-      "caption": "Current arousal state strongly shifts self-reported kink scores in the late-added subsample.",
+      "question": "Does being horny right now change the number of kinks someone reports?",
+      "caption": "Being horny right now noticeably shifts how many kinks people report (based on a smaller group who saw this question).",
       "sql": "SELECT\n          cast(\"How horny are you right now? (1jtj2nx)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"How horny are you right now? (1jtj2nx)\" AS VARCHAR)\n            WHEN 'Not horny at all' THEN 1\n            WHEN 'A little horny' THEN 2\n            WHEN 'Moderately horny' THEN 3\n            WHEN 'Real horny' THEN 4\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"How horny are you right now? (1jtj2nx)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 4,
       "outputColumns": [
@@ -497,9 +478,9 @@
       "exploreY": "totalfetishcategory",
       "chartType": "bar",
       "xLabel": "Horniness right now",
-      "yLabel": "Average number of fetish categories",
+      "yLabel": "Average number of kink categories",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "exploratory",
         "effectSizeNote": "Large shift but based on late-added question (N~2.7k)",
@@ -519,8 +500,8 @@
       "id": "neuroticism-pain-direction",
       "title": "Neuroticism and pain-direction preference",
       "shortTitle": "Anxiety & Pain",
-      "question": "Does neuroticism change receiving-vs-giving pain direction?",
-      "caption": "Higher neuroticism bins tilt more toward receiving pain than giving pain.",
+      "question": "Does anxiety change whether someone prefers receiving or giving pain?",
+      "caption": "People with higher anxiety scores lean more toward receiving pain than giving pain.",
       "sql": "WITH binned AS (\n          SELECT\n            CASE\n              WHEN \"neuroticismvariable\" <= -2 THEN 'Low'\n              WHEN \"neuroticismvariable\" <= 2 THEN 'Middle'\n              ELSE 'High'\n            END AS group_key,\n            CASE\n              WHEN \"neuroticismvariable\" <= -2 THEN 1\n              WHEN \"neuroticismvariable\" <= 2 THEN 2\n              ELSE 3\n            END AS sort_order,\n            \"receivepain\",\n            \"givepain\"\n          FROM data\n          WHERE \"neuroticismvariable\" IS NOT NULL\n            AND \"receivepain\" IS NOT NULL\n            AND \"givepain\" IS NOT NULL\n        )\n        SELECT\n          group_key,\n          round(avg(\"receivepain\")::DOUBLE, 2) AS \"Receive pain\",\n          round(avg(\"givepain\")::DOUBLE, 2) AS \"Give pain\",\n          min(sort_order) AS sort_order\n        FROM binned\n        GROUP BY group_key\n        ORDER BY sort_order",
       "rowCount": 3,
       "outputColumns": [
@@ -555,7 +536,7 @@
       "xLabel": "Neuroticism level",
       "yLabel": "Average interest (0-5)",
       "status": "validated",
-      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "generatedAt": "2026-02-14T10:26:34.551985+00:00",
       "wave2": {
         "evidenceTier": "supported",
         "effectSizeNote": "Wave-1 top personality signal; wave-2 recommends gating caveat",
@@ -612,7 +593,7 @@
       "presetId": "politics-breadth"
     },
     {
-      "prompt": "What is connected to straightness overall?",
+      "prompt": "What is connected to sexual orientation?",
       "deepLink": "/relationships?column=straightness"
     }
   ],

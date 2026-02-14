@@ -3,6 +3,12 @@ interface ColumnWithDisplayName {
   displayName?: string;
 }
 
+const HASH_SUFFIX_PATTERN = /\s\(([a-z0-9]{5,8})\)$/i;
+
+export function stripHashSuffix(value: string): string {
+  return value.replace(HASH_SUFFIX_PATTERN, "");
+}
+
 export function candidateValueKeys(value: string): string[] {
   const trimmed = value.trim();
   if (trimmed.length === 0) {
@@ -26,7 +32,11 @@ export function candidateValueKeys(value: string): string[] {
   return [...candidates];
 }
 
-export function formatValueWithLabel(value: string, valueLabels?: Record<string, string>): string {
+export function formatValueWithLabel(
+  value: string,
+  valueLabels?: Record<string, string>,
+  includeRawValue = false,
+): string {
   if (value === "NULL") {
     return "No answer";
   }
@@ -37,7 +47,7 @@ export function formatValueWithLabel(value: string, valueLabels?: Record<string,
   for (const key of candidateValueKeys(value)) {
     const label = valueLabels[key];
     if (label) {
-      return `${value} - ${label}`;
+      return includeRawValue ? `${value} - ${label}` : label;
     }
   }
 
@@ -45,5 +55,5 @@ export function formatValueWithLabel(value: string, valueLabels?: Record<string,
 }
 
 export function getColumnDisplayName(column: ColumnWithDisplayName): string {
-  return column.displayName ?? column.name;
+  return stripHashSuffix(column.displayName ?? column.name);
 }

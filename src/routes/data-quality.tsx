@@ -11,7 +11,7 @@ import { StatCard } from "@/components/stat-card";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { useDuckDB } from "@/lib/duckdb/provider";
-import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
+import { formatValueWithLabel, getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
 import { formatNumber, formatPercent, asNumber, asNullableNumber } from "@/lib/format";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
@@ -34,6 +34,22 @@ const MISSINGNESS_BUCKETS: MissingnessBucket[] = [
   { label: "50-75%", min: 0.5, max: 0.75 },
   { label: "75-100%", min: 0.75, max: 1.01 },
 ];
+
+const TAG_LABELS: Record<string, string> = {
+  demographic: "Demographics",
+  ocean: "Personality (Big Five)",
+  fetish: "Kinks and interests",
+  derived: "Computed scores",
+  other: "Other",
+};
+
+const LOGICAL_TYPE_LABELS: Record<string, string> = {
+  categorical: "Multiple choice",
+  numeric: "Number",
+  boolean: "Yes/No",
+  text: "Text",
+  unknown: "Unspecified",
+};
 
 function DashboardPage() {
   const { phase } = useDuckDB();
@@ -225,7 +241,7 @@ function DashboardPage() {
       <header className="page-header">
         <h1 className="page-title">Data Quality Dashboard</h1>
         <p className="page-subtitle">
-          Coverage, caveats, missing answers, and diagnostic metadata.
+          Coverage, missing answers, and question details.
         </p>
         {schema ? (
           <p className="dateline">
@@ -239,7 +255,7 @@ function DashboardPage() {
       {schema ? (
         <>
           <section className="stat-grid grid-cols-1 md:grid-cols-3">
-            <StatCard label="Rows" value={formatNumber(schema.dataset.rowCount)} />
+            <StatCard label="Respondents" value={formatNumber(schema.dataset.rowCount)} />
             <StatCard label="Questions" value={formatNumber(schema.dataset.columnCount)} />
             <StatCard
               label="Generated"
@@ -281,7 +297,7 @@ function DashboardPage() {
                         <div className="space-y-1">
                           <span>{getColumnDisplayName(row)}</span>
                           {row.displayName ? (
-                            <p className="mono-value text-[var(--ink-faded)]">{row.name}</p>
+                            <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
                           ) : null}
                           <div>
                             <MissingnessBadge meaning={row.nullMeaning} />
@@ -309,7 +325,7 @@ function DashboardPage() {
                   rows={tagBreakdown}
                   rowKey={(row) => row.tag}
                   columns={[
-                    { id: "tag", header: "Tag", cell: (row) => row.tag },
+                    { id: "tag", header: "Tag", cell: (row) => TAG_LABELS[row.tag] ?? row.tag },
                     { id: "count", header: "Questions", align: "right", cell: (row) => formatNumber(row.count) },
                   ]}
                 />
@@ -317,13 +333,13 @@ function DashboardPage() {
             </div>
 
             <div>
-              <SectionHeader number="04" title="Missingness Histogram" />
+              <SectionHeader number="04" title="Missing-Answer Distribution" />
               <div className="mt-3">
                 <DataTable
                   rows={missingnessHistogram}
                   rowKey={(row) => row.bucket}
                   columns={[
-                    { id: "bucket", header: "Bucket", cell: (row) => row.bucket },
+                    { id: "bucket", header: "Range", cell: (row) => row.bucket },
                     { id: "count", header: "Questions", align: "right", cell: (row) => formatNumber(row.count) },
                   ]}
                 />
@@ -333,7 +349,7 @@ function DashboardPage() {
 
           <section className="grid gap-8 lg:grid-cols-2">
             <div>
-              <SectionHeader number="05" title="Most Analysis-Friendly Questions" />
+              <SectionHeader number="05" title="Best-Answered Questions" />
               <div className="mt-3">
                 <DataTable
                   rows={analysisFriendlyColumns}
@@ -358,7 +374,7 @@ function DashboardPage() {
                     },
                     {
                       id: "null",
-                      header: "Null %",
+                      header: "Missing %",
                       align: "right",
                       cell: (row) => formatPercent(row.nullRatio * 100, 1),
                     },
@@ -374,7 +390,7 @@ function DashboardPage() {
             </div>
 
             <div>
-              <SectionHeader number="06" title="Most Conditional Questions" />
+              <SectionHeader number="06" title="Most-Skipped Questions" />
               <div className="mt-3">
                 <DataTable
                   rows={gatedColumns}
@@ -387,7 +403,7 @@ function DashboardPage() {
                         <div className="space-y-1">
                           <span>{getColumnDisplayName(row)}</span>
                           {row.displayName ? (
-                            <p className="mono-value text-[var(--ink-faded)]">{row.name}</p>
+                            <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
                           ) : null}
                           <div>
                             <MissingnessBadge meaning={row.nullMeaning} />
@@ -397,7 +413,7 @@ function DashboardPage() {
                     },
                     {
                       id: "null",
-                      header: "Null %",
+                      header: "Missing %",
                       align: "right",
                       cell: (row) => formatPercent(row.nullRatio * 100, 1),
                     },
@@ -408,7 +424,7 @@ function DashboardPage() {
           </section>
 
           <section className="raised-panel space-y-4">
-            <SectionHeader number="07" title="Question Inspector (Inline)" />
+            <SectionHeader number="07" title="Inspect a Question" />
 
             <label className="editorial-label max-w-[460px]">
               Question
@@ -425,10 +441,14 @@ function DashboardPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="mono-value">{getColumnDisplayName(selectedMeta)}</span>
                   {selectedMeta.displayName ? (
-                    <span className="mono-value text-[var(--ink-faded)]">({selectedMeta.name})</span>
+                    <span className="mono-value text-[var(--ink-faded)]">({stripHashSuffix(selectedMeta.name)})</span>
                   ) : null}
-                  <span className="null-badge">{selectedMeta.logicalType}</span>
-                  <MissingnessBadge meaning={selectedMeta.nullMeaning} />
+                  <span className="null-badge">
+                    {LOGICAL_TYPE_LABELS[selectedMeta.logicalType] ?? selectedMeta.logicalType}
+                  </span>
+                  {selectedMeta.nullMeaning && selectedMeta.nullMeaning !== "UNKNOWN" ? (
+                    <MissingnessBadge meaning={selectedMeta.nullMeaning} />
+                  ) : null}
                 </div>
                 {stats ? (
                   <SampleSizeDisplay total={stats.totalCount} nonNull={stats.nonNullCount} used={stats.nonNullCount} />
@@ -445,11 +465,11 @@ function DashboardPage() {
                   <DataTable
                     rows={[
                       { metric: "Mean", value: stats.mean },
-                      { metric: "Stddev", value: stats.stddev },
+                      { metric: "Spread", value: stats.stddev },
                       { metric: "Min", value: stats.min },
-                      { metric: "P25", value: stats.p25 },
+                      { metric: "25th percentile", value: stats.p25 },
                       { metric: "Median", value: stats.median },
-                      { metric: "P75", value: stats.p75 },
+                      { metric: "75th percentile", value: stats.p75 },
                       { metric: "Max", value: stats.max },
                     ]}
                     rowKey={(row) => row.metric}
@@ -475,6 +495,7 @@ function DashboardPage() {
                           formatValueWithLabel(
                             String(row.value ?? "NULL"),
                             selectedMeta?.valueLabels,
+                            true,
                           ),
                       },
                       {

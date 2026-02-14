@@ -48,7 +48,16 @@ function AboutPage() {
           >
             Aella
           </a>
-          , collecting responses from hundreds of thousands of participants.
+          , collecting responses from ~970,000 participants.
+          The survey is still open — you can{" "}
+          <a
+            href="https://www.guidedtrack.com/programs/u4m797m/run"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+          >
+            take it yourself
+          </a>.
           Topics span sexual interests and kinks, personality traits (OCEAN
           model), demographics, political orientation, relationship structures,
           and psychological characteristics.
@@ -73,10 +82,14 @@ function AboutPage() {
       <section className="editorial-panel space-y-5">
         <SectionHeader number="02" title="The Dataset We Work With" />
 
-        <div className="stat-grid grid-cols-1 md:grid-cols-3">
+        <div className="stat-grid grid-cols-1 md:grid-cols-4">
+          <div className="stat-cell">
+            <span className="stat-cell-value">~970k</span>
+            <span className="stat-cell-label">Original Respondents</span>
+          </div>
           <div className="stat-cell">
             <span className="stat-cell-value">~15,500</span>
-            <span className="stat-cell-label">Respondents</span>
+            <span className="stat-cell-label">Public Subsample</span>
           </div>
           <div className="stat-cell">
             <span className="stat-cell-value">365</span>
@@ -327,12 +340,12 @@ function AboutPage() {
         </p>
 
         <div className="space-y-2 border-l-2 border-[var(--accent)] pl-3">
-          <span className="mono-label text-[var(--ink-faded)]">MCP SERVER</span>
+          <span className="mono-label block text-[var(--ink-faded)]">MCP SERVER</span>
           <a
             href="https://bks-mcp-server-production.up.railway.app/mcp"
             target="_blank"
             rel="noopener noreferrer"
-            className="mono-value text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            className="mono-value block text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
           >
             https://bks-mcp-server-production.up.railway.app/mcp
           </a>

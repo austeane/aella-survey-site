@@ -20,6 +20,7 @@ DEFAULT_OUTPUT_MARKDOWN = REPO_ROOT / "docs" / "schema" / "interesting-findings.
 FIXITY_COLUMN = "If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)"
 HONESTY_COLUMN = "How honest were you when answering this survey? (g1vao1y)"
 HORNY_NOW_COLUMN = "How horny are you right now? (1jtj2nx)"
+SPANKING_CHILDHOOD_COLUMN = "From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)"
 LIBERATION_COLUMN = 'How "sexually liberated" was your upbringing? (fs700v2)'
 DOM_AROUSAL_COLUMN = '"I am aroused by being dominant in sexual interactions" (6w3xquw)'
 SUB_AROUSAL_COLUMN = '"I am aroused by being submissive in sexual interactions" (xem7hbu)'
@@ -72,7 +73,7 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         title="Who likes giving vs receiving pain?",
         short_title="Pain & Gender",
         question="Are men and women different on giving vs receiving pain?",
-        caption="Women report higher receiving-pain interest while men report higher giving-pain interest in the responder subset.",
+        caption="Women report higher interest in receiving pain, while men report higher interest in giving pain (among people who answered both questions).",
         chart_type="grouped-bar",
         x_label="Sex",
         y_label="Average interest (0-5)",
@@ -103,35 +104,40 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="spanking-childhood",
         title="Does childhood spanking predict adult S/M interest?",
         short_title="Childhood -> Kinks?",
-        question="Do people spanked more often as kids report different adult S/M interest?",
-        caption="The strongest bivariate pattern in the current curated set: higher childhood spanking bins map to higher S/M interest.",
+        question="Do people who were spanked more as kids show different sadomasochism interest as adults?",
+        caption="People who report more childhood spanking also report higher sadomasochism interest as adults.",
         chart_type="bar",
         x_label="Childhood spanking frequency",
         y_label="Average S/M interest (0-5)",
-        explore_x="spanking",
+        explore_x=SPANKING_CHILDHOOD_COLUMN,
         explore_y="sadomasochism",
-        sql="""
+        sql=f"""
         SELECT
-          cast(cast("spanking" AS INTEGER) AS VARCHAR) AS name,
+          {qi(SPANKING_CHILDHOOD_COLUMN)} AS name,
           round(avg("sadomasochism")::DOUBLE, 2) AS value,
-          cast("spanking" AS INTEGER) AS sort_order
+          CASE {qi(SPANKING_CHILDHOOD_COLUMN)}
+            WHEN 'Never' THEN 1
+            WHEN 'Sometimes' THEN 2
+            WHEN 'Often' THEN 3
+            ELSE 99
+          END AS sort_order
         FROM data
-        WHERE "spanking" IS NOT NULL
+        WHERE {qi(SPANKING_CHILDHOOD_COLUMN)} IS NOT NULL
           AND "sadomasochism" IS NOT NULL
         GROUP BY 1, 3
         ORDER BY sort_order
         """.strip(),
-        evidence_tier="robust",
-        effect_size_note="Large signal in wave-2 controls (R^2≈0.107)",
-        risk_flags=("gated_selection_bias",),
-        curation_notes="Direction remains stable in multivariate checks; still responder-biased due gating.",
+        evidence_tier="supported",
+        effect_size_note="Direction is clear in this dataset; interpreted as correlation only.",
+        risk_flags=(),
+        curation_notes="Uses the direct childhood-discipline question rather than the adult spanking-arousal item.",
     ),
     PresetDefinition(
         id="partner-count-openness",
         title="Partner count and personality openness",
         short_title="Partners & Openness",
         question="Do people with more partners report different openness scores?",
-        caption="Openness rises monotonically across partner-count bins, but the absolute effect is small.",
+        caption="Openness rises steadily as partner count increases, but the overall difference is small.",
         chart_type="bar",
         x_label="Number of partners",
         y_label="Average openness score",
@@ -164,16 +170,23 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="fixity-breadth",
         title="Could you stop being aroused by a kink?",
         short_title="How fixed are kinks?",
-        question="How does arousal fixity relate to total kink breadth?",
+        question="Do people whose kinks feel more permanent have a wider variety of interests?",
         caption="People who report that changing arousal is impossible show the broadest kink repertoires.",
         chart_type="bar",
         x_label="Self-reported arousal fixity",
-        y_label="Average number of fetish categories",
+        y_label="Average number of kink categories",
         explore_x=FIXITY_COLUMN,
         explore_y="totalfetishcategory",
         sql=f"""
         SELECT
-          cast({qi(FIXITY_COLUMN)} AS VARCHAR) AS name,
+          CASE cast({qi(FIXITY_COLUMN)} AS VARCHAR)
+            WHEN 'With little effort, yes' THEN 'Little effort'
+            WHEN 'With some effort, yes' THEN 'Some effort'
+            WHEN 'With a lot of effort, yes' THEN 'Lots of effort'
+            WHEN 'With an extreme amount of effort, maybe' THEN 'Extreme effort'
+            WHEN 'Impossible' THEN 'Impossible'
+            ELSE cast({qi(FIXITY_COLUMN)} AS VARCHAR)
+          END AS name,
           round(avg("totalfetishcategory")::DOUBLE, 2) AS value,
           CASE cast({qi(FIXITY_COLUMN)} AS VARCHAR)
             WHEN 'With little effort, yes' THEN 1
@@ -198,11 +211,11 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="honesty-breadth",
         title="Do more honest respondents report more kinks?",
         short_title="Do people lie?",
-        question="How does self-reported honesty relate to kink breadth?",
-        caption="Respondents who report being totally honest show higher average kink breadth than mostly-honest respondents.",
+        question="Do people who say they're more honest report more kinks?",
+        caption="People who say they're totally honest report a wider range of kinks than those who say they're mostly honest.",
         chart_type="bar",
         x_label="Self-reported survey honesty",
-        y_label="Average number of fetish categories",
+        y_label="Average number of kink categories",
         explore_x=HONESTY_COLUMN,
         explore_y="totalfetishcategory",
         sql=f"""
@@ -229,8 +242,8 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="dom-sub-quadrants",
         title="Which gender-orientation groups are dom-leaning vs sub-leaning?",
         short_title="Dom vs Sub",
-        question="How do dominant and submissive arousal scores vary across gender-orientation quadrants?",
-        caption="Straight men are the only quadrant where dominant arousal exceeds submissive arousal.",
+        question="How do dominant and submissive interests differ across gender and orientation groups?",
+        caption="Straight men are the only group where dominant interest exceeds submissive interest.",
         chart_type="grouped-bar",
         x_label="Gender x orientation",
         y_label="Average arousal score (-3 to 3)",
@@ -275,11 +288,11 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="politics-breadth",
         title="Do politics predict total kink breadth?",
         short_title="Politics & Kinks",
-        question="How does political leaning relate to total fetish-category count?",
-        caption="Differences exist but are modest; politics is a weak predictor compared with gender and personality axes.",
+        question="How does political leaning relate to how many kinks someone has?",
+        caption="Differences exist but are modest - politics matters much less than gender or personality.",
         chart_type="bar",
         x_label="Political leaning",
-        y_label="Average number of fetish categories",
+        y_label="Average number of kink categories",
         explore_x="politics",
         explore_y="totalfetishcategory",
         sql="""
@@ -308,11 +321,11 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="orientation-breadth",
         title="Do straight and non-straight groups differ in kink breadth?",
         short_title="Orientation & Kinks",
-        question="How much does orientation shift total kink breadth?",
-        caption="Orientation differences are real but small relative to role-direction differences.",
+        question="How much does sexual orientation affect the number of kinks someone has?",
+        caption="Orientation differences are real but small compared to dominant-vs-submissive differences.",
         chart_type="bar",
         x_label="Orientation",
-        y_label="Average number of fetish categories",
+        y_label="Average number of kink categories",
         explore_x="straightness",
         explore_y="totalfetishcategory",
         sql="""
@@ -340,11 +353,11 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="horny-state-breadth",
         title="How much does current arousal state shift responses?",
         short_title="Mood & Arousal",
-        question="Does being horny right now change reported kink breadth?",
-        caption="Current arousal state strongly shifts self-reported kink scores in the late-added subsample.",
+        question="Does being horny right now change the number of kinks someone reports?",
+        caption="Being horny right now noticeably shifts how many kinks people report (based on a smaller group who saw this question).",
         chart_type="bar",
         x_label="Horniness right now",
-        y_label="Average number of fetish categories",
+        y_label="Average number of kink categories",
         explore_x=HORNY_NOW_COLUMN,
         explore_y="totalfetishcategory",
         sql=f"""
@@ -374,8 +387,8 @@ FEATURED_PRESETS: list[PresetDefinition] = [
         id="neuroticism-pain-direction",
         title="Neuroticism and pain-direction preference",
         short_title="Anxiety & Pain",
-        question="Does neuroticism change receiving-vs-giving pain direction?",
-        caption="Higher neuroticism bins tilt more toward receiving pain than giving pain.",
+        question="Does anxiety change whether someone prefers receiving or giving pain?",
+        caption="People with higher anxiety scores lean more toward receiving pain than giving pain.",
         chart_type="grouped-bar",
         x_label="Neuroticism level",
         y_label="Average interest (0-5)",
@@ -430,7 +443,7 @@ QUESTION_CARDS: list[dict[str, str]] = [
     {"prompt": "How fixed are people's arousal patterns over time?", "presetId": "fixity-breadth"},
     {"prompt": "Do people with more partners score higher on openness?", "presetId": "partner-count-openness"},
     {"prompt": "How much do politics or orientation actually matter?", "presetId": "politics-breadth"},
-    {"prompt": "What is connected to straightness overall?", "deepLink": "/relationships?column=straightness"},
+    {"prompt": "What is connected to sexual orientation?", "deepLink": "/relationships?column=straightness"},
 ]
 
 

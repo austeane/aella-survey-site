@@ -39,7 +39,7 @@ const columnNames = Object.keys(data.relationships).sort((a, b) =>
 );
 
 function strengthLabel(value: number): string {
-  if (value < 0.1) return "negligible";
+  if (value < 0.1) return "very weak";
   if (value < 0.3) return "weak";
   if (value < 0.5) return "moderate";
   return "strong";
@@ -136,6 +136,9 @@ function RelationshipsPage() {
               : "No connections found for this question"
           }
         />
+        <p className="section-subtitle">
+          Scores range from 0 (no connection) to 1 (perfect connection).
+        </p>
 
         {relationships.length > 0 ? (
           <div className="editorial-table-wrap">
@@ -144,9 +147,9 @@ function RelationshipsPage() {
                 <tr>
                   <th>Related Question</th>
                   <th>Metric</th>
-                  <th className="numeric">Strength</th>
+                  <th className="numeric">Score</th>
                   <th>Label</th>
-                  <th className="numeric">People (N)</th>
+                  <th className="numeric">People</th>
                   <th style={{ width: "120px" }}>Strength</th>
                 </tr>
               </thead>
@@ -180,7 +183,7 @@ function RelationshipsPage() {
                       </td>
                       <td className="numeric">
                         <span className="mono-value">
-                          {rel.value.toFixed(3)}
+                          {rel.value.toFixed(2)}
                         </span>
                       </td>
                       <td>

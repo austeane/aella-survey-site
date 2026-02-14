@@ -12,9 +12,9 @@ test.describe("Home page", () => {
 
   test("renders hero and section headers", async ({ page }) => {
     await expect(
-      page.getByText("What 15,000 people revealed about desire"),
+      page.getByText("what 15,000 answers revealed about desire", { exact: false }),
     ).toBeVisible();
-    await expect(page.getByText("Based on 15,503 anonymized survey responses.")).toBeVisible();
+    await expect(page.getByText("15,503 anonymized responses from a", { exact: false })).toBeVisible();
 
     await expect(page.getByText("What the data shows")).toBeVisible();
     await expect(page.getByText("Build your own chart")).toBeVisible();

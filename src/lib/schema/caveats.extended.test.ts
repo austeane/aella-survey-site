@@ -102,13 +102,13 @@ describe("formatCaveatHint", () => {
   it("returns comma-separated titles for column with caveats", () => {
     const hint = formatCaveatHint("politics");
     expect(hint).toContain("Binned or Collapsed");
-    expect(hint).toContain("Gated Missingness");
+    expect(hint).toContain("Skip-Logic Questions");
     expect(hint).toContain("Late-Added Questions");
   });
 
   it("includes global caveats for unknown columns", () => {
     const hint = formatCaveatHint("totally_unknown");
-    expect(hint).toContain("Gated Missingness");
+    expect(hint).toContain("Skip-Logic Questions");
     expect(hint).toContain("Late-Added Questions");
   });
 
