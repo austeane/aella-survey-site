@@ -11,8 +11,9 @@ export function FeedbackDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
-  const basepath = useRouter({ warn: false }).basepath ?? "";
-  const apiBase = basepath === "/" ? "" : basepath;
+  const rawBasepath = useRouter({ warn: false }).basepath ?? "";
+  const normalizedBasepath = rawBasepath.replace(/^\/+|\/+$/g, "");
+  const apiBase = normalizedBasepath ? `/${normalizedBasepath}` : "";
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
