@@ -12,3 +12,8 @@ count.txt
 .vinxi
 __unconfig*
 todos.json
+__pycache__
+playwright-report
+test-results
+e2e/screenshots
+charts

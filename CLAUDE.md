@@ -33,7 +33,7 @@ Every commit must pass: lint-staged → type-check → tests
 - `analysis/META-FINDINGS.md` — deep-analysis synthesis and wave-2 rigor outcomes
 - `data/` — source parquet + column notes + survey documentation
 - `src/router.tsx` — TanStack Start entry (required, exports `getRouter`)
-- `src/routes/` — primary UI pages: about, index, data-quality, explore, columns, profile, relationships, sql, notebook
+- `src/routes/` — primary UI pages: about, index, data-quality, explore hub (`explore/index.tsx`), compare-questions crosstab (`explore/crosstab.tsx`), columns, profile, relationships, sql, notebook
 - `src/routes/llms[.]txt.ts` — machine-readable AI integration document (schema-driven MCP + REST docs at `/llms.txt`)
 - `src/routes/api/` — server route API endpoints
 - `src/lib/notebook-store.ts` — localStorage CRUD for notebook entries
@@ -69,4 +69,5 @@ Every commit must pass: lint-staged → type-check → tests
 6. UI follows "Ink & Paper" design system — see `docs/design/frontend.md` for tokens/patterns
 
 ## Session Hygiene
-At the end of each session or before compaction, update `docs/` with what was built, changed, or decided. Future agents should be able to read CLAUDE.md → docs/ and understand the current state without needing conversation history.
+When you have fully completed a task or before compaction, update `docs/` with what was built, changed, or decided. Future agents should be able to read CLAUDE.md → docs/ and understand the current state without needing conversation history.
+Also, when you believe you have fully completed a task, verify using Claude for Chrome or another browser tool to visually verify that your changes exist in detail. 

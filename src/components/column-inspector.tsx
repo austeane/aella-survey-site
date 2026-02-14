@@ -202,7 +202,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
   const tailSize = asNumber(tailQuery.data?.rows[0]?.[0] ?? 0, 0);
 
   const exploreHref = suggestedColumn
-    ? `/explore?x=${encodeURIComponent(column.name)}&y=${encodeURIComponent(suggestedColumn)}`
+    ? `/explore/crosstab?x=${encodeURIComponent(column.name)}&y=${encodeURIComponent(suggestedColumn)}`
     : "/explore";
 
   const sqlHref = `/sql?sql=${encodeSql(

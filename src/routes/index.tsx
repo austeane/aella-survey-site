@@ -264,6 +264,11 @@ function HomePage() {
             ~970,000-respondent survey
           </a>.
         </p>
+        <div className="mt-4">
+          <Link to="/explore" className="editorial-button editorial-button--filled inline-flex">
+            Start Exploring
+          </Link>
+        </div>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
@@ -336,7 +341,7 @@ function HomePage() {
             </div>
 
             <Link
-              to="/explore"
+              to="/explore/crosstab"
               search={{ x: selectedPreset.exploreX, y: selectedPreset.exploreY }}
               className="editorial-button"
             >
@@ -415,7 +420,7 @@ function HomePage() {
               </div>
             ) : null}
 
-            <Link to="/explore" search={{ x: buildX || undefined, y: buildY || undefined }} className="editorial-button">
+            <Link to="/explore/crosstab" search={{ x: buildX || undefined, y: buildY || undefined }} className="editorial-button">
               Open this in Explore
             </Link>
           </>

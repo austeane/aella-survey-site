@@ -2,6 +2,51 @@
 
 ## 2026-02-14
 
+### Explore hub + nav dropdown implementation (mobile-first)
+
+**Plan document**: `docs/plans/completed/2026-02-14-explore-hub-nav-dropdown.md`
+
+- Implemented route split:
+  - `/explore` -> new Explore hub page (`src/routes/explore/index.tsx`)
+  - `/explore/crosstab` -> existing compare-questions experience (`src/routes/explore/crosstab.tsx`)
+  - removed legacy `src/routes/explore.tsx`
+- Implemented new nav model in `src/routes/__root.tsx`:
+  - Desktop top-level reduced to 5 links (`Home`, `Explore`, `SQL Console`, `Notebook`, `About`)
+  - Explore desktop dropdown with 5 grouped destinations
+  - Mobile Explore expandable group with ARIA (`aria-expanded`, `aria-controls`), Escape support, and close-on-navigation behavior
+- Added Home header CTA (`Start Exploring`) linking to `/explore` in `src/routes/index.tsx`.
+- Migrated crosstab deep links to `/explore/crosstab` in:
+  - `src/routes/index.tsx`
+  - `src/routes/about.tsx` (Try This links)
+  - `src/routes/data-quality.tsx`
+  - `src/routes/relationships.tsx`
+  - `src/components/column-inspector.tsx`
+- Updated navigation and crosstab styles in `src/styles.css` for:
+  - featured Explore treatment
+  - desktop dropdown panel/items
+  - mobile group/sub-item interactions
+  - focus-visible states and mobile touch target sizing
+- Updated route tree generation (`src/routeTree.gen.ts`) for new route structure.
+- Updated E2E specs for new route/nav behavior:
+  - `e2e/navigation.spec.ts`
+  - `e2e/explore.spec.ts`
+  - `e2e/dashboard.spec.ts`
+  - `e2e/profile-rel-sql-notebook.spec.ts` (relationships deep-link expectation + current profile copy labels)
+
+**Docs sync (CLAUDE.md + META-PLAN session hygiene):**
+- Archived plan from active to completed:
+  - `docs/plans/completed/2026-02-14-explore-hub-nav-dropdown.md`
+- Updated route surface docs:
+  - `docs/design/architecture.md`
+  - `docs/design/deployment.md`
+- Updated route pointer in `CLAUDE.md` to reflect Explore hub + crosstab file split.
+
+**Verification:**
+- `pnpm check-types` -> pass
+- `pnpm test --run` -> pass
+- `pnpm test:e2e -- e2e/navigation.spec.ts e2e/explore.spec.ts e2e/dashboard.spec.ts` -> pass (48 tests)
+- `pnpm test:e2e -- e2e/profile-rel-sql-notebook.spec.ts` -> intermittent failures in pre-existing SQL/Notebook flows (`query_limit` input stabilization, occasional `page.goto("/sql")` abort), while updated relationships deep-link expectation to `/explore/crosstab` passes.
+
 ### V3 UX overhaul execution + documentation sync
 
 **Plan document**: `docs/plans/active/v3-ux-overhaul.md`

@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
-import { ScrollArea } from "./ui/scroll-area";
 
 interface ColumnOption {
   name: string;
@@ -165,7 +164,7 @@ export function ColumnCombobox({
             }}
           />
 
-          <ScrollArea className="mt-2 max-h-72 border border-[var(--rule-light)] bg-[var(--paper)]">
+          <div className="mt-2 max-h-72 overflow-y-auto border border-[var(--rule-light)] bg-[var(--paper)]">
             {filteredOptions.length === 0 ? (
               <p className="px-2 py-2 text-[0.72rem] text-[var(--ink-faded)]">No matching columns</p>
             ) : (
@@ -199,7 +198,7 @@ export function ColumnCombobox({
                 })}
               </div>
             )}
-          </ScrollArea>
+          </div>
         </div>
       ) : null}
     </div>

@@ -40,20 +40,20 @@ test.describe("Profile page (/profile)", () => {
 
     // Wait for results: stat cards should appear
     await expect(page.getByText("Dataset Size")).toBeVisible({ timeout: DUCKDB_TIMEOUT });
-    await expect(page.getByText("Cohort Size")).toBeVisible({ timeout: DUCKDB_TIMEOUT });
-    await expect(page.getByText("Cohort Share", { exact: true })).toBeVisible({ timeout: DUCKDB_TIMEOUT });
+    await expect(page.getByText("Group Size")).toBeVisible({ timeout: DUCKDB_TIMEOUT });
+    await expect(page.getByText("Group Share", { exact: true })).toBeVisible({ timeout: DUCKDB_TIMEOUT });
 
     // Over-indexing table section
-    await expect(page.getByText("Most Unusually Common Signals")).toBeVisible({ timeout: DUCKDB_TIMEOUT });
+    await expect(page.getByText("What Makes This Group Different")).toBeVisible({ timeout: DUCKDB_TIMEOUT });
   });
 
-  test("compare mode: toggle, see cohort A and B panels", async ({ page }) => {
+  test("compare mode: toggle, see group A and B panels", async ({ page }) => {
     // Click compare mode
     await page.getByRole("button", { name: "Compare Two Groups" }).click();
 
-    // Cohort A and Cohort B panels should appear
-    await expect(page.getByText("Cohort A").first()).toBeVisible();
-    await expect(page.getByText("Cohort B").first()).toBeVisible();
+    // Group A and Group B panels should appear
+    await expect(page.getByText("Group A").first()).toBeVisible();
+    await expect(page.getByText("Group B").first()).toBeVisible();
 
     // Button should show "Compare" not "Build Profile"
     await expect(page.getByRole("button", { name: "Compare", exact: true })).toBeVisible();
@@ -106,14 +106,14 @@ test.describe("Relationships page (/relationships)", () => {
     await expect(strengthBadge).toBeVisible();
   });
 
-  test("result links navigate to /explore with x and y params", async ({ page }) => {
+  test("result links navigate to /explore/crosstab with x and y params", async ({ page }) => {
     // Table should load with default column selected
     const firstLink = page.locator(".editorial-table a").first();
     await expect(firstLink).toBeVisible({ timeout: DUCKDB_TIMEOUT });
 
-    // Get the href and verify it points to /explore with params
+    // Get the href and verify it points to /explore/crosstab with params
     const href = await firstLink.getAttribute("href");
-    expect(href).toContain("/explore");
+    expect(href).toContain("/explore/crosstab");
     expect(href).toContain("x=");
     expect(href).toContain("y=");
   });
@@ -177,6 +177,10 @@ test.describe("SQL Console (/sql)", () => {
   });
 
   test("limit input restricts results", async ({ page }) => {
+    // Wait for DuckDB to be ready before changing the limit
+    const runBtn = page.getByRole("button", { name: "Run Query" });
+    await expect(runBtn).toBeEnabled({ timeout: DUCKDB_TIMEOUT });
+
     // Set limit to 5
     const limitInput = page.locator('input[name="query_limit"]');
     await limitInput.fill("5");
@@ -184,8 +188,6 @@ test.describe("SQL Console (/sql)", () => {
     await expect(limitInput).toHaveValue("5");
 
     // Run the starter query
-    const runBtn = page.getByRole("button", { name: "Run Query" });
-    await expect(runBtn).toBeEnabled({ timeout: DUCKDB_TIMEOUT });
     await runBtn.click();
 
     // Check row count in results

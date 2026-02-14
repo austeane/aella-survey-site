@@ -19,7 +19,7 @@ test.describe("Home page", () => {
     await expect(page.getByText("What the data shows")).toBeVisible();
     await expect(page.getByText("Build your own chart")).toBeVisible();
     await expect(page.getByText("Questions you can explore")).toBeVisible();
-    await expect(page.getByText("About the Data")).toBeVisible();
+    await expect(page.getByRole("heading", { name: /About the Data/ })).toBeVisible();
   });
 
   test("featured findings area loads tabs and sample size", async ({ page }) => {
@@ -52,7 +52,7 @@ test.describe("Home page", () => {
     await expect(exploreFurther).toBeVisible({ timeout: DATA_TIMEOUT });
 
     const href = await exploreFurther.getAttribute("href");
-    expect(href).toContain("/explore");
+    expect(href).toContain("/explore/crosstab");
     expect(href).toContain("x=");
     expect(href).toContain("y=");
   });
@@ -73,7 +73,7 @@ test.describe("Home page", () => {
 
     const openLink = page.getByRole("link", { name: "Open this in Explore" });
     await expect(openLink).toBeVisible({ timeout: DATA_TIMEOUT });
-    await expect(openLink).toHaveAttribute("href", /\/explore\?x=.*&y=.*/);
+    await expect(openLink).toHaveAttribute("href", /\/explore\/crosstab\?x=.*&y=.*/);
   });
 
   test("question cards include promoted items and links", async ({ page }) => {

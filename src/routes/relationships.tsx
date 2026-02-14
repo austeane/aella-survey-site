@@ -165,7 +165,7 @@ function RelationshipsPage() {
                       <td>
                         <ColumnNameTooltip column={schemaByName.get(rel.column) ?? { name: rel.column }}>
                           <Link
-                            to="/explore"
+                            to="/explore/crosstab"
                             search={{ x: selectedColumn, y: rel.column }}
                             className="mono-value"
                             style={{

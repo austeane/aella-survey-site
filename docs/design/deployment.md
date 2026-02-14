@@ -55,7 +55,8 @@ All pages are under the base path:
 
 - `GET /survey/` dashboard (schema stats, caveats, missingness, column inspector)
 - `GET /survey/about` intro page (dataset background, credits, feature guide)
-- `GET /survey/explore` cross-tab explorer (pivot matrix, Cramer's V, filters, notebook save)
+- `GET /survey/explore` Explore hub landing page
+- `GET /survey/explore/crosstab` cross-tab explorer (pivot matrix, Cramer's V, filters, notebook save)
 - `GET /survey/columns` Column Atlas (search, tags, sort, Column Inspector, URL state)
 - `GET /survey/profile` profile/cohort builder (single + compare modes, over-indexing, notebook save)
 - `GET /survey/relationships` Relationship Finder (precomputed associations for 159 columns)

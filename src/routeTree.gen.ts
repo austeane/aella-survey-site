@@ -14,14 +14,16 @@ import { Route as RelationshipsRouteImport } from './routes/relationships'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as NotebookRouteImport } from './routes/notebook'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
-import { Route as ExploreRouteImport } from './routes/explore'
 import { Route as DataQualityRouteImport } from './routes/data-quality'
 import { Route as ColumnsRouteImport } from './routes/columns'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExploreIndexRouteImport } from './routes/explore/index'
+import { Route as ExploreCrosstabRouteImport } from './routes/explore/crosstab'
 import { Route as ApiSchemaRouteImport } from './routes/api/schema'
 import { Route as ApiQueryRouteImport } from './routes/api/query'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
+import { Route as ApiFeedbackRouteImport } from './routes/api/feedback'
 import { Route as ApiCrosstabRouteImport } from './routes/api/crosstab'
 import { Route as ApiStatsColumnRouteImport } from './routes/api/stats.$column'
 
@@ -50,11 +52,6 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExploreRoute = ExploreRouteImport.update({
-  id: '/explore',
-  path: '/explore',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DataQualityRoute = DataQualityRouteImport.update({
   id: '/data-quality',
   path: '/data-quality',
@@ -75,6 +72,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExploreIndexRoute = ExploreIndexRouteImport.update({
+  id: '/explore/',
+  path: '/explore/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreCrosstabRoute = ExploreCrosstabRouteImport.update({
+  id: '/explore/crosstab',
+  path: '/explore/crosstab',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSchemaRoute = ApiSchemaRouteImport.update({
   id: '/api/schema',
   path: '/api/schema',
@@ -88,6 +95,11 @@ const ApiQueryRoute = ApiQueryRouteImport.update({
 const ApiHealthRoute = ApiHealthRouteImport.update({
   id: '/api/health',
   path: '/api/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiFeedbackRoute = ApiFeedbackRouteImport.update({
+  id: '/api/feedback',
+  path: '/api/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiCrosstabRoute = ApiCrosstabRouteImport.update({
@@ -106,16 +118,18 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
   '/data-quality': typeof DataQualityRoute
-  '/explore': typeof ExploreRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
   '/api/crosstab': typeof ApiCrosstabRoute
+  '/api/feedback': typeof ApiFeedbackRoute
   '/api/health': typeof ApiHealthRoute
   '/api/query': typeof ApiQueryRoute
   '/api/schema': typeof ApiSchemaRoute
+  '/explore/crosstab': typeof ExploreCrosstabRoute
+  '/explore/': typeof ExploreIndexRoute
   '/api/stats/$column': typeof ApiStatsColumnRoute
 }
 export interface FileRoutesByTo {
@@ -123,16 +137,18 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
   '/data-quality': typeof DataQualityRoute
-  '/explore': typeof ExploreRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
   '/api/crosstab': typeof ApiCrosstabRoute
+  '/api/feedback': typeof ApiFeedbackRoute
   '/api/health': typeof ApiHealthRoute
   '/api/query': typeof ApiQueryRoute
   '/api/schema': typeof ApiSchemaRoute
+  '/explore/crosstab': typeof ExploreCrosstabRoute
+  '/explore': typeof ExploreIndexRoute
   '/api/stats/$column': typeof ApiStatsColumnRoute
 }
 export interface FileRoutesById {
@@ -141,16 +157,18 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
   '/data-quality': typeof DataQualityRoute
-  '/explore': typeof ExploreRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
   '/api/crosstab': typeof ApiCrosstabRoute
+  '/api/feedback': typeof ApiFeedbackRoute
   '/api/health': typeof ApiHealthRoute
   '/api/query': typeof ApiQueryRoute
   '/api/schema': typeof ApiSchemaRoute
+  '/explore/crosstab': typeof ExploreCrosstabRoute
+  '/explore/': typeof ExploreIndexRoute
   '/api/stats/$column': typeof ApiStatsColumnRoute
 }
 export interface FileRouteTypes {
@@ -160,16 +178,18 @@ export interface FileRouteTypes {
     | '/about'
     | '/columns'
     | '/data-quality'
-    | '/explore'
     | '/llms.txt'
     | '/notebook'
     | '/profile'
     | '/relationships'
     | '/sql'
     | '/api/crosstab'
+    | '/api/feedback'
     | '/api/health'
     | '/api/query'
     | '/api/schema'
+    | '/explore/crosstab'
+    | '/explore/'
     | '/api/stats/$column'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -177,16 +197,18 @@ export interface FileRouteTypes {
     | '/about'
     | '/columns'
     | '/data-quality'
-    | '/explore'
     | '/llms.txt'
     | '/notebook'
     | '/profile'
     | '/relationships'
     | '/sql'
     | '/api/crosstab'
+    | '/api/feedback'
     | '/api/health'
     | '/api/query'
     | '/api/schema'
+    | '/explore/crosstab'
+    | '/explore'
     | '/api/stats/$column'
   id:
     | '__root__'
@@ -194,16 +216,18 @@ export interface FileRouteTypes {
     | '/about'
     | '/columns'
     | '/data-quality'
-    | '/explore'
     | '/llms.txt'
     | '/notebook'
     | '/profile'
     | '/relationships'
     | '/sql'
     | '/api/crosstab'
+    | '/api/feedback'
     | '/api/health'
     | '/api/query'
     | '/api/schema'
+    | '/explore/crosstab'
+    | '/explore/'
     | '/api/stats/$column'
   fileRoutesById: FileRoutesById
 }
@@ -212,16 +236,18 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ColumnsRoute: typeof ColumnsRoute
   DataQualityRoute: typeof DataQualityRoute
-  ExploreRoute: typeof ExploreRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   NotebookRoute: typeof NotebookRoute
   ProfileRoute: typeof ProfileRoute
   RelationshipsRoute: typeof RelationshipsRoute
   SqlRoute: typeof SqlRoute
   ApiCrosstabRoute: typeof ApiCrosstabRoute
+  ApiFeedbackRoute: typeof ApiFeedbackRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiQueryRoute: typeof ApiQueryRoute
   ApiSchemaRoute: typeof ApiSchemaRoute
+  ExploreCrosstabRoute: typeof ExploreCrosstabRoute
+  ExploreIndexRoute: typeof ExploreIndexRoute
   ApiStatsColumnRoute: typeof ApiStatsColumnRoute
 }
 
@@ -262,13 +288,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/explore': {
-      id: '/explore'
-      path: '/explore'
-      fullPath: '/explore'
-      preLoaderRoute: typeof ExploreRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/data-quality': {
       id: '/data-quality'
       path: '/data-quality'
@@ -297,6 +316,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/explore/': {
+      id: '/explore/'
+      path: '/explore'
+      fullPath: '/explore/'
+      preLoaderRoute: typeof ExploreIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore/crosstab': {
+      id: '/explore/crosstab'
+      path: '/explore/crosstab'
+      fullPath: '/explore/crosstab'
+      preLoaderRoute: typeof ExploreCrosstabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/schema': {
       id: '/api/schema'
       path: '/api/schema'
@@ -316,6 +349,13 @@ declare module '@tanstack/react-router' {
       path: '/api/health'
       fullPath: '/api/health'
       preLoaderRoute: typeof ApiHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/feedback': {
+      id: '/api/feedback'
+      path: '/api/feedback'
+      fullPath: '/api/feedback'
+      preLoaderRoute: typeof ApiFeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/crosstab': {
@@ -340,16 +380,18 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ColumnsRoute: ColumnsRoute,
   DataQualityRoute: DataQualityRoute,
-  ExploreRoute: ExploreRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   NotebookRoute: NotebookRoute,
   ProfileRoute: ProfileRoute,
   RelationshipsRoute: RelationshipsRoute,
   SqlRoute: SqlRoute,
   ApiCrosstabRoute: ApiCrosstabRoute,
+  ApiFeedbackRoute: ApiFeedbackRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiQueryRoute: ApiQueryRoute,
   ApiSchemaRoute: ApiSchemaRoute,
+  ExploreCrosstabRoute: ExploreCrosstabRoute,
+  ExploreIndexRoute: ExploreIndexRoute,
   ApiStatsColumnRoute: ApiStatsColumnRoute,
 }
 export const routeTree = rootRouteImport

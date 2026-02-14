@@ -30,7 +30,7 @@ import { buildWhereClause, quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sq
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
 
-export const Route = createFileRoute("/explore")({
+export const Route = createFileRoute("/explore/crosstab")({
   validateSearch: (
     search,
   ): {
@@ -146,7 +146,7 @@ function ExplorePage() {
   const search = Route.useSearch();
   const searchKey = `${search.x ?? ""}|${search.y ?? ""}|${search.filterColumn ?? ""}`;
   const [appliedKey, setAppliedKey] = useState(searchKey);
-  const navigate = useNavigate({ from: "/explore" });
+  const navigate = useNavigate({ from: "/explore/crosstab" });
   const { phase } = useDuckDB();
 
   const [schema, setSchema] = useState<SchemaData | null>(null);
@@ -218,7 +218,7 @@ function ExplorePage() {
 
         const initialFilterValues =
           selectedFilter && search.filterValues
-            ? search.filterValues.split(",").map((value) => value.trim()).filter(Boolean)
+            ? search.filterValues.split(",").map((value: string) => value.trim()).filter(Boolean)
             : [];
         setSelectedFilterValues(initialFilterValues);
         setAppliedKey(searchKey);
@@ -704,7 +704,7 @@ LIMIT 250
             <SectionHeader number="03" title="Edit this chart" />
 
             <div className="grid gap-4 lg:grid-cols-2">
-              <label className="editorial-label">
+              <div className="editorial-label">
                 <div className="flex items-center gap-2">
                   <span>X question</span>
                   <ControlHelp text="Pick the first question for the horizontal axis." />
@@ -716,9 +716,9 @@ LIMIT 250
                   placeholder="Select X"
                 />
                 {xMeta?.nullMeaning && xMeta.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={xMeta.nullMeaning} /> : null}
-              </label>
+              </div>
 
-              <label className="editorial-label">
+              <div className="editorial-label">
                 <div className="flex items-center gap-2">
                   <span>Y question</span>
                   <ControlHelp text="Pick the second question to compare against X." />
@@ -730,9 +730,9 @@ LIMIT 250
                   placeholder="Select Y"
                 />
                 {yMeta?.nullMeaning && yMeta.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={yMeta.nullMeaning} /> : null}
-              </label>
+              </div>
 
-              <label className="editorial-label">
+              <div className="editorial-label">
                 <div className="flex items-center gap-2">
                   <span>Optional demographic filter</span>
                   <ControlHelp text="Limit the comparison to specific groups before counting." />
@@ -747,7 +747,7 @@ LIMIT 250
                     setSelectedFilterValues([]);
                   }}
                 />
-              </label>
+              </div>
 
               <label className="editorial-label">
                 <div className="flex items-center gap-2">

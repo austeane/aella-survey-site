@@ -1,63 +1,138 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 
-const navLinks = [
+const desktopTopLinks = [
   { to: "/", label: "Home" },
   { to: "/explore", label: "Explore" },
-  { to: "/columns", label: "Browse Topics" },
-  { to: "/profile", label: "Build a Profile" },
-  { to: "/relationships", label: "What's Connected?" },
   { to: "/sql", label: "SQL Console" },
   { to: "/notebook", label: "Notebook" },
-  { to: "/data-quality", label: "Data Quality" },
   { to: "/about", label: "About" },
 ] as const;
 
+const exploreDropdownLinks = [
+  { to: "/explore/crosstab", label: "Compare Questions" },
+  { to: "/columns", label: "Browse Topics" },
+  { to: "/profile", label: "Build a Profile" },
+  { to: "/relationships", label: "What's Connected?" },
+  { to: "/data-quality", label: "Data Quality" },
+] as const;
+
+function pathRegex(path: string): RegExp {
+  if (path === "/") return /^http:\/\/localhost:3000\/$/;
+  return new RegExp(`^http://localhost:3000${path.replace(/\//g, "\\/")}`);
+}
+
+async function openMobileMenu(page: Page) {
+  const menuButton = page.locator(".nav-toggle");
+  await expect(menuButton).toBeVisible();
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    const expanded = await menuButton.getAttribute("aria-expanded");
+    if (expanded === "true") return;
+
+    await menuButton.click();
+    await page.waitForTimeout(120);
+  }
+
+  await expect(menuButton).toHaveAttribute("aria-expanded", "true");
+}
+
 test.describe("Root navigation bar", () => {
-  test("renders all nav links", async ({ page }) => {
+  test("renders top-level links and Explore dropdown links", async ({ page }) => {
     await page.goto("/");
-    const navLinksContainer = page.locator(".nav-links--desktop");
-    for (const link of navLinks) {
-      await expect(navLinksContainer.getByRole("link", { name: link.label })).toBeVisible();
+    const nav = page.locator(".nav-links--desktop");
+
+    for (const link of desktopTopLinks) {
+      await expect(nav.getByRole("link", { name: link.label })).toBeVisible();
+    }
+
+    const compareQuestions = nav.getByRole("link", { name: "Compare Questions" });
+    await expect(compareQuestions).not.toBeVisible();
+
+    await nav.getByRole("link", { name: "Explore" }).hover();
+
+    for (const link of exploreDropdownLinks) {
+      await expect(nav.getByRole("link", { name: link.label })).toBeVisible();
     }
   });
 
-  for (const link of navLinks) {
-    test(`"${link.label}" link navigates to ${link.to}`, async ({ page }) => {
-      await page.goto("/about"); // start somewhere neutral
+  for (const link of desktopTopLinks) {
+    test(`top-level \"${link.label}\" navigates to ${link.to}`, async ({ page }) => {
+      await page.goto("/about");
       const nav = page.locator(".nav-links--desktop");
       await nav.getByRole("link", { name: link.label }).click();
-      await expect(page).toHaveURL(new RegExp(`^http://localhost:3000${link.to === "/" ? "/$" : link.to.replace("/", "\\/")}`));
+      await expect(page).toHaveURL(pathRegex(link.to));
     });
   }
 
-  test("active link has nav-link-active class", async ({ page }) => {
+  for (const link of exploreDropdownLinks) {
+    test(`Explore dropdown \"${link.label}\" navigates to ${link.to}`, async ({ page }) => {
+      await page.goto("/about");
+      const nav = page.locator(".nav-links--desktop");
+      await nav.getByRole("link", { name: "Explore" }).hover();
+      await nav.getByRole("link", { name: link.label }).click();
+      await expect(page).toHaveURL(pathRegex(link.to));
+    });
+  }
+
+  test("Explore top-level link is active across grouped routes", async ({ page }) => {
+    const groupedRoutes = [
+      "/explore",
+      "/explore/crosstab",
+      "/columns",
+      "/profile",
+      "/relationships",
+      "/data-quality",
+    ];
+
+    for (const route of groupedRoutes) {
+      await page.goto(route);
+      const exploreLink = page.locator(".nav-links--desktop").getByRole("link", { name: "Explore" });
+      await expect(exploreLink).toHaveClass(/nav-link-active/);
+    }
+
     await page.goto("/about");
-    const aboutLink = page.locator(".nav-links--desktop").getByRole("link", { name: "About" });
-    await expect(aboutLink).toHaveClass(/nav-link-active/);
-
-    // other links should NOT have active class
-    const homeLink = page.locator(".nav-links--desktop").getByRole("link", { name: "Home" });
-    await expect(homeLink).not.toHaveClass(/nav-link-active/);
-  });
-
-  test("active class updates on navigation", async ({ page }) => {
-    await page.goto("/");
     const nav = page.locator(".nav-links--desktop");
-    await expect(nav.getByRole("link", { name: "Home" })).toHaveClass(/nav-link-active/);
-
-    await nav.getByRole("link", { name: "Explore" }).click();
-    await expect(nav.getByRole("link", { name: "Explore" })).toHaveClass(/nav-link-active/);
-    await expect(nav.getByRole("link", { name: "Home" })).not.toHaveClass(/nav-link-active/);
+    await expect(nav.getByRole("link", { name: "About" })).toHaveClass(/nav-link-active/);
+    await expect(nav.getByRole("link", { name: "Explore" })).not.toHaveClass(/nav-link-active/);
   });
 
-  test("mobile menu reveals links", async ({ page }) => {
+  test("mobile menu supports Explore expansion and closes after navigation", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto("/");
 
-    const menuButton = page.getByRole("button", { name: /open navigation menu/i });
-    await expect(menuButton).toBeVisible();
-    await expect(menuButton).toHaveAttribute("aria-controls", "mobile-nav-links");
-    await expect(page.locator(".nav-links--desktop")).toBeHidden();
+    await openMobileMenu(page);
+
+    const mobileMenu = page.locator("#mobile-nav-links");
+    const exploreToggle = mobileMenu.getByRole("button", { name: /explore/i });
+
+    await expect(exploreToggle).toHaveAttribute("aria-expanded", "false");
+    await exploreToggle.click();
+    await expect(exploreToggle).toHaveAttribute("aria-expanded", "true");
+
+    const compareQuestionsLink = mobileMenu.getByRole("link", { name: "Compare Questions" });
+    await expect(compareQuestionsLink).toBeVisible();
+    await compareQuestionsLink.click();
+
+    await expect(page).toHaveURL(pathRegex("/explore/crosstab"));
+    await expect(page.locator(".nav-toggle")).toHaveAttribute("aria-expanded", "false");
+  });
+
+  test("mobile menu closes on Escape and resets Explore group state", async ({ page }) => {
+    await page.setViewportSize({ width: 320, height: 568 });
+    await page.goto("/");
+
+    await openMobileMenu(page);
+
+    const mobileMenu = page.locator("#mobile-nav-links");
+    const exploreToggle = mobileMenu.getByRole("button", { name: /explore/i });
+    await exploreToggle.click();
+    await expect(exploreToggle).toHaveAttribute("aria-expanded", "true");
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator(".nav-toggle")).toHaveAttribute("aria-expanded", "false");
+
+    await openMobileMenu(page);
+    await expect(mobileMenu.getByRole("button", { name: /explore/i })).toHaveAttribute("aria-expanded", "false");
   });
 });
 
@@ -106,20 +181,19 @@ test.describe("About page", () => {
   });
 
   test('"Try This" example links navigate correctly', async ({ page }) => {
-    // First "Try This" link: Explore orientation vs politics
     const tryThisLink = page.getByRole("link", { name: "Explore orientation vs politics" });
     await expect(tryThisLink).toBeVisible();
     await tryThisLink.click();
-    await expect(page).toHaveURL(/\/explore\?.*x=straightness/);
-    await expect(page).toHaveURL(/\/explore\?.*y=politics/);
+    await expect(page).toHaveURL(/\/explore\/crosstab\?.*x=straightness/);
+    await expect(page).toHaveURL(/\/explore\/crosstab\?.*y=politics/);
   });
 
   test("second Try This link navigates to explore with gender params", async ({ page }) => {
     const link = page.getByRole("link", { name: "Compare gender and relationship style" });
     await expect(link).toBeVisible();
     await link.click();
-    await expect(page).toHaveURL(/\/explore\?.*x=biomale/);
-    await expect(page).toHaveURL(/\/explore\?.*y=/);
+    await expect(page).toHaveURL(/\/explore\/crosstab\?.*x=biomale/);
+    await expect(page).toHaveURL(/\/explore\/crosstab\?.*y=/);
   });
 
   test("third Try This link navigates to relationships", async ({ page }) => {
@@ -135,6 +209,7 @@ test.describe("Page load smoke tests", () => {
     { path: "/", name: "Home" },
     { path: "/about", name: "About" },
     { path: "/explore", name: "Explore" },
+    { path: "/explore/crosstab", name: "Compare Questions" },
     { path: "/columns", name: "Browse Topics" },
     { path: "/profile", name: "Build a Profile" },
     { path: "/relationships", name: "What's Connected?" },
@@ -149,9 +224,7 @@ test.describe("Page load smoke tests", () => {
       page.on("pageerror", (err) => errors.push(err.message));
 
       await page.goto(pg.path);
-      // Wait for the nav to confirm the app shell rendered
       await expect(page.locator(".app-nav")).toBeVisible();
-      // Wait for main content area
       await expect(page.locator(".app-main")).toBeVisible();
 
       expect(errors).toEqual([]);

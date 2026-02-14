@@ -42,7 +42,8 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 ### UI Pages
 - `/about` — intro page: dataset background, methodology caveats, feature guide, credits (links to Aella's blog post)
 - `/` — dashboard with schema stats, global caveats, missingness histogram, tag breakdown, column inspector
-- `/explore` — cross-tab explorer with pivot matrix, Cramer's V, normalization modes, demographic filters, value-label rendering, URL state sync, cell drilldown, notebook save
+- `/explore` — Explore hub landing page with navigation cards for Compare Questions, Browse Topics, Build a Profile, What's Connected?, and Data Quality
+- `/explore/crosstab` — cross-tab explorer with pivot matrix, Cramer's V, normalization modes, demographic filters, value-label rendering, URL state sync, cell drilldown, notebook save
 - `/columns` — Column Atlas with search, tag filters, sort modes, Column Inspector panel, URL state sync
 - `/profile` — cohort builder with single/compare modes, percentile cards, over-indexing signals, cohort rarity metric, URL state sync, notebook save
 - `/relationships` — Relationship Finder with precomputed Cramer's V and Pearson correlations for 159 columns, URL state sync

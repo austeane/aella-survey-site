@@ -13,7 +13,7 @@ async function selectColumn(
   labelText: string,
   columnName: string,
 ) {
-  const label = page.locator("label.editorial-label", {
+  const label = page.locator(".editorial-label", {
     hasText: labelText,
   });
   const trigger = label.locator("button:has(svg)").first();
@@ -38,7 +38,7 @@ async function selectColumn(
  */
 async function waitForDefaultPivot(page: Page) {
   await expect(
-    page.locator("label.editorial-label", { hasText: "X question" }),
+    page.locator(".editorial-label", { hasText: "X question" }),
   ).toBeVisible({ timeout: 30000 });
 
   await expect(page.locator(".editorial-table")).toBeVisible({
@@ -48,7 +48,7 @@ async function waitForDefaultPivot(page: Page) {
 
 test.describe("Explore page", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/explore");
+    await page.goto("/explore/crosstab");
   });
 
   test("loads and shows controls after DuckDB initializes", async ({
@@ -66,10 +66,10 @@ test.describe("Explore page", () => {
 
     // X/Y Column labels present
     await expect(
-      page.locator("label.editorial-label", { hasText: "X question" }),
+      page.locator(".editorial-label", { hasText: "X question" }),
     ).toBeVisible();
     await expect(
-      page.locator("label.editorial-label", { hasText: "Y question" }),
+      page.locator(".editorial-label", { hasText: "Y question" }),
     ).toBeVisible();
   });
 
@@ -78,19 +78,19 @@ test.describe("Explore page", () => {
 
     // Default X is "straightness" => display "Sexual Orientation"
     const xButton = page
-      .locator("label.editorial-label", { hasText: "X question" })
+      .locator(".editorial-label", { hasText: "X question" })
       .locator("button:has(svg)")
       .first();
     await expect(xButton).toContainText("Sexual Orientation");
 
     // Now switch X to "biomale" using selectColumn
     await selectColumn(page, "X question", "biomale");
-    await expect(xButton).toContainText("Sex (biological male)", { timeout: 5000 });
+    await expect(xButton).toContainText("Biological Sex", { timeout: 5000 });
 
     // Switch Y to "straightness"
     await selectColumn(page, "Y question", "straightness");
     const yButton = page
-      .locator("label.editorial-label", { hasText: "Y question" })
+      .locator(".editorial-label", { hasText: "Y question" })
       .locator("button:has(svg)")
       .first();
     await expect(yButton).toContainText("Sexual Orientation", {
@@ -135,7 +135,7 @@ test.describe("Explore page", () => {
 
     // Switch to "Row %"
     const normTrigger = page
-      .locator("label.editorial-label", {
+      .locator(".editorial-label", {
         hasText: "How to count",
       })
       .locator('button[role="combobox"]')
@@ -190,7 +190,7 @@ test.describe("Explore page", () => {
   test("filter column shows checkboxes with values", async ({ page }) => {
     // Wait for controls and filter values to load
     await expect(
-      page.locator("label.editorial-label", { hasText: "X question" }),
+      page.locator(".editorial-label", { hasText: "X question" }),
     ).toBeVisible({ timeout: 30000 });
 
     await expect(page.locator("text=Filter values")).toBeVisible({
@@ -239,10 +239,10 @@ test.describe("Explore page", () => {
 
     // Links to Profile and SQL
     await expect(
-      page.locator("a, button", { hasText: "Open this cohort in Profile" }),
+      page.locator("a, button", { hasText: "Open this group in Profile" }),
     ).toBeVisible();
     await expect(
-      page.locator("a", { hasText: "Generate SQL for this cohort" }),
+      page.locator("a", { hasText: "Open in SQL Console" }),
     ).toBeVisible();
   });
 
@@ -262,16 +262,16 @@ test.describe("Explore page", () => {
     expect(url2).toContain("x=biomale");
 
     // Navigate directly via URL and verify state restores
-    await page.goto("/explore?x=biomale&y=politics");
+    await page.goto("/explore/crosstab?x=biomale&y=politics");
     await expect(
-      page.locator("label.editorial-label", { hasText: "X question" }),
+      page.locator(".editorial-label", { hasText: "X question" }),
     ).toBeVisible({ timeout: 30000 });
 
     const xButton = page
-      .locator("label.editorial-label", { hasText: "X question" })
+      .locator(".editorial-label", { hasText: "X question" })
       .locator("button:has(svg)")
       .first();
-    await expect(xButton).toContainText("Sex (biological male)", { timeout: 10000 });
+    await expect(xButton).toContainText("Biological Sex", { timeout: 10000 });
 
     await expect(page.locator(".editorial-table")).toBeVisible({
       timeout: 30000,
@@ -301,10 +301,10 @@ test.describe("Explore page", () => {
   });
 
   test("normalization param persists in URL", async ({ page }) => {
-    await page.goto("/explore?x=straightness&y=politics&normalization=row");
+    await page.goto("/explore/crosstab?x=straightness&y=politics&normalization=row");
 
     await expect(
-      page.locator("label.editorial-label", { hasText: "X question" }),
+      page.locator(".editorial-label", { hasText: "X question" }),
     ).toBeVisible({ timeout: 30000 });
 
     await expect(page.locator(".editorial-table")).toBeVisible({

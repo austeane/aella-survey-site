@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
+import { SimpleBarChart } from "@/components/charts/bar-chart";
+import { CHART_COLORS } from "@/components/charts/chart-config";
 import { ColumnCombobox } from "@/components/column-combobox";
 import { DataTable } from "@/components/data-table";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
@@ -297,7 +299,17 @@ function DashboardPage() {
                       cell: (row) => (
                         <div className="space-y-1">
                           <ColumnNameTooltip column={row}>
-                            <span>{getColumnDisplayName(row)}</span>
+                            <Link
+                              to="/columns"
+                              search={{ column: row.name, q: undefined, tags: undefined, sort: undefined }}
+                              className="mono-value"
+                              style={{
+                                color: "var(--accent)",
+                                borderBottom: "1px solid var(--rule-light)",
+                              }}
+                            >
+                              {getColumnDisplayName(row)}
+                            </Link>
                           </ColumnNameTooltip>
                           {row.displayName ? (
                             <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
@@ -324,13 +336,14 @@ function DashboardPage() {
             <div>
               <SectionHeader number="03" title="Tag Breakdown" />
               <div className="mt-3">
-                <DataTable
-                  rows={tagBreakdown}
-                  rowKey={(row) => row.tag}
-                  columns={[
-                    { id: "tag", header: "Tag", cell: (row) => TAG_LABELS[row.tag] ?? row.tag },
-                    { id: "count", header: "Questions", align: "right", cell: (row) => formatNumber(row.count) },
-                  ]}
+                <SimpleBarChart
+                  data={tagBreakdown.map((row) => ({
+                    name: TAG_LABELS[row.tag] ?? row.tag,
+                    value: row.count,
+                  }))}
+                  yLabel="Questions"
+                  color={CHART_COLORS.ink}
+                  height={220}
                 />
               </div>
             </div>
@@ -338,13 +351,14 @@ function DashboardPage() {
             <div>
               <SectionHeader number="04" title="Missing-Answer Distribution" />
               <div className="mt-3">
-                <DataTable
-                  rows={missingnessHistogram}
-                  rowKey={(row) => row.bucket}
-                  columns={[
-                    { id: "bucket", header: "Range", cell: (row) => row.bucket },
-                    { id: "count", header: "Questions", align: "right", cell: (row) => formatNumber(row.count) },
-                  ]}
+                <SimpleBarChart
+                  data={missingnessHistogram.map((row) => ({
+                    name: row.bucket,
+                    value: row.count,
+                  }))}
+                  yLabel="Questions"
+                  color={CHART_COLORS.accent}
+                  height={220}
                 />
               </div>
             </div>
@@ -364,7 +378,7 @@ function DashboardPage() {
                       cell: (row) => (
                         <ColumnNameTooltip column={row}>
                           <Link
-                            to="/explore"
+                            to="/explore/crosstab"
                             search={{ x: row.name }}
                             className="mono-value"
                             style={{
@@ -407,7 +421,17 @@ function DashboardPage() {
                       cell: (row) => (
                         <div className="space-y-1">
                           <ColumnNameTooltip column={row}>
-                            <span>{getColumnDisplayName(row)}</span>
+                            <Link
+                              to="/columns"
+                              search={{ column: row.name, q: undefined, tags: undefined, sort: undefined }}
+                              className="mono-value"
+                              style={{
+                                color: "var(--accent)",
+                                borderBottom: "1px solid var(--rule-light)",
+                              }}
+                            >
+                              {getColumnDisplayName(row)}
+                            </Link>
                           </ColumnNameTooltip>
                           {row.displayName ? (
                             <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>

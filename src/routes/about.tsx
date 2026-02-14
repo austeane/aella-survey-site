@@ -146,7 +146,6 @@ function AboutPage() {
           <div>
             <Link
               to="/explore"
-              search={{ x: undefined, y: undefined }}
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
               Explore
@@ -233,7 +232,7 @@ function AboutPage() {
         <div className="space-y-3 border-l-2 border-[var(--rule)] pl-4">
           <div>
             <Link
-              to="/explore"
+              to="/explore/crosstab"
               search={{ x: "straightness", y: "politics" }}
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
@@ -242,7 +241,7 @@ function AboutPage() {
           </div>
           <div>
             <Link
-              to="/explore"
+              to="/explore/crosstab"
               search={{ x: "biomale", y: "Personally, your preferred relationship style is: (4jib23m)" }}
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >

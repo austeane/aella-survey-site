@@ -25,8 +25,8 @@ test.describe("Columns page load", () => {
   test("renders page header, topic list, and inspector", async ({ page }) => {
     await page.goto("/columns");
     await expect(page.getByRole("heading", { name: "Browse Topics" })).toBeVisible();
-    await expect(page.getByText("Topics").first()).toBeVisible();
-    await expect(page.getByText("Question Inspector").first()).toBeVisible();
+    await expect(page.locator(".app-main").getByText("Topics").first()).toBeVisible();
+    await expect(page.locator(".app-main").getByText("Question Inspector").first()).toBeVisible();
   });
 
   test("column list shows items with metadata", async ({ page }) => {
@@ -153,7 +153,7 @@ test.describe("Column selection and inspector", () => {
 
     const inspector = page.locator("aside.raised-panel");
     await expect(inspector.getByText("Question Inspector")).toBeVisible();
-    await expect(inspector.getByText("Missingness Context")).toBeVisible();
+    await expect(inspector.getByText("Missing Answers", { exact: true })).toBeVisible();
     await expect(inspector.getByText("Caveats")).toBeVisible();
 
     await expect(page).toHaveURL(/[?&]column=/, { timeout: 10_000 });
@@ -207,7 +207,7 @@ test.describe("Related columns", () => {
     await waitForColumnsLoaded(page);
 
     const inspector = page.locator("aside.raised-panel");
-    const relatedHeader = inspector.getByText("Related Columns");
+    const relatedHeader = inspector.getByText("Related Questions");
     await relatedHeader.scrollIntoViewIfNeeded();
     await expect(relatedHeader).toBeVisible();
 
