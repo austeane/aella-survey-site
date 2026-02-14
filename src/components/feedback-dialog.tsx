@@ -1,8 +1,6 @@
 import * as Dialog from "@radix-ui/react-dialog";
-import { useRouterState } from "@tanstack/react-router";
+import { useRouter, useRouterState } from "@tanstack/react-router";
 import { useState } from "react";
-
-const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -13,6 +11,8 @@ export function FeedbackDialog({
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
+  const basepath = useRouter({ warn: false }).basepath ?? "";
+  const apiBase = basepath === "/" ? "" : basepath;
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
@@ -35,7 +35,7 @@ export function FeedbackDialog({
 
     setStatus("sending");
     try {
-      const res = await fetch(`${API_BASE}/api/feedback`, {
+      const res = await fetch(`${apiBase}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
