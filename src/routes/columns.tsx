@@ -17,7 +17,7 @@ import {
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
-import { getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
+import { getColumnDisplayName, getColumnTooltip, stripHashSuffix } from "@/lib/format-labels";
 import { formatNumber, formatPercent } from "@/lib/format";
 
 export const Route = createFileRoute("/columns")({
@@ -236,7 +236,7 @@ function ColumnsPage() {
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <span className="mono-value text-[var(--ink)]">{getColumnDisplayName(column)}</span>
+                      <span className="mono-value text-[var(--ink)]" title={getColumnTooltip(column)}>{getColumnDisplayName(column)}</span>
                       {column.displayName ? <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(column.name)}</p> : null}
                     </div>
                     <div className="flex flex-wrap items-center gap-1">

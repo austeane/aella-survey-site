@@ -11,7 +11,7 @@ import { StatCard } from "@/components/stat-card";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { useDuckDB } from "@/lib/duckdb/provider";
-import { formatValueWithLabel, getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
+import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip, stripHashSuffix } from "@/lib/format-labels";
 import { formatNumber, formatPercent, asNumber, asNullableNumber } from "@/lib/format";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
@@ -295,7 +295,7 @@ function DashboardPage() {
                       header: "Question",
                       cell: (row) => (
                         <div className="space-y-1">
-                          <span>{getColumnDisplayName(row)}</span>
+                          <span title={getColumnTooltip(row)}>{getColumnDisplayName(row)}</span>
                           {row.displayName ? (
                             <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
                           ) : null}
@@ -363,6 +363,7 @@ function DashboardPage() {
                           to="/explore"
                           search={{ x: row.name }}
                           className="mono-value"
+                          title={getColumnTooltip(row)}
                           style={{
                             color: "var(--accent)",
                             borderBottom: "1px solid var(--rule-light)",
@@ -401,7 +402,7 @@ function DashboardPage() {
                       header: "Question",
                       cell: (row) => (
                         <div className="space-y-1">
-                          <span>{getColumnDisplayName(row)}</span>
+                          <span title={getColumnTooltip(row)}>{getColumnDisplayName(row)}</span>
                           {row.displayName ? (
                             <p className="mono-value text-[var(--ink-faded)]">{stripHashSuffix(row.name)}</p>
                           ) : null}
@@ -439,7 +440,7 @@ function DashboardPage() {
             {selectedMeta ? (
               <div className="space-y-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="mono-value">{getColumnDisplayName(selectedMeta)}</span>
+                  <span className="mono-value" title={getColumnTooltip(selectedMeta)}>{getColumnDisplayName(selectedMeta)}</span>
                   {selectedMeta.displayName ? (
                     <span className="mono-value text-[var(--ink-faded)]">({stripHashSuffix(selectedMeta.name)})</span>
                   ) : null}

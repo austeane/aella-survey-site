@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router";
 
 import { CAVEAT_DEFINITIONS } from "@/lib/schema/caveats";
 import { asNullableNumber, asNumber, formatNumber, formatPercent } from "@/lib/format";
-import { formatValueWithLabel, getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
+import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip, stripHashSuffix } from "@/lib/format-labels";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
 import relationshipData from "@/lib/schema/relationships.generated.json";
@@ -215,7 +215,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
         title="Question Inspector"
         subtitle={
           <span className="flex flex-wrap items-center gap-2">
-            <span className="mono-value">{getColumnDisplayName(column)}</span>
+            <span className="mono-value" title={getColumnTooltip(column)}>{getColumnDisplayName(column)}</span>
             {column.displayName ? (
               <span className="mono-value text-[var(--ink-faded)]">({stripHashSuffix(column.name)})</span>
             ) : null}

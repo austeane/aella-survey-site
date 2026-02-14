@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ColumnCombobox } from "@/components/column-combobox";
 import { SectionHeader } from "@/components/section-header";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
-import { getColumnDisplayName } from "@/lib/format-labels";
+import { getColumnDisplayName, getColumnTooltip } from "@/lib/format-labels";
 import { formatNumber } from "@/lib/format";
 import schemaMetadata from "@/lib/schema/columns.generated.json";
 import relationshipData from "@/lib/schema/relationships.generated.json";
@@ -167,6 +167,7 @@ function RelationshipsPage() {
                           to="/explore"
                           search={{ x: selectedColumn, y: rel.column }}
                           className="mono-value"
+                          title={getColumnTooltip(schemaByName.get(rel.column) ?? { name: rel.column })}
                           style={{
                             color: "var(--accent)",
                             borderBottom: "1px solid var(--rule-light)",

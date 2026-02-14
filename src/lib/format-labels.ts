@@ -57,3 +57,12 @@ export function formatValueWithLabel(
 export function getColumnDisplayName(column: ColumnWithDisplayName): string {
   return stripHashSuffix(column.displayName ?? column.name);
 }
+
+export function getColumnTooltip(column: ColumnWithDisplayName): string {
+  const display = getColumnDisplayName(column);
+  const raw = stripHashSuffix(column.name);
+  if (column.displayName && raw !== display) {
+    return `${display}\n(${raw})`;
+  }
+  return display;
+}
