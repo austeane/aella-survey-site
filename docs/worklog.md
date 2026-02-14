@@ -2,6 +2,32 @@
 
 ## 2026-02-14
 
+### Production feedback incident: URL base-path join and deploy blockers
+
+- **Symptom**:
+  - Users saw "Something went wrong. Please try again." in Feedback dialog on prod.
+- **What actually failed**:
+  - Browser request was sent to `/survey/survey/api/feedback` (404), not `/survey/api/feedback`.
+  - Earlier attempts also validated against stale prod because two deploys were failing at build time.
+- **Root causes**:
+  - Client URL join bug in `src/components/feedback-dialog.tsx`:
+    - router basepath value could be `survey` (no leading slash), producing a relative URL.
+  - Separate deploy blockers delayed rollout:
+    - `.gitignore` pattern issue excluded `src/components/charts/*` from deploy context and broke build.
+    - local `.pnpm-store` cache caused Railway upload failure (`413 Payload Too Large`).
+- **Fixes shipped**:
+  - Normalized router basepath before joining API paths in `src/components/feedback-dialog.tsx`.
+  - Deployed successful build `8bac4eba-80fb-480e-9d79-9b0ef2843b75` on `bks-explorer`.
+- **Verification evidence**:
+  - Browser automation on public URL submitted feedback successfully.
+  - Network request URL: `https://www.austinwallace.ca/survey/api/feedback`.
+  - Response: `200` with `{\"ok\":true,\"data\":{\"sent\":true}}`.
+- **Meta lessons captured**:
+  - Validate behavior in browser network tab, not only with direct curl.
+  - Confirm latest deploy is `SUCCESS` before runtime debugging.
+  - Treat basepath as untrusted string; canonicalize before URL joins.
+  - Keep deployment context clean of large local caches.
+
 ### Explore hub + nav dropdown implementation (mobile-first)
 
 **Plan document**: `docs/plans/completed/2026-02-14-explore-hub-nav-dropdown.md`

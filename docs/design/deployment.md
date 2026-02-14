@@ -140,3 +140,19 @@ curl -X POST https://www.austinwallace.ca/survey/api/query \
 - The CloudFront proxy in austin-site passes requests through without rewriting paths.
 - If production shows stale content, redeploy with `railway up --service bks-explorer`.
 - Local verification baseline: `pnpm check-types`, `pnpm test --run`, `pnpm build`.
+
+## Incident Learnings (2026-02-14 feedback submit)
+
+1. Browser verification beats curl-only checks for base-path bugs.
+   - `POST /survey/api/feedback` can return `200` directly while the UI still fails due to a wrong client URL.
+   - Always inspect the browser network request URL after deploy.
+2. Canonicalize base paths before joining API paths.
+   - TanStack router basepath can be observed as `survey`, `/survey`, or `/survey/`.
+   - Normalize first, then prepend exactly one leading slash before joining (`/survey/api/...`).
+   - Avoid relative fetch targets like `survey/api/...`; they can resolve to `/survey/survey/api/...`.
+3. Confirm deploy success before behavior debugging.
+   - Check deployment status first (`SUCCESS` vs `BUILDING`/`FAILED`) and inspect build logs for failed deploys.
+   - Do not trust runtime observations until the target deployment is live.
+4. Keep deploy upload context clean.
+   - Large local cache directories can cause Railway upload failures (`413 Payload Too Large`).
+   - Remove or exclude heavy local artifacts before `railway up`.

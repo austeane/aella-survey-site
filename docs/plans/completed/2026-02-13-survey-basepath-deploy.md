@@ -31,6 +31,8 @@ Mount BKS Explorer under `/survey` on the austin-site CloudFront gateway. CloudF
 - Nitro `baseURL` is ALSO required — without it, Nitro's static file middleware doesn't know to serve assets under the base path. This was the critical missing piece.
 - DuckDB WASM imports (`?url`) are resolved by Vite at build time, so `base` handles them automatically
 - `import.meta.env.BASE_URL` (Vite built-in) is the right way to prefix runtime paths in client code
+- Client code that consumes router basepath should canonicalize it (`survey`, `/survey`, `/survey/` -> `/survey`) before joining API paths.
+- Production validation for base-path issues must include browser network inspection; direct endpoint curls alone can miss client-side URL construction errors.
 
 ## What didn't need changing
 - Nav links in `__root.tsx` — TanStack Router auto-prepends basepath

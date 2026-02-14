@@ -460,7 +460,7 @@ function AboutPage() {
         <p>
           Machine-readable endpoint for agent discovery:{" "}
           <a
-            href="/llms.txt"
+            href={`${import.meta.env.BASE_URL}llms.txt`}
             className="mono-value text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
           >
             /llms.txt
