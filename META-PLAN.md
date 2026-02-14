@@ -1,6 +1,6 @@
 # Meta-Plan: Agent-First Development Philosophy
 
-This document captures the higher-level engineering philosophy for this project, informed by [OpenAI's harness engineering approach](https://openai.com/index/harness-engineering/) and patterns from the solstice codebase. It sits alongside `PLAN.md` (the concrete implementation plan).
+This document captures the engineering philosophy for this project, informed by [OpenAI's harness engineering approach](https://openai.com/index/harness-engineering/).
 
 ## Core Principle
 
@@ -17,15 +17,13 @@ Anything not in the repo doesn't exist for agents. Slack discussions, mental mod
 ```
 kink/
 ├── CLAUDE.md              # ~100 lines, table of contents (NOT an encyclopedia)
-├── PLAN.md                # Concrete implementation plan
 ├── META-PLAN.md           # This file: philosophy and patterns
 ├── docs/
-│   ├── design/            # Architectural decisions, core beliefs
-│   ├── schema/            # Column metadata, data dictionary
-│   ├── plans/
-│   │   ├── active/        # In-progress execution plans
-│   │   └── completed/     # Done plans (for context)
-│   └── references/        # External docs pulled in-repo (llms.txt files, etc)
+│   ├── design/            # Architectural decisions, design system, deployment
+│   ├── schema/            # Column metadata, data dictionary, curated findings
+│   └── plans/
+│       ├── active/        # In-progress execution plans
+│       └── completed/     # Done plans (for context)
 ```
 
 **Progressive disclosure**: CLAUDE.md is the entry point — a map with pointers. Agents start small and are taught where to look next, not overwhelmed upfront.
@@ -58,56 +56,27 @@ It should NOT contain:
 
 Prefer linting rules and structural tests over written guidelines. An enforced rule is a rule that works; a documented rule is a suggestion.
 
-### Enforcement Stack (adapted from solstice)
+### Enforcement Stack
 
-1. **oxlint** — Fast, catches common issues (no-console, eqeqeq, no-debugger)
-2. **ESLint** — Framework-specific rules (TanStack Router, React hooks)
-3. **TypeScript strict mode** — Type safety as enforcement
-4. **Pre-commit hooks** (husky + lint-staged):
-   - Format staged files
+1. **oxlint** — Fast linter, catches common issues
+2. **TypeScript strict mode** — Type safety as enforcement
+3. **Pre-commit hooks** (husky + lint-staged):
+   - Lint staged `.ts`/`.tsx` files via oxlint
    - Type check (`pnpm check-types`)
    - Run tests (`pnpm test --run`)
-5. **CI pipeline** — Lint, type-check, test, build on every push
 
-### Custom Lints for Agent Legibility
-
-Write custom lint error messages that inject remediation instructions into agent context. When an agent hits a lint failure, the error message should tell it exactly how to fix it.
-
-## Agent Safety
-
-### Git Safety Guard (from solstice)
-
-A `.claude/hooks/git_safety_guard.py` that blocks destructive operations:
-- `git reset --hard`
-- `git clean -f` (except dry-run)
-- `force push`
-- `rm -rf` (except /tmp)
-
-This prevents agents from accidentally destroying work.
-
-## Agent Workflows (from solstice .claude/commands/)
-
-Encode common workflows as reusable commands:
-
-| Command | Purpose |
-|---|---|
-| `/build` | Scaffold → implement → validate loop |
-| `/investigate` | Systematic exploration with evidence gathering |
-| `/review` | Code review with scope confirmation |
-| `/refactor` | Find patterns, plan refactoring, preserve behavior |
-
-These are markdown files in `.claude/commands/` that structure agent work into phases.
+When an agent hits a lint failure, the error message should tell it how to fix it. If it doesn't, improve the message or add a doc pointer.
 
 ## Architecture Enforcement
 
 > "Enforce boundaries centrally, allow autonomy locally."
 
-### Invariants for This Project
+### Invariants
 
 1. **Data flows one direction**: Parquet → DuckDB → Query → Component
 2. **API routes are thin**: They translate HTTP to DuckDB SQL and return JSON. No business logic in routes.
-3. **Schema is the source of truth**: `src/lib/schema/columns.ts` defines all column metadata. Charts, filters, and API all derive from it.
-4. **Client-first**: DuckDB-WASM handles all human-facing queries. Server API routes exist only for AI agents.
+3. **Schema is the source of truth**: `src/lib/schema/columns.generated.json` defines all column metadata. Charts, filters, and API all derive from it.
+4. **DuckDB-WASM is the primary query engine**: Browser-side DuckDB handles interactive exploration. Server API routes provide the same data for agents and server-rendered paths.
 5. **Validate at boundaries**: API inputs validated with Zod. SQL queries sanitized. No YOLO data probing.
 
 ## Making the App Legible to Agents
@@ -116,9 +85,10 @@ Borrowing from OpenAI's approach of making the app itself inspectable by agents:
 
 1. **API routes serve structured JSON** — agents can query the data directly
 2. **Schema endpoint** — `/api/schema` returns column metadata, types, categories, valid values
-3. **MCP server** — agents connect directly and query with typed tools
-4. **Descriptive column metadata** — every column has a human+agent readable description
-5. **Query examples in docs** — show agents what queries are useful
+3. **MCP server** — agents connect directly and query with typed tools (`mcp-server/`)
+4. **Descriptive column metadata** — every column has a human+agent readable description, caveats, null semantics
+5. **`/llms.txt`** — machine-readable integration doc auto-generated from schema, with MCP config and API docs
+6. **Query examples in docs** — show agents what queries are useful
 
 ## Boring Technology, Agent-Friendly
 
@@ -128,51 +98,49 @@ Our stack choices optimize for agent legibility:
 - **DuckDB SQL** — standard SQL, well-represented in training data
 - **React** — most common UI framework, agents know it deeply
 - **Tailwind** — utility classes are predictable and composable
-- **shadcn/ui** — copy-paste components, no opaque abstractions
+- **Radix UI + CVA** — composable primitives with variant styling, no opaque abstractions
 - **Zod** — schema validation agents naturally reach for
 - **Parquet** — standard columnar format, DuckDB's native format
-
-## Continuous Cleanup (Garbage Collection)
-
-> "Technical debt is like a high-interest loan."
-
-Rather than "AI slop Fridays," encode golden principles and run cleanup continuously:
-
-1. **Quality scoring** — grade each feature area, track gaps
-2. **Doc gardening** — periodic checks for stale documentation
-3. **Pattern consistency** — prefer shared utilities over hand-rolled helpers
-4. **Small PRs** — corrections are cheap when changes are small
 
 ## Testing Strategy
 
 ### Unit Tests (Vitest)
-- jsdom environment for component tests
-- Test utilities and schema logic
-- Coverage reporting
+- Test query guards, schema logic, API contracts, caveats
+- Run on every commit via pre-commit hook
 
-### E2E / Visual Validation
-- Playwright for critical user journeys
-- Screenshot evidence in `.playwright-mcp/`
-- Accessibility checks
+### E2E (Playwright)
+- Critical user journeys and visual validation
+- Screenshot evidence for review
 
 ### Agent-Driven Validation
-- Agents can boot the app, drive it with Chrome DevTools, validate their own work
+- Agents can boot the app, drive it with browser automation, validate their own work
 - API routes are self-documenting and testable via curl
 - MCP server tools are individually testable
 
 ## Pre-commit Contract
 
 Every commit must pass:
-1. `lint-staged` (format + lint staged files)
+1. `lint-staged` (oxlint on staged files)
 2. `pnpm check-types` (TypeScript)
 3. `pnpm test --run` (all unit tests)
 
 This is non-negotiable. It's the minimum bar that keeps agents from committing broken code.
 
+## Continuous Improvement
+
+> "Technical debt is like a high-interest loan."
+
+Rather than scheduled cleanup sprints, encode principles and fix forward:
+
+1. **Doc gardening** — when docs are stale, update them as part of the task that revealed the staleness
+2. **Pattern consistency** — prefer shared utilities over hand-rolled helpers
+3. **Small changes** — corrections are cheap when changes are small
+4. **Promote rules into code** — if a mistake recurs, add a lint rule or structural test
+
 ## What This Means in Practice
 
 When building a feature:
-1. Write the execution plan (docs/plans/active/)
+1. Write the execution plan (`docs/plans/active/`)
 2. Define the schema/types first
 3. Implement with mechanical enforcement (lints, types, tests)
 4. Validate via API + UI
