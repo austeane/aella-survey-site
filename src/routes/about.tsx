@@ -326,6 +326,28 @@ function AboutPage() {
               TanStack Start, React, DuckDB-WASM, Tailwind
             </span>
           </p>
+          <p>
+            <strong>Source code:</strong>{" "}
+            <a
+              href="https://github.com/austeane/aella-survey-site"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              GitHub — austeane/aella-survey-site
+            </a>
+          </p>
+          <p>
+            <strong>Built by:</strong>{" "}
+            <a
+              href="https://www.linkedin.com/in/austintwallace/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              Austin Wallace
+            </a>
+          </p>
         </div>
       </section>
 
