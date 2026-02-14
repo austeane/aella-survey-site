@@ -11,7 +11,7 @@ const badgeVariants = cva(
         default: "border-[var(--rule)] text-[var(--ink-faded)] bg-[var(--paper)]",
         accent: "border-[var(--accent)] text-[var(--accent)] bg-[var(--paper)]",
         warm: "border-[#8f5a2b] text-[#8f5a2b] bg-[var(--paper)]",
-        cool: "border-[#4d5d73] text-[#4d5d73] bg-[var(--paper)]",
+        cool: "border-[#6b6259] text-[#6b6259] bg-[var(--paper)]",
       },
     },
     defaultVariants: {

@@ -27,7 +27,10 @@ export function candidateValueKeys(value: string): string[] {
 }
 
 export function formatValueWithLabel(value: string, valueLabels?: Record<string, string>): string {
-  if (!valueLabels || value === "NULL") {
+  if (value === "NULL") {
+    return "No answer";
+  }
+  if (!valueLabels) {
     return value;
   }
 

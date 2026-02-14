@@ -97,6 +97,28 @@ a {
   align-items: center;
 }
 
+.nav-toggle {
+  display: none;
+  margin-left: auto;
+  border: 1px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  padding: 0.35rem 0.7rem;
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.nav-toggle:hover {
+  color: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.nav-links-mobile {
+  display: none;
+}
+
 .nav-link {
   margin-bottom: -2px;
   border-bottom: 2px solid transparent;
@@ -207,7 +229,9 @@ a {
 .raised-panel::before {
   content: "";
   position: absolute;
-  inset: 0 0 auto;
+  top: 0;
+  left: 0;
+  right: 0;
   border-top: 3px solid var(--accent);
 }
 
@@ -238,7 +262,7 @@ a {
 .stat-cell-value {
   margin-top: 0.35rem;
   font-family: "Fraunces", Georgia, serif;
-  font-size: 2.2rem;
+  font-size: 2.5rem;
   line-height: 1;
   letter-spacing: -0.03em;
   font-weight: 700;
@@ -437,8 +461,8 @@ a {
 }
 
 .null-badge--not_applicable {
-  border-color: #4d5d73;
-  color: #4d5d73;
+  border-color: #6b6259;
+  color: #6b6259;
 }
 
 .inline-ratio {
@@ -496,20 +520,51 @@ a {
   }
 
   .nav-inner {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 0.85rem;
     padding-bottom: 0.55rem;
+    align-items: center;
   }
 
-  .nav-links {
-    margin-left: 0;
-    width: 100%;
-    overflow-x: auto;
+  .brand-link {
+    min-width: 0;
   }
 
-  .nav-link {
-    padding-left: 0.75rem;
-    padding-right: 0.75rem;
+  .brand-title {
+    font-size: 1.2rem;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav-links--desktop {
+    display: none;
+  }
+
+  .nav-links-mobile {
+    display: none;
+    border-top: 1px solid var(--rule);
+    padding: 0.5rem 0 0.75rem;
+  }
+
+  .nav-links-mobile--open {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .nav-link--mobile {
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--rule-light);
+    padding: 0.55rem 0.2rem;
+    font-size: 0.72rem;
     white-space: nowrap;
   }
 

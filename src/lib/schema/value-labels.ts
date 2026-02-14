@@ -36,7 +36,18 @@ const VANILLA_COLUMNS = new Set<string>([
   '"I find dirtytalking erotic" (947wne3)',
 ]);
 
-const AGREEMENT_COLUMNS = new Set<string>(["supernatural"]);
+const AGREEMENT_COLUMNS = new Set<string>([
+  "supernatural",
+  '"To what extent do you agree with this statement: I am a narcissist. (1bqtk47)',
+  '"I am aroused by being submissive in sexual interactions" (xem7hbu)',
+  '"I find age-related things (beyond "normal" stuff like being attracted to people your own age) to be:" (92qqx0)',
+  '"I find it erotic when two people of the opposite gender to me sexually interact with each other" (fbqcymm)',
+  '"I find the thought of existing (in *nonsexual* situations) as a biological *female* to be erotic" (6w84yry)',
+  '"I find the thought of existing (in *nonsexual* situations) as a biological *male* to be erotic" (l7vpprx)',
+  '"I find the thought of masturbating alone as a biological female, to be erotic" (sgdpy8l)',
+  '"I find the thought of masturbating alone as a biological male, to be erotic" (guwym9g)',
+  '"I sometimes find people who have clearly reached sexual maturity, but are not yet adults (e.g., ages 13-17), to be sexually attractive" (kbpolw9)',
+]);
 
 const AROUSAL_COLUMNS = new Set<string>([
   "abnormalbody",
@@ -94,9 +105,15 @@ const AROUSAL_COLUMNS = new Set<string>([
   "worshipping",
   '"I find scenarios where I eagerly beg others to be:" (jvrbyep)',
   '"I find scenarios where others eagerly beg me to be:" (stmm5eg)',
+  "agegap",
+  "genderswapped",
 ]);
 
 const CUSTOM_VALUE_LABELS: Record<string, ValueLabels> = {
+  biomale: {
+    "0": "Female",
+    "1": "Male",
+  },
   animated: {
     "-2": "Entirely live action",
     "-1": "Mostly live action",

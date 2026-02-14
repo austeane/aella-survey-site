@@ -1,9 +1,14 @@
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
+const basepath = import.meta.env.VITE_BASE_PATH
+  ? import.meta.env.VITE_BASE_PATH.replace(/\/$/, "")
+  : "/";
+
 export function getRouter() {
   const router = createRouter({
     routeTree,
+    basepath,
     scrollRestoration: true,
   });
 

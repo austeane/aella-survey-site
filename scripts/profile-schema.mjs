@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { mkdir, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,6 +11,21 @@ const projectRoot = resolve(__dirname, "..");
 
 const sourcePath = process.env.BKS_PARQUET_PATH ?? resolve(projectRoot, "data", "BKSPublic.parquet");
 const outputPath = process.env.BKS_COLUMNS_OUTPUT ?? resolve(projectRoot, "src", "lib", "schema", "columns.generated.json");
+const humanLabelsPath = resolve(projectRoot, "src", "lib", "schema", "human-labels.json");
+
+/** @type {Record<string, string>} */
+let humanLabels = {};
+try {
+  const raw = await readFile(humanLabelsPath, "utf8");
+  const parsed = JSON.parse(raw);
+  // Filter out the _comment key
+  humanLabels = Object.fromEntries(
+    Object.entries(parsed).filter(([key]) => !key.startsWith("_")),
+  );
+  console.log(`Loaded ${Object.keys(humanLabels).length} human label overrides`);
+} catch {
+  console.log("No human-labels.json found, using auto-generated display names only");
+}
 
 const derivedColumns = new Set([
   "straightness",
@@ -246,6 +261,11 @@ function toTitleCaseIdentifier(value) {
 }
 
 function buildDisplayName(name) {
+  // Human-curated override takes priority
+  if (humanLabels[name]) {
+    return humanLabels[name];
+  }
+
   const quotedMatch = name.match(/^"(.+)"\s+\([^)]+\)$/);
   if (quotedMatch) {
     return truncateDisplayName(quotedMatch[1].trim());

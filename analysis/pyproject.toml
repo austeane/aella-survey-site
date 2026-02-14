@@ -1,0 +1,22 @@
+[project]
+name = "kink-analysis"
+version = "0.2.0"
+description = "Statistical analysis toolkit for the Big Kink Survey explorer"
+requires-python = ">=3.11"
+dependencies = [
+  "duckdb>=1.4.0",
+  "pandas>=2.2.0",
+  "numpy>=1.26.0",
+  "scipy>=1.14.0",
+  "scikit-learn>=1.5.0",
+  "statsmodels>=0.14.0",
+]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+testpaths = ["analysis/tests"]

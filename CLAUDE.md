@@ -14,9 +14,13 @@ Interactive research explorer for the Big Kink Survey (~15.5k rows, 365 columns)
 - `pnpm start` — run production server (`node .output/server/index.mjs`)
 - `pnpm sync-public-data` — copy parquet from `data/` to `public/`
 - `pnpm profile-schema` — regenerate `src/lib/schema/columns.generated.json`
+- `pnpm validate-chart-presets` — run all curated chart preset SQL against parquet
 - `pnpm check-types` — TypeScript validation
 - `pnpm test --run` — unit tests
+- `pnpm test:e2e` — Playwright end-to-end test suite
 - `pnpm lint` — oxlint + eslint
+- `uv run --project analysis python analysis/build_findings.py` — regenerate curated findings artifacts
+- `uv run --project analysis pytest analysis/tests -q` — validate findings pipeline
 - `duckdb -c "SQL"` — ad-hoc queries against `data/BKSPublic.parquet` (see `docs/design/architecture.md`)
 
 ## Pre-commit Contract
@@ -25,13 +29,15 @@ Every commit must pass: lint-staged → type-check → tests
 ## Key Files
 - `PLAN.md` — v1 implementation plan with milestones M0-M6 (complete)
 - `META-PLAN.md` — agent-first development philosophy
-- `docs/plans/active/v2-next-steps.md` — v2 execution plan (phases 1-3 complete, phase 4 partial)
+- `docs/plans/active/v3-ux-overhaul.md` — current v3 execution plan and implementation status
+- `analysis/META-FINDINGS.md` — deep-analysis synthesis and wave-2 rigor outcomes
 - `data/` — source parquet + column notes + survey documentation
 - `src/router.tsx` — TanStack Start entry (required, exports `getRouter`)
-- `src/routes/` — 8 primary UI pages: about, index, explore, columns, profile, relationships, sql, notebook
+- `src/routes/` — primary UI pages: about, index, data-quality, explore, columns, profile, relationships, sql, notebook
 - `src/routes/llms[.]txt.ts` — machine-readable AI integration document (schema-driven MCP + REST docs at `/llms.txt`)
 - `src/routes/api/` — server route API endpoints
 - `src/lib/notebook-store.ts` — localStorage CRUD for notebook entries
+- `src/lib/chart-presets.ts` — canonical featured findings/question cards/defaults wired from `analysis/findings.json`
 - `src/lib/schema/relationships.generated.json` — precomputed pairwise associations
 - `scripts/precompute-relationships.mjs` — generates relationships JSON
 - `mcp-server/` — Python MCP server for AI agent access
@@ -42,13 +48,17 @@ Every commit must pass: lint-staged → type-check → tests
 - `docs/design/deployment.md` — Railway config, URLs, how to deploy
 - `docs/design/mcps.md` — available MCP servers and how to use them
 - `docs/schema/README.md` — schema metadata and caveat generation model
+- `docs/schema/interesting-findings.md` — human-readable curated findings generated from `analysis/findings.json`
 - `docs/plans/active/` — in-progress execution plans
 - `docs/plans/completed/` — finished plans for context
 
 ## Deployment
-- **Live**: https://bks-explorer-production.up.railway.app
+- **Public URL**: https://www.austinwallace.ca/survey (via CloudFront → Railway proxy)
+- **Direct Railway**: https://bks-explorer-production.up.railway.app/survey/
 - Railway project: `bks-explorer`, environment: `production`
-- Deploy: `railway up` or use Railway MCP `deploy` tool
+- Deploy: `railway up --service bks-explorer` or use Railway MCP `deploy` tool
+- Base path controlled by `VITE_BASE_PATH` env var (set to `/survey/` in production)
+- See `docs/design/deployment.md` for full details including CloudFront routing
 
 ## Architectural Invariants
 1. Data flows one direction: Parquet → DuckDB → Query → Component

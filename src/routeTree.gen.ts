@@ -15,6 +15,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as NotebookRouteImport } from './routes/notebook'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as DataQualityRouteImport } from './routes/data-quality'
 import { Route as ColumnsRouteImport } from './routes/columns'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
@@ -52,6 +53,11 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
 const ExploreRoute = ExploreRouteImport.update({
   id: '/explore',
   path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DataQualityRoute = DataQualityRouteImport.update({
+  id: '/data-quality',
+  path: '/data-quality',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ColumnsRoute = ColumnsRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
+  '/data-quality': typeof DataQualityRoute
   '/explore': typeof ExploreRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
@@ -115,6 +122,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
+  '/data-quality': typeof DataQualityRoute
   '/explore': typeof ExploreRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
@@ -132,6 +140,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/columns': typeof ColumnsRoute
+  '/data-quality': typeof DataQualityRoute
   '/explore': typeof ExploreRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/notebook': typeof NotebookRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/columns'
+    | '/data-quality'
     | '/explore'
     | '/llms.txt'
     | '/notebook'
@@ -166,6 +176,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/columns'
+    | '/data-quality'
     | '/explore'
     | '/llms.txt'
     | '/notebook'
@@ -182,6 +193,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/columns'
+    | '/data-quality'
     | '/explore'
     | '/llms.txt'
     | '/notebook'
@@ -199,6 +211,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   ColumnsRoute: typeof ColumnsRoute
+  DataQualityRoute: typeof DataQualityRoute
   ExploreRoute: typeof ExploreRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   NotebookRoute: typeof NotebookRoute
@@ -254,6 +267,13 @@ declare module '@tanstack/react-router' {
       path: '/explore'
       fullPath: '/explore'
       preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/data-quality': {
+      id: '/data-quality'
+      path: '/data-quality'
+      fullPath: '/data-quality'
+      preLoaderRoute: typeof DataQualityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/columns': {
@@ -319,6 +339,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   ColumnsRoute: ColumnsRoute,
+  DataQualityRoute: DataQualityRoute,
   ExploreRoute: ExploreRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   NotebookRoute: NotebookRoute,

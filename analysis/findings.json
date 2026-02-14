@@ -1,0 +1,754 @@
+{
+  "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+  "sourceParquet": "/Users/austin/dev/kink/data/BKSPublic.parquet",
+  "featuredPresets": [
+    {
+      "id": "pain-gender",
+      "title": "Who likes giving vs receiving pain?",
+      "shortTitle": "Pain & Gender",
+      "question": "Are men and women different on giving vs receiving pain?",
+      "caption": "Women report higher receiving-pain interest while men report higher giving-pain interest in the responder subset.",
+      "sql": "SELECT\n          CASE WHEN \"biomale\" = 1 THEN 'Men' ELSE 'Women' END AS group_key,\n          round(avg(\"receivepain\")::DOUBLE, 2) AS \"Receive pain\",\n          round(avg(\"givepain\")::DOUBLE, 2) AS \"Give pain\"\n        FROM data\n        WHERE \"biomale\" IS NOT NULL\n          AND \"receivepain\" IS NOT NULL\n          AND \"givepain\" IS NOT NULL\n        GROUP BY 1\n        ORDER BY 1",
+      "rowCount": 2,
+      "outputColumns": [
+        "group_key",
+        "Receive pain",
+        "Give pain"
+      ],
+      "outputPreview": [
+        {
+          "group_key": "Men",
+          "Receive pain": 2.15,
+          "Give pain": 2.74
+        },
+        {
+          "group_key": "Women",
+          "Receive pain": 3.17,
+          "Give pain": 1.72
+        }
+      ],
+      "exploreX": "biomale",
+      "exploreY": "receivepain",
+      "chartType": "grouped-bar",
+      "xLabel": "Sex",
+      "yLabel": "Average interest (0-5)",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "robust",
+        "effectSizeNote": "Large in responder subset (wave-2: d\u22480.62 pre-imputation, much smaller under zero-imputation)",
+        "riskFlags": [
+          "gated_selection_bias",
+          "imputation_sensitive"
+        ],
+        "riskNotes": [
+          "Uses gated columns; effect sizes are inflated among responders.",
+          "Direction/magnitude may change under zero-imputation sensitivity checks."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Kept for narrative value; must always ship with gating caveat copy."
+      },
+      "series": [
+        {
+          "key": "Receive pain",
+          "label": "Receive pain",
+          "color": "#b8432f"
+        },
+        {
+          "key": "Give pain",
+          "label": "Give pain",
+          "color": "#1a1612"
+        }
+      ]
+    },
+    {
+      "id": "spanking-childhood",
+      "title": "Does childhood spanking predict adult S/M interest?",
+      "shortTitle": "Childhood -> Kinks?",
+      "question": "Do people spanked more often as kids report different adult S/M interest?",
+      "caption": "The strongest bivariate pattern in the current curated set: higher childhood spanking bins map to higher S/M interest.",
+      "sql": "SELECT\n          cast(cast(\"spanking\" AS INTEGER) AS VARCHAR) AS name,\n          round(avg(\"sadomasochism\")::DOUBLE, 2) AS value,\n          cast(\"spanking\" AS INTEGER) AS sort_order\n        FROM data\n        WHERE \"spanking\" IS NOT NULL\n          AND \"sadomasochism\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 6,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "0",
+          "value": 3.33,
+          "sort_order": 0
+        },
+        {
+          "name": "1",
+          "value": 2.84,
+          "sort_order": 1
+        },
+        {
+          "name": "2",
+          "value": 2.74,
+          "sort_order": 2
+        },
+        {
+          "name": "3",
+          "value": 2.99,
+          "sort_order": 3
+        },
+        {
+          "name": "4",
+          "value": 3.36,
+          "sort_order": 4
+        },
+        {
+          "name": "5",
+          "value": 4.11,
+          "sort_order": 5
+        }
+      ],
+      "exploreX": "spanking",
+      "exploreY": "sadomasochism",
+      "chartType": "bar",
+      "xLabel": "Childhood spanking frequency",
+      "yLabel": "Average S/M interest (0-5)",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "robust",
+        "effectSizeNote": "Large signal in wave-2 controls (R^2\u22480.107)",
+        "riskFlags": [
+          "gated_selection_bias"
+        ],
+        "riskNotes": [
+          "Uses gated columns; effect sizes are inflated among responders."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Direction remains stable in multivariate checks; still responder-biased due gating."
+      }
+    },
+    {
+      "id": "partner-count-openness",
+      "title": "Partner count and personality openness",
+      "shortTitle": "Partners & Openness",
+      "question": "Do people with more partners report different openness scores?",
+      "caption": "Openness rises monotonically across partner-count bins, but the absolute effect is small.",
+      "sql": "SELECT\n          cast(\"sexcount\" AS VARCHAR) AS name,\n          round(avg(\"opennessvariable\")::DOUBLE, 2) AS value,\n          CASE cast(\"sexcount\" AS VARCHAR)\n            WHEN '0' THEN 1\n            WHEN '1-2' THEN 2\n            WHEN '3-7' THEN 3\n            WHEN '8-20' THEN 4\n            WHEN '21+' THEN 5\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"sexcount\" IS NOT NULL\n          AND \"opennessvariable\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 5,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "0",
+          "value": 1.34,
+          "sort_order": 1
+        },
+        {
+          "name": "1-2",
+          "value": 1.67,
+          "sort_order": 2
+        },
+        {
+          "name": "3-7",
+          "value": 1.78,
+          "sort_order": 3
+        },
+        {
+          "name": "8-20",
+          "value": 1.84,
+          "sort_order": 4
+        },
+        {
+          "name": "21+",
+          "value": 1.93,
+          "sort_order": 5
+        }
+      ],
+      "exploreX": "sexcount",
+      "exploreY": "opennessvariable",
+      "chartType": "bar",
+      "xLabel": "Number of partners",
+      "yLabel": "Average openness score",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "supported",
+        "effectSizeNote": "Small but consistent (wave-2: d\u22480.22 top vs bottom bins)",
+        "riskFlags": [
+          "small_effect"
+        ],
+        "riskNotes": [
+          "Statistically real but practically small in wave-2 effect-size review."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Kept as a clean monotonic effect that is easy to interpret."
+      }
+    },
+    {
+      "id": "fixity-breadth",
+      "title": "Could you stop being aroused by a kink?",
+      "shortTitle": "How fixed are kinks?",
+      "question": "How does arousal fixity relate to total kink breadth?",
+      "caption": "People who report that changing arousal is impossible show the broadest kink repertoires.",
+      "sql": "SELECT\n          cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n            WHEN 'With little effort, yes' THEN 1\n            WHEN 'With some effort, yes' THEN 2\n            WHEN 'With a lot of effort, yes' THEN 3\n            WHEN 'With an extreme amount of effort, maybe' THEN 4\n            WHEN 'Impossible' THEN 5\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 5,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "With little effort, yes",
+          "value": 8.5,
+          "sort_order": 1
+        },
+        {
+          "name": "With some effort, yes",
+          "value": 9.28,
+          "sort_order": 2
+        },
+        {
+          "name": "With a lot of effort, yes",
+          "value": 10.0,
+          "sort_order": 3
+        },
+        {
+          "name": "With an extreme amount of effort, maybe",
+          "value": 10.83,
+          "sort_order": 4
+        },
+        {
+          "name": "Impossible",
+          "value": 11.11,
+          "sort_order": 5
+        }
+      ],
+      "exploreX": "If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)",
+      "exploreY": "totalfetishcategory",
+      "chartType": "bar",
+      "xLabel": "Self-reported arousal fixity",
+      "yLabel": "Average number of fetish categories",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "robust",
+        "effectSizeNote": "Large practical spread (~30% breadth gap from lowest to highest fixity)",
+        "riskFlags": [
+          "self_report_bias"
+        ],
+        "riskNotes": [
+          "Based on self-report honesty/attitude items."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Promoted from swarm wave-1/7 due strong slope and simple interpretation."
+      }
+    },
+    {
+      "id": "honesty-breadth",
+      "title": "Do more honest respondents report more kinks?",
+      "shortTitle": "Do people lie?",
+      "question": "How does self-reported honesty relate to kink breadth?",
+      "caption": "Respondents who report being totally honest show higher average kink breadth than mostly-honest respondents.",
+      "sql": "SELECT\n          cast(\"How honest were you when answering this survey? (g1vao1y)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"How honest were you when answering this survey? (g1vao1y)\" AS VARCHAR)\n            WHEN 'Mostly honest' THEN 1\n            WHEN 'Totally honest' THEN 2\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"How honest were you when answering this survey? (g1vao1y)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 2,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "Mostly honest",
+          "value": 9.73,
+          "sort_order": 1
+        },
+        {
+          "name": "Totally honest",
+          "value": 10.29,
+          "sort_order": 2
+        }
+      ],
+      "exploreX": "How honest were you when answering this survey? (g1vao1y)",
+      "exploreY": "totalfetishcategory",
+      "chartType": "bar",
+      "xLabel": "Self-reported survey honesty",
+      "yLabel": "Average number of fetish categories",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "supported",
+        "effectSizeNote": "Small-to-moderate and directionally useful as a response-validity signal",
+        "riskFlags": [
+          "self_report_bias"
+        ],
+        "riskNotes": [
+          "Based on self-report honesty/attitude items."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Useful trust-building chart for newcomers; not a causal claim."
+      }
+    },
+    {
+      "id": "dom-sub-quadrants",
+      "title": "Which gender-orientation groups are dom-leaning vs sub-leaning?",
+      "shortTitle": "Dom vs Sub",
+      "question": "How do dominant and submissive arousal scores vary across gender-orientation quadrants?",
+      "caption": "Straight men are the only quadrant where dominant arousal exceeds submissive arousal.",
+      "sql": "SELECT\n          CASE\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Straight' THEN 'Straight men'\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Not straight' THEN 'Non-straight men'\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Straight' THEN 'Straight women'\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Not straight' THEN 'Non-straight women'\n            ELSE 'Other'\n          END AS group_key,\n          round(avg(\"\"\"I am aroused by being dominant in sexual interactions\"\" (6w3xquw)\")::DOUBLE, 2) AS \"Dominant arousal\",\n          round(avg(\"\"\"I am aroused by being submissive in sexual interactions\"\" (xem7hbu)\")::DOUBLE, 2) AS \"Submissive arousal\",\n          CASE\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Straight' THEN 1\n            WHEN \"biomale\" = 1 AND \"straightness\" = 'Not straight' THEN 2\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Not straight' THEN 3\n            WHEN \"biomale\" = 0 AND \"straightness\" = 'Straight' THEN 4\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"biomale\" IS NOT NULL\n          AND \"straightness\" IS NOT NULL\n          AND \"\"\"I am aroused by being dominant in sexual interactions\"\" (6w3xquw)\" IS NOT NULL\n          AND \"\"\"I am aroused by being submissive in sexual interactions\"\" (xem7hbu)\" IS NOT NULL\n        GROUP BY 1, 4\n        ORDER BY sort_order",
+      "rowCount": 4,
+      "outputColumns": [
+        "group_key",
+        "Dominant arousal",
+        "Submissive arousal",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "group_key": "Straight men",
+          "Dominant arousal": 1.16,
+          "Submissive arousal": 0.63,
+          "sort_order": 1
+        },
+        {
+          "group_key": "Non-straight men",
+          "Dominant arousal": 0.81,
+          "Submissive arousal": 0.95,
+          "sort_order": 2
+        },
+        {
+          "group_key": "Non-straight women",
+          "Dominant arousal": 0.31,
+          "Submissive arousal": 1.55,
+          "sort_order": 3
+        },
+        {
+          "group_key": "Straight women",
+          "Dominant arousal": 0.09,
+          "Submissive arousal": 1.59,
+          "sort_order": 4
+        }
+      ],
+      "exploreX": "straightness",
+      "exploreY": "\"I am aroused by being dominant in sexual interactions\" (6w3xquw)",
+      "chartType": "grouped-bar",
+      "xLabel": "Gender x orientation",
+      "yLabel": "Average arousal score (-3 to 3)",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "robust",
+        "effectSizeNote": "Large quadrant separation in swarm wave-1/8 and wave-2 clustering",
+        "riskFlags": [
+          "subgroup_specific"
+        ],
+        "riskNotes": [
+          "Pattern is strongest in a specific demographic subgroup."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Promoted because it captures the direction-over-intensity thesis directly."
+      },
+      "series": [
+        {
+          "key": "Dominant arousal",
+          "label": "Dominant arousal",
+          "color": "#1a1612"
+        },
+        {
+          "key": "Submissive arousal",
+          "label": "Submissive arousal",
+          "color": "#b8432f"
+        }
+      ]
+    },
+    {
+      "id": "politics-breadth",
+      "title": "Do politics predict total kink breadth?",
+      "shortTitle": "Politics & Kinks",
+      "question": "How does political leaning relate to total fetish-category count?",
+      "caption": "Differences exist but are modest; politics is a weak predictor compared with gender and personality axes.",
+      "sql": "SELECT\n          cast(\"politics\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"politics\" AS VARCHAR)\n            WHEN 'Liberal' THEN 1\n            WHEN 'Moderate' THEN 2\n            WHEN 'Conservative' THEN 3\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"politics\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 3,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "Liberal",
+          "value": 10.3,
+          "sort_order": 1
+        },
+        {
+          "name": "Moderate",
+          "value": 10.0,
+          "sort_order": 2
+        },
+        {
+          "name": "Conservative",
+          "value": 9.81,
+          "sort_order": 3
+        }
+      ],
+      "exploreX": "politics",
+      "exploreY": "totalfetishcategory",
+      "chartType": "bar",
+      "xLabel": "Political leaning",
+      "yLabel": "Average number of fetish categories",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "tiny",
+        "effectSizeNote": "Wave-2: statistically significant in some models but practically small",
+        "riskFlags": [
+          "small_effect"
+        ],
+        "riskNotes": [
+          "Statistically real but practically small in wave-2 effect-size review."
+        ],
+        "recommendedForHome": false,
+        "curationNotes": "Replaces politics->multiplepartners which wave-2 flagged as age-confounded."
+      }
+    },
+    {
+      "id": "orientation-breadth",
+      "title": "Do straight and non-straight groups differ in kink breadth?",
+      "shortTitle": "Orientation & Kinks",
+      "question": "How much does orientation shift total kink breadth?",
+      "caption": "Orientation differences are real but small relative to role-direction differences.",
+      "sql": "SELECT\n          cast(\"straightness\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"straightness\" AS VARCHAR)\n            WHEN 'Straight' THEN 1\n            WHEN 'Not straight' THEN 2\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"straightness\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 2,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "Straight",
+          "value": 9.99,
+          "sort_order": 1
+        },
+        {
+          "name": "Not straight",
+          "value": 10.42,
+          "sort_order": 2
+        }
+      ],
+      "exploreX": "straightness",
+      "exploreY": "totalfetishcategory",
+      "chartType": "bar",
+      "xLabel": "Orientation",
+      "yLabel": "Average number of fetish categories",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "tiny",
+        "effectSizeNote": "Wave-2: survives controls but small (d\u22480.07)",
+        "riskFlags": [
+          "small_effect"
+        ],
+        "riskNotes": [
+          "Statistically real but practically small in wave-2 effect-size review."
+        ],
+        "recommendedForHome": false,
+        "curationNotes": "Kept as an example of statistically real but practically tiny signal."
+      }
+    },
+    {
+      "id": "horny-state-breadth",
+      "title": "How much does current arousal state shift responses?",
+      "shortTitle": "Mood & Arousal",
+      "question": "Does being horny right now change reported kink breadth?",
+      "caption": "Current arousal state strongly shifts self-reported kink scores in the late-added subsample.",
+      "sql": "SELECT\n          cast(\"How horny are you right now? (1jtj2nx)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"How horny are you right now? (1jtj2nx)\" AS VARCHAR)\n            WHEN 'Not horny at all' THEN 1\n            WHEN 'A little horny' THEN 2\n            WHEN 'Moderately horny' THEN 3\n            WHEN 'Real horny' THEN 4\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"How horny are you right now? (1jtj2nx)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
+      "rowCount": 4,
+      "outputColumns": [
+        "name",
+        "value",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "name": "Not horny at all",
+          "value": 8.26,
+          "sort_order": 1
+        },
+        {
+          "name": "A little horny",
+          "value": 9.83,
+          "sort_order": 2
+        },
+        {
+          "name": "Moderately horny",
+          "value": 10.3,
+          "sort_order": 3
+        },
+        {
+          "name": "Real horny",
+          "value": 11.02,
+          "sort_order": 4
+        }
+      ],
+      "exploreX": "How horny are you right now? (1jtj2nx)",
+      "exploreY": "totalfetishcategory",
+      "chartType": "bar",
+      "xLabel": "Horniness right now",
+      "yLabel": "Average number of fetish categories",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "exploratory",
+        "effectSizeNote": "Large shift but based on late-added question (N~2.7k)",
+        "riskFlags": [
+          "late_added_subsample",
+          "state_dependent"
+        ],
+        "riskNotes": [
+          "Question exists only for a smaller late-added subsample.",
+          "Likely influenced by current survey-time arousal state."
+        ],
+        "recommendedForHome": false,
+        "curationNotes": "Important methodological caveat; defaulted off home despite large apparent effect."
+      }
+    },
+    {
+      "id": "neuroticism-pain-direction",
+      "title": "Neuroticism and pain-direction preference",
+      "shortTitle": "Anxiety & Pain",
+      "question": "Does neuroticism change receiving-vs-giving pain direction?",
+      "caption": "Higher neuroticism bins tilt more toward receiving pain than giving pain.",
+      "sql": "WITH binned AS (\n          SELECT\n            CASE\n              WHEN \"neuroticismvariable\" <= -2 THEN 'Low'\n              WHEN \"neuroticismvariable\" <= 2 THEN 'Middle'\n              ELSE 'High'\n            END AS group_key,\n            CASE\n              WHEN \"neuroticismvariable\" <= -2 THEN 1\n              WHEN \"neuroticismvariable\" <= 2 THEN 2\n              ELSE 3\n            END AS sort_order,\n            \"receivepain\",\n            \"givepain\"\n          FROM data\n          WHERE \"neuroticismvariable\" IS NOT NULL\n            AND \"receivepain\" IS NOT NULL\n            AND \"givepain\" IS NOT NULL\n        )\n        SELECT\n          group_key,\n          round(avg(\"receivepain\")::DOUBLE, 2) AS \"Receive pain\",\n          round(avg(\"givepain\")::DOUBLE, 2) AS \"Give pain\",\n          min(sort_order) AS sort_order\n        FROM binned\n        GROUP BY group_key\n        ORDER BY sort_order",
+      "rowCount": 3,
+      "outputColumns": [
+        "group_key",
+        "Receive pain",
+        "Give pain",
+        "sort_order"
+      ],
+      "outputPreview": [
+        {
+          "group_key": "Low",
+          "Receive pain": 2.43,
+          "Give pain": 2.49,
+          "sort_order": 1
+        },
+        {
+          "group_key": "Middle",
+          "Receive pain": 2.57,
+          "Give pain": 2.22,
+          "sort_order": 2
+        },
+        {
+          "group_key": "High",
+          "Receive pain": 3.1,
+          "Give pain": 1.93,
+          "sort_order": 3
+        }
+      ],
+      "exploreX": "neuroticismvariable",
+      "exploreY": "receivepain",
+      "chartType": "grouped-bar",
+      "xLabel": "Neuroticism level",
+      "yLabel": "Average interest (0-5)",
+      "status": "validated",
+      "generatedAt": "2026-02-14T08:43:23.382927+00:00",
+      "wave2": {
+        "evidenceTier": "supported",
+        "effectSizeNote": "Wave-1 top personality signal; wave-2 recommends gating caveat",
+        "riskFlags": [
+          "gated_selection_bias"
+        ],
+        "riskNotes": [
+          "Uses gated columns; effect sizes are inflated among responders."
+        ],
+        "recommendedForHome": true,
+        "curationNotes": "Kept as personality anchor finding; communicate as directional trend, not deterministic rule."
+      },
+      "series": [
+        {
+          "key": "Receive pain",
+          "label": "Receive pain",
+          "color": "#b8432f"
+        },
+        {
+          "key": "Give pain",
+          "label": "Give pain",
+          "color": "#1a1612"
+        }
+      ]
+    }
+  ],
+  "questionCards": [
+    {
+      "prompt": "Are men and women different on giving vs receiving pain?",
+      "presetId": "pain-gender"
+    },
+    {
+      "prompt": "Does childhood spanking connect to adult S/M interest?",
+      "presetId": "spanking-childhood"
+    },
+    {
+      "prompt": "Do personality traits shape pain-direction preferences?",
+      "presetId": "neuroticism-pain-direction"
+    },
+    {
+      "prompt": "Which groups are dom-leaning vs sub-leaning?",
+      "presetId": "dom-sub-quadrants"
+    },
+    {
+      "prompt": "How fixed are people's arousal patterns over time?",
+      "presetId": "fixity-breadth"
+    },
+    {
+      "prompt": "Do people with more partners score higher on openness?",
+      "presetId": "partner-count-openness"
+    },
+    {
+      "prompt": "How much do politics or orientation actually matter?",
+      "presetId": "politics-breadth"
+    },
+    {
+      "prompt": "What is connected to straightness overall?",
+      "deepLink": "/relationships?column=straightness"
+    }
+  ],
+  "defaultsByPage": {
+    "home": {
+      "presetId": "pain-gender",
+      "fallbackPresetIds": [
+        "spanking-childhood",
+        "fixity-breadth",
+        "dom-sub-quadrants"
+      ]
+    },
+    "explore": {
+      "x": "straightness",
+      "y": "politics",
+      "normalization": "row",
+      "topN": 12
+    },
+    "relationships": {
+      "column": "straightness"
+    },
+    "profile": {
+      "suggestedCohorts": [
+        {
+          "label": "Straight males 25-28",
+          "filters": [
+            {
+              "column": "straightness",
+              "value": "Straight"
+            },
+            {
+              "column": "biomale",
+              "value": "1.0"
+            },
+            {
+              "column": "age",
+              "value": "25-28"
+            }
+          ]
+        },
+        {
+          "label": "Liberal females",
+          "filters": [
+            {
+              "column": "politics",
+              "value": "Liberal"
+            },
+            {
+              "column": "biomale",
+              "value": "0.0"
+            }
+          ]
+        },
+        {
+          "label": "Conservative non-straight",
+          "filters": [
+            {
+              "column": "politics",
+              "value": "Conservative"
+            },
+            {
+              "column": "straightness",
+              "value": "Not straight"
+            }
+          ]
+        }
+      ]
+    },
+    "columns": {
+      "sort": "interestingness",
+      "interestingColumns": [
+        "straightness",
+        "politics",
+        "biomale",
+        "sexcount",
+        "spanking",
+        "totalfetishcategory",
+        "powerdynamic",
+        "sadomasochism",
+        "nonconsent",
+        "receivepain"
+      ]
+    }
+  },
+  "termMappings": [
+    {
+      "technical": "Null ratio",
+      "plainLanguage": "Data coverage / % answered"
+    },
+    {
+      "technical": "Cardinality",
+      "plainLanguage": "Number of answer choices"
+    },
+    {
+      "technical": "Missingness",
+      "plainLanguage": "Missing answers"
+    },
+    {
+      "technical": "Cramer's V",
+      "plainLanguage": "Connection strength"
+    },
+    {
+      "technical": "Pearson correlation",
+      "plainLanguage": "Connection strength"
+    },
+    {
+      "technical": "Normalization",
+      "plainLanguage": "How to count"
+    },
+    {
+      "technical": "Pivot table / cross-tabulate",
+      "plainLanguage": "Compare two questions"
+    },
+    {
+      "technical": "Gated column",
+      "plainLanguage": "Conditional question"
+    },
+    {
+      "technical": "Caveat",
+      "plainLanguage": "Data note"
+    },
+    {
+      "technical": "Non-null",
+      "plainLanguage": "Answered"
+    },
+    {
+      "technical": "Sample size (N)",
+      "plainLanguage": "People who answered (N)"
+    },
+    {
+      "technical": "Over-indexing",
+      "plainLanguage": "Unusually common in this group"
+    },
+    {
+      "technical": "Lift",
+      "plainLanguage": "Times more likely"
+    }
+  ]
+}

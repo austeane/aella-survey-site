@@ -32,7 +32,9 @@ const MCP_TOOLS = [
 
 function getAppBaseUrl(request: Request): string {
   try {
-    return new URL(request.url).origin;
+    const origin = new URL(request.url).origin;
+    const base = (import.meta.env.BASE_URL ?? "/").replace(/\/$/, "");
+    return `${origin}${base}`;
   } catch {
     return APP_BASE_URL_FALLBACK;
   }

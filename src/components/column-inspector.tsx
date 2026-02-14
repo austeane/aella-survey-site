@@ -37,6 +37,13 @@ interface RelationshipData {
 }
 
 const relationshipsByColumn = (relationshipData as RelationshipData).relationships;
+const LOGICAL_TYPE_LABELS: Record<string, string> = {
+  categorical: "Multiple choice",
+  numeric: "Number",
+  boolean: "Yes/No",
+  text: "Text",
+  unknown: "Unspecified",
+};
 
 function encodeSql(sql: string): string {
   return encodeURIComponent(sql);
@@ -172,7 +179,7 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
   if (!column) {
     return (
       <aside className="raised-panel">
-        <SectionHeader number="02" title="Column Inspector" subtitle="Select a column to inspect." />
+        <SectionHeader number="02" title="Question Inspector" subtitle="Select a question to inspect." />
       </aside>
     );
   }
@@ -205,15 +212,15 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
     <aside className="raised-panel space-y-5">
       <SectionHeader
         number="02"
-        title="Column Inspector"
+        title="Question Inspector"
         subtitle={
           <span className="flex flex-wrap items-center gap-2">
             <span className="mono-value">{getColumnDisplayName(column)}</span>
             {column.displayName ? (
               <span className="mono-value text-[var(--ink-faded)]">({column.name})</span>
             ) : null}
-            <span className="null-badge">{column.logicalType}</span>
-            <MissingnessBadge meaning={column.nullMeaning} />
+            <span className="null-badge">{LOGICAL_TYPE_LABELS[column.logicalType] ?? column.logicalType}</span>
+            {column.nullMeaning && column.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={column.nullMeaning} /> : null}
           </span>
         }
       />
@@ -291,8 +298,11 @@ export function ColumnInspector({ column, allColumns }: ColumnInspectorProps) {
       <div>
         <p className="mono-label">Missingness Context</p>
         <div className="space-y-2">
-          <p className="mono-value">Null ratio: {formatPercent(column.nullRatio * 100, 1)}</p>
-          <p className="mono-value">Null meaning: <MissingnessBadge meaning={column.nullMeaning} /></p>
+          <p className="mono-value">Missing answers: {formatPercent(column.nullRatio * 100, 1)}</p>
+          <p className="mono-value">
+            Missing-answer reason:{" "}
+            {column.nullMeaning && column.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={column.nullMeaning} /> : "No special flag"}
+          </p>
         </div>
       </div>
 

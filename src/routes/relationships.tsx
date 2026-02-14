@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { ColumnCombobox } from "@/components/column-combobox";
 import { SectionHeader } from "@/components/section-header";
+import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 import { getColumnDisplayName } from "@/lib/format-labels";
 import { formatNumber } from "@/lib/format";
 import schemaMetadata from "@/lib/schema/columns.generated.json";
@@ -45,17 +46,24 @@ function strengthLabel(value: number): string {
 }
 
 function metricLabel(metric: string): string {
-  if (metric === "cramers_v") return "Cramer\u2019s V";
-  if (metric === "correlation") return "Correlation";
+  if (metric === "cramers_v") return "Connection score";
+  if (metric === "correlation") return "Correlation score";
   return metric;
 }
 
 function RelationshipsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/relationships" });
+  const defaultColumn = DEFAULTS_BY_PAGE.relationships?.column;
   const [selectedColumn, setSelectedColumn] = useState(
     search.column && columnNames.includes(search.column) ? search.column : columnNames[0] ?? "",
   );
+
+  useEffect(() => {
+    if (search.column) return;
+    if (!defaultColumn || !columnNames.includes(defaultColumn)) return;
+    setSelectedColumn(defaultColumn);
+  }, [search.column, defaultColumn]);
 
   useEffect(() => {
     void navigate({
@@ -94,28 +102,26 @@ function RelationshipsPage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Relationship Finder</h1>
+        <h1 className="page-title">What's Connected?</h1>
         <p className="page-subtitle">
-          Precomputed pairwise associations between survey columns.
-          Categorical pairs use Cramer&rsquo;s V; numeric pairs use Pearson
-          correlation.
+          See which questions tend to move together. Higher scores mean stronger relationships in this dataset.
         </p>
         <p className="dateline">
-          {formatNumber(data.columnCount)} columns &middot;{" "}
-          {formatNumber(data.pairCount)} relationships
+          {formatNumber(data.columnCount)} questions &middot;{" "}
+          {formatNumber(data.pairCount)} connections
         </p>
       </header>
 
       <section className="raised-panel space-y-4">
-        <SectionHeader number="01" title="Target Column" />
+        <SectionHeader number="01" title="Question to start from" />
 
         <label className="editorial-label">
-          Select a column to see its strongest associations
+          Select a question to see its strongest connections
           <ColumnCombobox
             columns={columnOptions}
             value={selectedColumn}
             onValueChange={setSelectedColumn}
-            placeholder="Choose a column"
+            placeholder="Choose a question"
           />
         </label>
       </section>
@@ -123,11 +129,11 @@ function RelationshipsPage() {
       <section className="editorial-panel space-y-4">
         <SectionHeader
           number="02"
-          title="Top Related Columns"
+          title="Top related questions"
           subtitle={
             relationships.length > 0
-              ? `${relationships.length} associations for "${selectedColumnDisplayName}"`
-              : "No associations found for this column"
+              ? `${relationships.length} connections for "${selectedColumnDisplayName}"`
+              : "No connections found for this question"
           }
         />
 
@@ -136,11 +142,11 @@ function RelationshipsPage() {
             <table className="editorial-table">
               <thead>
                 <tr>
-                  <th>Related Column</th>
+                  <th>Related Question</th>
                   <th>Metric</th>
                   <th className="numeric">Strength</th>
                   <th>Label</th>
-                  <th className="numeric">N</th>
+                  <th className="numeric">People (N)</th>
                   <th style={{ width: "120px" }}>Strength</th>
                 </tr>
               </thead>
@@ -153,7 +159,7 @@ function RelationshipsPage() {
                   return (
                     <tr key={rel.column}>
                       <td>
-                        <div className="space-y-1">
+                        <div>
                         <Link
                           to="/explore"
                           search={{ x: selectedColumn, y: rel.column }}
@@ -165,7 +171,6 @@ function RelationshipsPage() {
                         >
                           {getColumnDisplayName(schemaByName.get(rel.column) ?? { name: rel.column })}
                         </Link>
-                        <p className="mono-value text-[var(--ink-faded)]">{rel.column}</p>
                         </div>
                       </td>
                       <td>
@@ -175,7 +180,7 @@ function RelationshipsPage() {
                       </td>
                       <td className="numeric">
                         <span className="mono-value">
-                          {rel.value.toFixed(4)}
+                          {rel.value.toFixed(3)}
                         </span>
                       </td>
                       <td>
@@ -220,7 +225,7 @@ function RelationshipsPage() {
           </div>
         ) : (
           <p className="section-subtitle">
-            Select a column above to view its relationships.
+            Select a question above to view its connections.
           </p>
         )}
       </section>

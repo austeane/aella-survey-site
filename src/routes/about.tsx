@@ -75,16 +75,16 @@ function AboutPage() {
 
         <div className="stat-grid grid-cols-1 md:grid-cols-3">
           <div className="stat-cell">
-            <span className="stat-value">~15,500</span>
-            <span className="stat-label">Respondents</span>
+            <span className="stat-cell-value">~15,500</span>
+            <span className="stat-cell-label">Respondents</span>
           </div>
           <div className="stat-cell">
-            <span className="stat-value">365</span>
-            <span className="stat-label">Columns</span>
+            <span className="stat-cell-value">365</span>
+            <span className="stat-cell-label">Questions</span>
           </div>
           <div className="stat-cell">
-            <span className="stat-value">5</span>
-            <span className="stat-label">Variable Categories</span>
+            <span className="stat-cell-value">5</span>
+            <span className="stat-cell-label">Variable Categories</span>
           </div>
         </div>
 
@@ -124,10 +124,10 @@ function AboutPage() {
               to="/"
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
-              Dashboard
+              Home
             </Link>
             <span className="mono-value ml-2 text-[var(--ink-faded)]">
-              — Dataset shape, caveats, missingness, and high-signal variables.
+              — Start with curated findings and plain-language takeaways.
             </span>
           </div>
           <div>
@@ -139,8 +139,7 @@ function AboutPage() {
               Explore
             </Link>
             <span className="mono-value ml-2 text-[var(--ink-faded)]">
-              — Cross-tabulate any two variables with normalization, Cramer's V
-              association strength, demographic filters, and cell drilldown.
+              — Compare two questions visually, adjust counting mode, and drill into selected groups.
             </span>
           </div>
           <div>
@@ -149,12 +148,10 @@ function AboutPage() {
               search={{ column: undefined, q: undefined, tags: undefined, sort: undefined }}
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
-              Columns
+              Browse Topics
             </Link>
             <span className="mono-value ml-2 text-[var(--ink-faded)]">
-              — Browse and search all 365 columns with tag filters, sort by
-              missingness or cardinality, and inspect individual variable
-              distributions.
+              — Browse and search all 365 questions with topic filters and data-note summaries.
             </span>
           </div>
           <div>
@@ -162,11 +159,10 @@ function AboutPage() {
               to="/profile"
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
-              Profile
+              Build a Profile
             </Link>
             <span className="mono-value ml-2 text-[var(--ink-faded)]">
-              — Define a demographic cohort and see what over-indexes against the
-              full dataset. Compare two cohorts side by side.
+              — Define one or two groups and see what is unusually common in each.
             </span>
           </div>
           <div>
@@ -174,11 +170,21 @@ function AboutPage() {
               to="/relationships"
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
-              Relationships
+              What's Connected?
             </Link>
             <span className="mono-value ml-2 text-[var(--ink-faded)]">
-              — Precomputed Cramer's V and Pearson correlations ranked by
-              association strength.
+              — Precomputed question-to-question connection strength rankings.
+            </span>
+          </div>
+          <div>
+            <Link
+              to="/data-quality"
+              className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
+            >
+              Data Quality
+            </Link>
+            <span className="mono-value ml-2 text-[var(--ink-faded)]">
+              — Deep diagnostics: missing answers, caveats, and question metadata.
             </span>
           </div>
           <div>
@@ -224,7 +230,7 @@ function AboutPage() {
           <div>
             <Link
               to="/explore"
-              search={{ x: "gender", y: "relationshipstyle" }}
+              search={{ x: "biomale", y: "Personally, your preferred relationship style is: (4jib23m)" }}
               className="text-[var(--accent)] underline decoration-[var(--rule)] underline-offset-2 hover:decoration-[var(--accent)]"
             >
               Compare gender and relationship style

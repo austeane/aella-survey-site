@@ -5,7 +5,7 @@ import duckdbMvpWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-mvp.worker.
 import duckdbEhWasm from "@duckdb/duckdb-wasm/dist/duckdb-eh.wasm?url";
 import duckdbEhWorker from "@duckdb/duckdb-wasm/dist/duckdb-browser-eh.worker.js?url";
 
-const PARQUET_URL = "/BKSPublic.parquet";
+const PARQUET_URL = `${import.meta.env.BASE_URL}BKSPublic.parquet`;
 
 export type DuckDBInitPhase =
   | "idle"

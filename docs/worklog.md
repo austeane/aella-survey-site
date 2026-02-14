@@ -1,5 +1,42 @@
 # Worklog
 
+## 2026-02-14
+
+### V3 UX overhaul execution + documentation sync
+
+**Plan document**: `docs/plans/active/v3-ux-overhaul.md`
+
+- Completed v3 implementation phases in app code and findings pipeline:
+  - Question-first home route on `/` with featured chart explorer, question cards, build-your-own chart controls, and trust block.
+  - Existing dashboard moved to `/data-quality` to preserve expert diagnostics behind progressive disclosure.
+  - Plain-language navigation/copy pass across key routes (`/columns`, `/profile`, `/relationships`, `/about`, root nav).
+  - Explore route reordered to chart-first flow with "Edit this chart" control section and new tooltip primitives.
+- Completed findings curation integration from deep-analysis wave outputs:
+  - `analysis/build_findings.py` now emits wave-2 metadata per preset (`evidenceTier`, `effectSizeNote`, `riskFlags`, `riskNotes`, `recommendedForHome`, `curationNotes`).
+  - Canonical artifacts regenerated:
+    - `analysis/findings.json`
+    - `docs/schema/interesting-findings.md`
+  - `analysis/tests/test_findings.py` updated to validate wave-2 metadata shape.
+- Wired app defaults to findings artifacts:
+  - `src/lib/chart-presets.ts` now exports canonical `FEATURED_PRESETS`, `QUESTION_CARDS`, and `DEFAULTS_BY_PAGE` from `analysis/findings.json`.
+  - Explore/Profile/Relationships/Columns/Home now consume curated defaults instead of hardcoded seeds.
+- Added preset validation tooling:
+  - `scripts/validate-chart-presets.mjs`
+  - `package.json` script: `pnpm validate-chart-presets`
+
+**Verification rerun (2026-02-14):**
+- `uv run --project analysis python analysis/build_findings.py` pass
+- `uv run --project analysis pytest analysis/tests -q` pass (19 tests)
+- `pnpm validate-chart-presets` pass (10/10 presets)
+- `pnpm check-types` pass
+- `pnpm build` pass
+- `pnpm test --run` pass (130 tests, unit scope)
+- Test-runner split follow-up complete: Vitest now scoped in `vite.config.ts` to `src/**/*.test.{ts,tsx}` and Playwright remains separate via `pnpm test:e2e`
+
+**Docs sync (session hygiene):**
+- Updated `docs/plans/active/v3-ux-overhaul.md` from draft plan to implemented status with completed-phase summary and current verification state.
+- Updated `CLAUDE.md` pointers to include v3 plan + findings docs and current routes/commands.
+
 ## 2026-02-13
 
 ### UX excellence plan implemented (all phases)
@@ -193,3 +230,29 @@ Also includes schema enhancement plan (add `nullMeaning`, `displayName` fields),
    - `docs/worklog.md` — this entry
 
 **Final deployment**: deploy `81cdd894` to bks-explorer service (includes About page + all Session 3 work).
+
+### 2026-02-14 UTC - V3 UX remediation execution and regression validation
+
+- Executed `docs/plans/active/v3-ux-remediation.md` implementation work across Home, Explore, mobile nav, Relationships, Profile, Columns, and schema/value-label presentation.
+- Added/updated active remediation documentation:
+  - `docs/plans/active/v3-ux-remediation.md`
+- Regenerated findings artifacts after plain-language preset/title updates:
+  - `analysis/findings.json`
+  - `docs/schema/interesting-findings.md`
+
+- E2E suite updates completed to match the current UX and labels:
+  - `e2e/dashboard.spec.ts` rewritten for current Home experience.
+  - `e2e/explore.spec.ts` updated for current humanized labels and normalization controls.
+  - `e2e/navigation.spec.ts` updated for current nav labels and mobile behavior.
+  - `e2e/columns.spec.ts` rewritten for current Browse Topics/Question Inspector flows.
+  - `e2e/profile-rel-sql-notebook.spec.ts` updated for current Profile/Relationships copy and robust SQL limit assertion.
+
+- Validation commands and outcomes:
+  - `pnpm check-types` -> pass
+  - `pnpm test --run` -> pass (130 tests)
+  - `pnpm build` -> pass
+  - `pnpm test:e2e` -> pass (75 tests)
+
+- Notes:
+  - Vitest still reports the existing process shutdown warning (`close timed out after 10000ms`) after successful completion.
+  - Build still emits existing chunk-size warnings; no functional regressions observed.

@@ -1,5 +1,7 @@
 import type { CrosstabData, QueryData, SchemaData, StatsData } from "@/lib/api/contracts";
 
+const API_BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
+
 interface ApiSuccess<T> {
   ok: true;
   data: T;
@@ -33,13 +35,13 @@ async function fetchEnvelope<T>(url: string, init?: RequestInit): Promise<ApiSuc
 }
 
 export async function getSchema() {
-  return fetchEnvelope<SchemaData>("/api/schema", {
+  return fetchEnvelope<SchemaData>(`${API_BASE}/api/schema`, {
     method: "GET",
   });
 }
 
 export async function getStats(column: string) {
-  return fetchEnvelope<StatsData>(`/api/stats/${encodeURIComponent(column)}`, {
+  return fetchEnvelope<StatsData>(`${API_BASE}/api/stats/${encodeURIComponent(column)}`, {
     method: "GET",
   });
 }
@@ -55,7 +57,7 @@ export interface CrosstabParams {
 }
 
 export async function getCrosstab(params: CrosstabParams) {
-  const url = new URL("/api/crosstab", window.location.origin);
+  const url = new URL(`${API_BASE}/api/crosstab`, window.location.origin);
   url.searchParams.set("x", params.x);
   url.searchParams.set("y", params.y);
 
@@ -78,7 +80,7 @@ export interface QueryParams {
 }
 
 export async function runQuery(params: QueryParams) {
-  return fetchEnvelope<QueryData>("/api/query", {
+  return fetchEnvelope<QueryData>(`${API_BASE}/api/query`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

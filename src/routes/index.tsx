@@ -1,45 +1,85 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 
 import { ColumnCombobox } from "@/components/column-combobox";
-import { DataTable } from "@/components/data-table";
+import { GroupedBarChart } from "@/components/charts/grouped-bar-chart";
+import { SimpleBarChart } from "@/components/charts/bar-chart";
+import { SimpleLineChart } from "@/components/charts/line-chart";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
-import { MissingnessBadge } from "@/components/missingness-badge";
-import { SampleSizeDisplay } from "@/components/sample-size-display";
 import { SectionHeader } from "@/components/section-header";
-import { StatCard } from "@/components/stat-card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
 import { useDuckDB } from "@/lib/duckdb/provider";
-import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
-import { formatNumber, formatPercent, asNumber, asNullableNumber } from "@/lib/format";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { useDuckDBQuery } from "@/lib/duckdb/use-query";
-
+import {
+  CHART_PRESETS,
+  DEFAULTS_BY_PAGE,
+  QUESTION_CARDS,
+  type ChartPreset,
+} from "@/lib/chart-presets";
+import { formatNumber } from "@/lib/format";
 
 export const Route = createFileRoute("/")({
-  component: DashboardPage,
+  validateSearch: (search): { chart?: string } => ({
+    chart: typeof search.chart === "string" ? search.chart : undefined,
+  }),
+  component: HomePage,
 });
 
-interface MissingnessBucket {
-  label: string;
-  min: number;
-  max: number;
-}
+type DataRow = Record<string, unknown>;
 
-const MISSINGNESS_BUCKETS: MissingnessBucket[] = [
-  { label: "0-10%", min: 0, max: 0.1 },
-  { label: "10-25%", min: 0.1, max: 0.25 },
-  { label: "25-50%", min: 0.25, max: 0.5 },
-  { label: "50-75%", min: 0.5, max: 0.75 },
-  { label: "75-100%", min: 0.75, max: 1.01 },
+type BuilderType = "bar" | "line";
+
+const BUILDER_TYPES: Array<{ value: BuilderType; label: string }> = [
+  { value: "bar", label: "Bar" },
+  { value: "line", label: "Line" },
 ];
 
-function DashboardPage() {
+function toNumber(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    if (Number.isFinite(parsed)) return parsed;
+  }
+  return 0;
+}
+
+function toCount(value: unknown): number {
+  if (typeof value === "bigint") return Number(value);
+  return toNumber(value);
+}
+
+function rowsToObjects(data: { columns: string[]; rows: unknown[][] } | null): DataRow[] {
+  if (!data) return [];
+
+  return data.rows.map((row) => {
+    const record: DataRow = {};
+    data.columns.forEach((column, index) => {
+      record[column] = row[index] ?? null;
+    });
+    return record;
+  });
+}
+
+function HomePage() {
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/" });
   const { phase } = useDuckDB();
+
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
-  const [selectedColumn, setSelectedColumn] = useState<string>("");
+
+  const [buildX, setBuildX] = useState("");
+  const [buildY, setBuildY] = useState("");
+  const [buildType, setBuildType] = useState<BuilderType>("bar");
 
   useEffect(() => {
     let cancelled = false;
@@ -47,9 +87,24 @@ function DashboardPage() {
     void getSchema()
       .then((response) => {
         if (cancelled) return;
-        setSchema(response.data);
-        const preferred = response.data.columns.find((column) => column.name === "straightness");
-        setSelectedColumn(preferred?.name ?? response.data.columns[0]?.name ?? "");
+
+        const nextSchema = response.data;
+        setSchema(nextSchema);
+
+        const defaults = DEFAULTS_BY_PAGE.explore;
+        const fallbackX = nextSchema.columns.find((column) => column.name === "politics")?.name
+          ?? nextSchema.columns.find((column) => column.name === defaults?.x)?.name
+          ?? nextSchema.columns.find((column) => column.name === "straightness")?.name
+          ?? nextSchema.columns[0]?.name
+          ?? "";
+        const fallbackY = nextSchema.columns.find((column) => column.name === "opennessvariable")?.name
+          ?? nextSchema.columns.find((column) => column.name === defaults?.y)?.name
+          ?? nextSchema.columns.find((column) => column.name === "politics")?.name
+          ?? nextSchema.columns[1]?.name
+          ?? "";
+
+        setBuildX((current) => current || fallbackX);
+        setBuildY((current) => current || fallbackY);
       })
       .catch((error: Error) => {
         if (!cancelled) setSchemaError(error.message);
@@ -60,447 +115,359 @@ function DashboardPage() {
     };
   }, []);
 
-  const selectedMeta = useMemo(() => {
-    if (!schema || !selectedColumn) return null;
-    return schema.columns.find((c) => c.name === selectedColumn) ?? null;
-  }, [schema, selectedColumn]);
+  const selectedPreset = useMemo(() => {
+    const byId = CHART_PRESETS.find((preset) => preset.id === search.chart);
+    return byId ?? CHART_PRESETS[0] ?? null;
+  }, [search.chart]);
 
-  const isNumeric = selectedMeta?.logicalType === "numeric";
-  const quoted = selectedColumn ? quoteIdentifier(selectedColumn) : "";
+  useEffect(() => {
+    if (!selectedPreset) return;
+    if (search.chart === selectedPreset.id) return;
 
-  const countsSql = useMemo(() => {
-    if (!selectedColumn) return null;
-    return `
-      SELECT
-        count(*)::BIGINT AS total_count,
-        count(${quoted})::BIGINT AS non_null_count,
-        (count(*) - count(${quoted}))::BIGINT AS null_count
-      FROM data
-    `;
-  }, [selectedColumn, quoted]);
-
-  const numericSql = useMemo(() => {
-    if (!selectedColumn || !isNumeric) return null;
-    return `
-      SELECT
-        avg(${quoted})::DOUBLE AS mean,
-        stddev_samp(${quoted})::DOUBLE AS stddev,
-        min(${quoted})::DOUBLE AS min_val,
-        quantile_cont(${quoted}, 0.25)::DOUBLE AS p25,
-        median(${quoted})::DOUBLE AS median_val,
-        quantile_cont(${quoted}, 0.75)::DOUBLE AS p75,
-        max(${quoted})::DOUBLE AS max_val
-      FROM data
-      WHERE ${quoted} IS NOT NULL
-    `;
-  }, [selectedColumn, isNumeric, quoted]);
-
-  const categoricalSql = useMemo(() => {
-    if (!selectedColumn || isNumeric) return null;
-    return `
-      SELECT
-        cast(${quoted} AS VARCHAR) AS value,
-        count(*)::BIGINT AS cnt
-      FROM data
-      WHERE ${quoted} IS NOT NULL
-      GROUP BY 1
-      ORDER BY cnt DESC
-      LIMIT 12
-    `;
-  }, [selectedColumn, isNumeric, quoted]);
-
-  const countsQuery = useDuckDBQuery(countsSql);
-  const numericQuery = useDuckDBQuery(numericSql);
-  const categoricalQuery = useDuckDBQuery(categoricalSql);
-
-  const statsLoading = countsQuery.loading || (isNumeric ? numericQuery.loading : categoricalQuery.loading);
-  const statsError = countsQuery.error ?? (isNumeric ? numericQuery.error : categoricalQuery.error);
-
-  const stats = useMemo(() => {
-    if (!countsQuery.data) return null;
-    const row = countsQuery.data.rows[0];
-    if (!row) return null;
-
-    const totalCount = asNumber(row[0]);
-    const nonNullCount = asNumber(row[1]);
-    const nullCount = asNumber(row[2]);
-    const logicalType = selectedMeta?.logicalType ?? "unknown";
-
-    if (isNumeric && numericQuery.data?.rows[0]) {
-      const nr = numericQuery.data.rows[0];
-      return {
-        logicalType,
-        totalCount,
-        nonNullCount,
-        nullCount,
-        kind: "numeric" as const,
-        mean: asNullableNumber(nr[0]),
-        stddev: asNullableNumber(nr[1]),
-        min: asNullableNumber(nr[2]),
-        p25: asNullableNumber(nr[3]),
-        median: asNullableNumber(nr[4]),
-        p75: asNullableNumber(nr[5]),
-        max: asNullableNumber(nr[6]),
-      };
-    }
-
-    if (!isNumeric && categoricalQuery.data) {
-      const topValues = categoricalQuery.data.rows.map((r) => {
-        const count = asNumber(r[1]);
-        return {
-          value: (r[0] ?? null) as string | number | boolean | null,
-          count,
-          percentage: nonNullCount > 0 ? (count / nonNullCount) * 100 : 0,
-        };
-      });
-
-      return {
-        logicalType,
-        totalCount,
-        nonNullCount,
-        nullCount,
-        kind: "categorical" as const,
-        topValues,
-      };
-    }
-
-    return null;
-  }, [countsQuery.data, numericQuery.data, categoricalQuery.data, isNumeric, selectedMeta]);
-
-  const topMissingColumns = useMemo(() => {
-    if (!schema) return [];
-    return [...schema.columns].sort((a, b) => b.nullRatio - a.nullRatio).slice(0, 8);
-  }, [schema]);
-
-  const tagBreakdown = useMemo(() => {
-    if (!schema) return [];
-
-    const counts = new Map<string, number>();
-    for (const column of schema.columns) {
-      for (const tag of column.tags) {
-        counts.set(tag, (counts.get(tag) ?? 0) + 1);
-      }
-    }
-
-    return [...counts.entries()]
-      .sort((left, right) => right[1] - left[1])
-      .map(([tag, count]) => ({ tag, count }));
-  }, [schema]);
-
-  const missingnessHistogram = useMemo(() => {
-    if (!schema) return [];
-    return MISSINGNESS_BUCKETS.map((bucket) => {
-      const count = schema.columns.filter(
-        (column) => column.nullRatio >= bucket.min && column.nullRatio < bucket.max,
-      ).length;
-      return {
-        bucket: bucket.label,
-        count,
-      };
+    void navigate({
+      search: { chart: selectedPreset.id },
+      replace: true,
     });
-  }, [schema]);
+  }, [search.chart, selectedPreset, navigate]);
 
-  const analysisFriendlyColumns = useMemo(() => {
-    if (!schema) return [];
-    return [...schema.columns]
-      .sort((left, right) => {
-        if (left.nullRatio !== right.nullRatio) {
-          return left.nullRatio - right.nullRatio;
-        }
-        return left.approxCardinality - right.approxCardinality;
-      })
-      .slice(0, 10);
-  }, [schema]);
+  const featuredQuery = useDuckDBQuery(selectedPreset?.sql ?? null);
+  const featuredRows = useMemo(() => rowsToObjects(featuredQuery.data), [featuredQuery.data]);
+  const [lastFeaturedRows, setLastFeaturedRows] = useState<DataRow[]>([]);
 
-  const gatedColumns = useMemo(() => {
-    if (!schema) return [];
-    return schema.columns
-      .filter((column) => column.caveatKeys.includes("gated_missingness"))
-      .sort((left, right) => right.nullRatio - left.nullRatio)
-      .slice(0, 10);
-  }, [schema]);
+  useEffect(() => {
+    if (featuredQuery.loading || featuredQuery.error) return;
+    setLastFeaturedRows(featuredRows);
+  }, [featuredQuery.loading, featuredQuery.error, featuredRows]);
+
+  const featuredSampleSql = useMemo(() => {
+    if (!selectedPreset) return null;
+
+    const xQuoted = quoteIdentifier(selectedPreset.exploreX);
+    const yQuoted = quoteIdentifier(selectedPreset.exploreY);
+
+    return `
+      SELECT count(*)::BIGINT AS n
+      FROM data
+      WHERE ${xQuoted} IS NOT NULL
+        AND ${yQuoted} IS NOT NULL
+    `;
+  }, [selectedPreset]);
+  const featuredSampleQuery = useDuckDBQuery(featuredSampleSql);
+  const featuredSampleSize = useMemo(
+    () => toCount(featuredSampleQuery.data?.rows[0]?.[0]),
+    [featuredSampleQuery.data],
+  );
+
+  const buildXMeta = useMemo(
+    () => schema?.columns.find((column) => column.name === buildX) ?? null,
+    [schema, buildX],
+  );
+  const buildYMeta = useMemo(
+    () => schema?.columns.find((column) => column.name === buildY) ?? null,
+    [schema, buildY],
+  );
+
+  const buildSql = useMemo(() => {
+    if (!buildX || !buildY || !buildXMeta || !buildYMeta) return null;
+
+    const xQuoted = quoteIdentifier(buildX);
+    const yQuoted = quoteIdentifier(buildY);
+
+    if (buildYMeta.logicalType === "numeric") {
+      return `
+        SELECT
+          cast(${xQuoted} AS VARCHAR) AS name,
+          round(avg(cast(${yQuoted} AS DOUBLE))::DOUBLE, 3) AS value,
+          count(*)::BIGINT AS answered_count
+        FROM data
+        WHERE ${xQuoted} IS NOT NULL
+          AND ${yQuoted} IS NOT NULL
+        GROUP BY 1
+        ORDER BY value DESC
+        LIMIT 20
+      `;
+    }
+
+    return `
+      SELECT
+        cast(${xQuoted} AS VARCHAR) AS name,
+        count(*)::BIGINT AS value
+      FROM data
+      WHERE ${xQuoted} IS NOT NULL
+        AND ${yQuoted} IS NOT NULL
+      GROUP BY 1
+      ORDER BY value DESC
+      LIMIT 20
+    `;
+  }, [buildX, buildY, buildXMeta, buildYMeta]);
+
+  const buildQuery = useDuckDBQuery(buildSql);
+  const buildRows = useMemo(() => {
+    const objects = rowsToObjects(buildQuery.data)
+      .map((row) => ({
+        name: String(row.name ?? "Unknown"),
+        value: toNumber(row.value),
+      }))
+      .filter((row) => Number.isFinite(row.value));
+
+    if (buildType === "line") {
+      const allNumeric = objects.every((row) => Number.isFinite(Number(row.name)));
+      if (allNumeric) {
+        return [...objects].sort((left, right) => Number(left.name) - Number(right.name));
+      }
+      return [...objects].sort((left, right) => left.name.localeCompare(right.name));
+    }
+
+    return objects;
+  }, [buildQuery.data, buildType]);
+
+  const renderFeaturedChart = (preset: ChartPreset, rows: DataRow[]) => {
+    if (preset.chartType === "grouped-bar") {
+      return (
+        <GroupedBarChart
+          data={rows}
+          series={preset.series ?? []}
+          xLabel={preset.xLabel}
+          yLabel={preset.yLabel}
+        />
+      );
+    }
+
+    const points = rows.map((row) => ({
+      name: String(row.name ?? "Unknown"),
+      value: toNumber(row.value),
+    }));
+
+    if (preset.chartType === "line") {
+      const sorted = [...points].sort((left, right) => Number(left.name) - Number(right.name));
+      return <SimpleLineChart data={sorted} xLabel={preset.xLabel} yLabel={preset.yLabel} />;
+    }
+
+    return <SimpleBarChart data={points} xLabel={preset.xLabel} yLabel={preset.yLabel} />;
+  };
 
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Dataset Dashboard</h1>
+        <h1 className="page-title">The Big Kink Survey</h1>
         <p className="page-subtitle">
-          Dataset shape, caveats, missingness, and high-signal variables.
+          What 15,000 people revealed about desire, personality, and identity.
         </p>
-        {schema ? (
-          <p className="dateline">
-            Updated {new Date(schema.dataset.generatedAt).toLocaleDateString("en-US")}
-          </p>
-        ) : null}
+        <p className="dateline">Based on 15,503 anonymized survey responses.</p>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
 
-      {schema ? (
-        <>
-          <section className="stat-grid grid-cols-1 md:grid-cols-3">
-            <StatCard label="Rows" value={formatNumber(schema.dataset.rowCount)} />
-            <StatCard label="Columns" value={formatNumber(schema.dataset.columnCount)} />
-            <StatCard
-              label="Generated"
-              value={new Date(schema.dataset.generatedAt).toLocaleDateString("en-US")}
-              note={new Date(schema.dataset.generatedAt).toLocaleTimeString("en-US")}
-            />
-          </section>
+      {selectedPreset ? (
+        <section className="raised-panel space-y-4" aria-labelledby="featured-chart-heading">
+          <SectionHeader number="01" title="What the data shows" />
 
-          <section className="grid gap-8 lg:grid-cols-2">
+          <p className="mono-label">Pick a finding</p>
+
+          <div role="tablist" aria-label="Featured findings" className="flex flex-wrap gap-2">
+            {CHART_PRESETS.map((preset) => {
+              const selected = preset.id === selectedPreset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  aria-controls="featured-chart-panel"
+                  className={`editorial-button ${selected ? "editorial-button--filled" : ""}`}
+                  onClick={() => {
+                    void navigate({ search: { chart: preset.id }, replace: true });
+                  }}
+                >
+                  {preset.shortTitle}
+                </button>
+              );
+            })}
+          </div>
+
+          <article id="featured-chart-panel" className="editorial-panel space-y-4">
             <div>
-              <SectionHeader number="01" title="Global Caveats" />
-              <div className="mt-3">
-                {schema.caveats.global.map((key) => {
-                  const definition = schema.caveats.definitions.find((item) => item.key === key);
-                  if (!definition) return null;
-
-                  return (
-                    <article key={key} className="caveat-item">
-                      <p className="caveat-title">{definition.title}</p>
-                      <p className="caveat-description">{definition.description}</p>
-                      <p className="caveat-guidance">{definition.guidance}</p>
-                    </article>
-                  );
-                })}
-              </div>
+              <p className="mono-label">Question</p>
+              <h2 id="featured-chart-heading" className="mt-1 text-[1.35rem] leading-tight font-['Fraunces',Georgia,serif]">
+                {selectedPreset.question}
+              </h2>
             </div>
 
-            <div>
-              <SectionHeader number="02" title="Highest Missingness Columns" />
-              <div className="mt-3">
-                <DataTable
-                  rows={topMissingColumns}
-                  rowKey={(row) => row.name}
-                  columns={[
-                    {
-                      id: "column",
-                      header: "Column",
-                      cell: (row) => (
-                        <div className="space-y-1">
-                          <span>{getColumnDisplayName(row)}</span>
-                          {row.displayName ? (
-                            <p className="mono-value text-[var(--ink-faded)]">{row.name}</p>
-                          ) : null}
-                          <div>
-                            <MissingnessBadge meaning={row.nullMeaning} />
-                          </div>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "null",
-                      header: "Null Ratio",
-                      align: "right",
-                      cell: (row) => formatPercent(row.nullRatio * 100, 1),
-                    },
-                  ]}
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="grid gap-8 lg:grid-cols-2">
-            <div>
-              <SectionHeader number="03" title="Tag Breakdown" />
-              <div className="mt-3">
-                <DataTable
-                  rows={tagBreakdown}
-                  rowKey={(row) => row.tag}
-                  columns={[
-                    { id: "tag", header: "Tag", cell: (row) => row.tag },
-                    { id: "count", header: "Columns", align: "right", cell: (row) => formatNumber(row.count) },
-                  ]}
-                />
-              </div>
-            </div>
-
-            <div>
-              <SectionHeader number="04" title="Missingness Histogram" />
-              <div className="mt-3">
-                <DataTable
-                  rows={missingnessHistogram}
-                  rowKey={(row) => row.bucket}
-                  columns={[
-                    { id: "bucket", header: "Bucket", cell: (row) => row.bucket },
-                    { id: "count", header: "Columns", align: "right", cell: (row) => formatNumber(row.count) },
-                  ]}
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="grid gap-8 lg:grid-cols-2">
-            <div>
-              <SectionHeader number="05" title="Most Analysis-Friendly Columns" />
-              <div className="mt-3">
-                <DataTable
-                  rows={analysisFriendlyColumns}
-                  rowKey={(row) => row.name}
-                  columns={[
-                    {
-                      id: "name",
-                      header: "Column",
-                      cell: (row) => (
-                        <Link
-                          to="/explore"
-                          search={{ x: row.name }}
-                          className="mono-value"
-                          style={{
-                            color: "var(--accent)",
-                            borderBottom: "1px solid var(--rule-light)",
-                          }}
-                        >
-                          {getColumnDisplayName(row)}
-                        </Link>
-                      ),
-                    },
-                    {
-                      id: "null",
-                      header: "Null %",
-                      align: "right",
-                      cell: (row) => formatPercent(row.nullRatio * 100, 1),
-                    },
-                    {
-                      id: "cardinality",
-                      header: "Cardinality",
-                      align: "right",
-                      cell: (row) => formatNumber(row.approxCardinality),
-                    },
-                  ]}
-                />
-              </div>
-            </div>
-
-            <div>
-              <SectionHeader number="06" title="Most Gated Columns" />
-              <div className="mt-3">
-                <DataTable
-                  rows={gatedColumns}
-                  rowKey={(row) => row.name}
-                  columns={[
-                    {
-                      id: "name",
-                      header: "Column",
-                      cell: (row) => (
-                        <div className="space-y-1">
-                          <span>{getColumnDisplayName(row)}</span>
-                          {row.displayName ? (
-                            <p className="mono-value text-[var(--ink-faded)]">{row.name}</p>
-                          ) : null}
-                          <div>
-                            <MissingnessBadge meaning={row.nullMeaning} />
-                          </div>
-                        </div>
-                      ),
-                    },
-                    {
-                      id: "null",
-                      header: "Null %",
-                      align: "right",
-                      cell: (row) => formatPercent(row.nullRatio * 100, 1),
-                    },
-                  ]}
-                />
-              </div>
-            </div>
-          </section>
-
-          <section className="raised-panel space-y-4">
-            <SectionHeader number="07" title="Column Inspector (Inline)" />
-
-            <label className="editorial-label max-w-[460px]">
-              Column
-              <ColumnCombobox
-                columns={schema.columns}
-                value={selectedColumn}
-                onValueChange={setSelectedColumn}
-                placeholder="Select a column"
-              />
-            </label>
-
-            {selectedMeta ? (
-              <div className="space-y-3">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="mono-value">{getColumnDisplayName(selectedMeta)}</span>
-                  {selectedMeta.displayName ? (
-                    <span className="mono-value text-[var(--ink-faded)]">({selectedMeta.name})</span>
-                  ) : null}
-                  <span className="null-badge">{selectedMeta.logicalType}</span>
-                  <MissingnessBadge meaning={selectedMeta.nullMeaning} />
-                </div>
-                {stats ? (
-                  <SampleSizeDisplay total={stats.totalCount} nonNull={stats.nonNullCount} used={stats.nonNullCount} />
-                ) : null}
-              </div>
+            {featuredQuery.loading && lastFeaturedRows.length === 0 ? (
+              <LoadingSkeleton variant="panel" phase={phase} title="Loading featured chart..." />
             ) : null}
 
-            {statsLoading ? <p className="section-subtitle">Loading stats...</p> : null}
-            {statsError ? <p className="alert alert--error">{statsError}</p> : null}
+            {featuredQuery.error ? <p className="alert alert--error">{featuredQuery.error}</p> : null}
 
-            {stats && !statsLoading ? (
+            {!featuredQuery.error ? (
               <>
-                {stats.kind === "numeric" ? (
-                  <DataTable
-                    rows={[
-                      { metric: "Mean", value: stats.mean },
-                      { metric: "Stddev", value: stats.stddev },
-                      { metric: "Min", value: stats.min },
-                      { metric: "P25", value: stats.p25 },
-                      { metric: "Median", value: stats.median },
-                      { metric: "P75", value: stats.p75 },
-                      { metric: "Max", value: stats.max },
-                    ]}
-                    rowKey={(row) => row.metric}
-                    columns={[
-                      { id: "metric", header: "Metric", cell: (row) => row.metric },
-                      {
-                        id: "value",
-                        header: "Value",
-                        align: "right",
-                        cell: (row) => (row.value == null ? "n/a" : row.value.toFixed(3)),
-                      },
-                    ]}
-                  />
-                ) : (
-                  <DataTable
-                    rows={stats.topValues}
-                    rowKey={(row) => String(row.value ?? "NULL")}
-                    columns={[
-                      {
-                        id: "value",
-                        header: "Value",
-                        cell: (row) =>
-                          formatValueWithLabel(
-                            String(row.value ?? "NULL"),
-                            selectedMeta?.valueLabels,
-                          ),
-                      },
-                      {
-                        id: "count",
-                        header: "Count",
-                        align: "right",
-                        cell: (row) => formatNumber(row.count),
-                      },
-                      {
-                        id: "pct",
-                        header: "%",
-                        align: "right",
-                        cell: (row) => formatPercent(row.percentage, 2),
-                      },
-                    ]}
-                  />
-                )}
+                <div className={`h-[360px] w-full transition-opacity ${featuredQuery.loading ? "opacity-70" : "opacity-100"}`}>
+                  {renderFeaturedChart(
+                    selectedPreset,
+                    featuredQuery.loading && lastFeaturedRows.length > 0 ? lastFeaturedRows : featuredRows,
+                  )}
+                </div>
+                {featuredQuery.loading && lastFeaturedRows.length > 0 ? (
+                  <p className="mono-value text-[var(--ink-faded)]">Updating chart...</p>
+                ) : null}
               </>
             ) : null}
-          </section>
-        </>
-      ) : (
-        <section className="editorial-panel">
-          <LoadingSkeleton variant="panel" phase={phase} title="Loading schema metadata..." />
+
+            <div className="space-y-2">
+              <p>{selectedPreset.caption}</p>
+              {!featuredSampleQuery.loading && featuredSampleSize > 0 ? (
+                <p className="mono-value text-[var(--ink-faded)]">Sample size: N = {formatNumber(featuredSampleSize)}</p>
+              ) : null}
+              {selectedPreset.wave2 ? (
+                <>
+                  <p className="mono-value text-[var(--ink-faded)]">
+                    Evidence: {selectedPreset.wave2.evidenceTier}.
+                  </p>
+                  <details>
+                    <summary className="mono-value cursor-pointer text-[var(--ink-faded)]">Method details</summary>
+                    <div className="mt-2 space-y-2">
+                      <p className="mono-value text-[var(--ink-faded)]">{selectedPreset.wave2.effectSizeNote}</p>
+                      {selectedPreset.wave2.riskNotes.length > 0 ? (
+                        <p className="mono-value text-[var(--ink-faded)]">
+                          Data notes: {selectedPreset.wave2.riskNotes.join(" ")}
+                        </p>
+                      ) : null}
+                    </div>
+                  </details>
+                </>
+              ) : null}
+            </div>
+
+            <Link
+              to="/explore"
+              search={{ x: selectedPreset.exploreX, y: selectedPreset.exploreY }}
+              className="editorial-button"
+            >
+              Explore this further
+            </Link>
+          </article>
         </section>
-      )}
+      ) : null}
+
+      <section className="editorial-panel space-y-4">
+        <SectionHeader number="02" title="Build your own chart" />
+        <p>Choose two questions and see a quick comparison.</p>
+
+        {schema ? (
+          <>
+            <div className="grid gap-4 lg:grid-cols-3">
+              <label className="editorial-label">
+                X question
+                <ColumnCombobox
+                  columns={schema.columns}
+                  value={buildX}
+                  onValueChange={setBuildX}
+                  placeholder="Choose X"
+                />
+              </label>
+
+              <label className="editorial-label">
+                Y question
+                <ColumnCombobox
+                  columns={schema.columns}
+                  value={buildY}
+                  onValueChange={setBuildY}
+                  placeholder="Choose Y"
+                />
+              </label>
+
+              <label className="editorial-label">
+                Chart type
+                <Select value={buildType} onValueChange={(value) => setBuildType(value as BuilderType)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {BUILDER_TYPES.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </label>
+            </div>
+
+            {buildQuery.loading ? (
+              <LoadingSkeleton variant="panel" phase={phase} title="Running chart query..." />
+            ) : null}
+            {buildQuery.error ? <p className="alert alert--error">{buildQuery.error}</p> : null}
+
+            {!buildQuery.loading && !buildQuery.error ? (
+              <div className="h-[320px] w-full border border-[var(--rule)] bg-[var(--paper)] p-2">
+                {buildType === "line" ? (
+                  <SimpleLineChart
+                    data={buildRows}
+                    xLabel={buildXMeta?.displayName ?? buildX}
+                    yLabel={buildYMeta?.displayName ?? buildY}
+                    height={300}
+                  />
+                ) : (
+                  <SimpleBarChart
+                    data={buildRows}
+                    xLabel={buildXMeta?.displayName ?? buildX}
+                    yLabel={buildYMeta?.displayName ?? buildY}
+                    height={300}
+                  />
+                )}
+              </div>
+            ) : null}
+
+            <Link to="/explore" search={{ x: buildX || undefined, y: buildY || undefined }} className="editorial-button">
+              Open this in Explore
+            </Link>
+          </>
+        ) : (
+          <LoadingSkeleton variant="panel" phase={phase} title="Loading columns for chart builder..." />
+        )}
+      </section>
+
+      <section className="editorial-panel space-y-4">
+        <SectionHeader number="03" title="Questions you can explore" />
+        <div className="grid gap-3 md:grid-cols-2">
+          {QUESTION_CARDS.map((card, index) => {
+            const featuredCard = index < 2;
+
+            return (
+              <article
+                key={card.prompt}
+                className={`border p-3 ${featuredCard ? "border-[var(--ink)] bg-[var(--paper-warm)]" : "border-[var(--rule)] bg-[var(--paper)]"}`}
+              >
+                {featuredCard ? <p className="mono-label text-[var(--accent)]">Popular</p> : null}
+                <p>{card.prompt}</p>
+                {card.presetId ? (
+                  <Link to="/" search={{ chart: card.presetId }} className="editorial-button mt-3 inline-flex">
+                    Open chart
+                  </Link>
+                ) : card.deepLink ? (
+                  <Link to={card.deepLink} className="editorial-button mt-3 inline-flex">
+                    Open page
+                  </Link>
+                ) : null}
+              </article>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="editorial-panel space-y-4">
+        <SectionHeader number="04" title="About the Data" />
+        <p>
+          This public sample includes 15,503 respondents and 365 columns. Responses are anonymized and include
+          intentional noise, so use patterns directionally rather than as exact population estimates.
+        </p>
+        <p className="mono-value text-[var(--ink-faded)]">
+          Tip: use Data Quality for schema diagnostics and missing-answer context before making strong claims.
+        </p>
+        <Link to="/data-quality" className="editorial-button">
+          Open Data Quality
+        </Link>
+      </section>
     </div>
   );
 }

@@ -16,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
+import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
+import { getColumnDisplayName } from "@/lib/format-labels";
 import { formatNumber, formatPercent } from "@/lib/format";
 
 export const Route = createFileRoute("/columns")({
@@ -29,13 +31,29 @@ export const Route = createFileRoute("/columns")({
 });
 
 type SortMode =
+  | "interestingness"
   | "name"
   | "null_low"
   | "null_high"
   | "cardinality_low"
   | "cardinality_high";
 
-const TAGS = ["demographic", "ocean", "fetish", "derived", "other"] as const;
+const TAG_OPTIONS = [
+  { value: "demographic", label: "Demographics" },
+  { value: "ocean", label: "Personality (Big Five)" },
+  { value: "fetish", label: "Kinks and interests" },
+  { value: "derived", label: "Computed scores" },
+  { value: "other", label: "Other" },
+] as const;
+const LOGICAL_TYPE_LABELS: Record<string, string> = {
+  categorical: "Multiple choice",
+  numeric: "Number",
+  boolean: "Yes/No",
+  text: "Text",
+  unknown: "Unspecified",
+};
+const DEFAULT_COLUMNS_SORT = (DEFAULTS_BY_PAGE.columns?.sort as SortMode | undefined) ?? "interestingness";
+const INTERESTING_COLUMNS = DEFAULTS_BY_PAGE.columns?.interestingColumns ?? [];
 
 function ColumnsPage() {
   const search = Route.useSearch();
@@ -49,7 +67,7 @@ function ColumnsPage() {
     search.tags ? search.tags.split(",").filter(Boolean) : [],
   );
   const [sortMode, setSortMode] = useState<SortMode>(
-    (search.sort as SortMode) ?? "name",
+    (search.sort as SortMode) ?? DEFAULT_COLUMNS_SORT,
   );
   const [selectedColumnName, setSelectedColumnName] = useState<string | null>(
     search.column ?? null,
@@ -62,7 +80,7 @@ function ColumnsPage() {
         column: selectedColumnName || undefined,
         q: searchTerm || undefined,
         tags: selectedTags.length > 0 ? selectedTags.join(",") : undefined,
-        sort: sortMode !== "name" ? sortMode : undefined,
+        sort: sortMode !== DEFAULT_COLUMNS_SORT ? sortMode : undefined,
       },
       replace: true,
     });
@@ -94,15 +112,26 @@ function ColumnsPage() {
     const term = searchTerm.trim().toLowerCase();
 
     const filtered = schema.columns.filter((column) => {
-      const matchesTerm = term.length === 0 || column.name.toLowerCase().includes(term);
+      const displayName = getColumnDisplayName(column).toLowerCase();
+      const matchesTerm = term.length === 0 || column.name.toLowerCase().includes(term) || displayName.includes(term);
       const matchesTags =
         selectedTags.length === 0 || selectedTags.some((tag) => column.tags.includes(tag as typeof column.tags[number]));
       return matchesTerm && matchesTags;
     });
 
     const sorted = [...filtered];
+    const interestingOrder = new Map(INTERESTING_COLUMNS.map((name, index) => [name, index]));
     sorted.sort((left, right) => {
       switch (sortMode) {
+        case "interestingness": {
+          const leftRank = interestingOrder.get(left.name);
+          const rightRank = interestingOrder.get(right.name);
+          if (leftRank != null && rightRank != null) return leftRank - rightRank;
+          if (leftRank != null) return -1;
+          if (rightRank != null) return 1;
+          if (left.nullRatio !== right.nullRatio) return left.nullRatio - right.nullRatio;
+          return left.approxCardinality - right.approxCardinality;
+        }
         case "null_low":
           return left.nullRatio - right.nullRatio;
         case "null_high":
@@ -128,23 +157,23 @@ function ColumnsPage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Column Atlas</h1>
-        <p className="page-subtitle">Search, filter, and sort columns. Select one to inspect its distribution and caveats.</p>
+        <h1 className="page-title">Browse Topics</h1>
+        <p className="page-subtitle">Search, filter, and sort survey questions. Pick one to inspect answer patterns and data notes.</p>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
 
       <section className="grid gap-8 xl:grid-cols-[1.2fr,0.8fr]">
         <div className="editorial-panel space-y-4">
-          <SectionHeader number="01" title="Atlas" />
+          <SectionHeader number="01" title="Topics" />
 
           <div className="grid gap-4 lg:grid-cols-2">
             <label className="editorial-label">
-              Search Columns
+              Search questions
               <Input
                 value={searchTerm}
                 onChange={(event) => setSearchTerm(event.target.value)}
-                placeholder="Type a column name"
+                placeholder="Type a question or keyword"
               />
             </label>
 
@@ -155,41 +184,42 @@ function ColumnsPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="interestingness">Interesting starter questions</SelectItem>
                   <SelectItem value="name">Name (A-Z)</SelectItem>
-                  <SelectItem value="null_low">Lowest null ratio</SelectItem>
-                  <SelectItem value="null_high">Highest null ratio</SelectItem>
-                  <SelectItem value="cardinality_low">Lowest cardinality</SelectItem>
-                  <SelectItem value="cardinality_high">Highest cardinality</SelectItem>
+                  <SelectItem value="null_low">Least missing answers</SelectItem>
+                  <SelectItem value="null_high">Most missing answers</SelectItem>
+                  <SelectItem value="cardinality_low">Fewest answer choices</SelectItem>
+                  <SelectItem value="cardinality_high">Most answer choices</SelectItem>
                 </SelectContent>
               </Select>
             </label>
           </div>
 
           <div>
-            <p className="mono-label">Tag Filters</p>
+            <p className="mono-label">Topic filters</p>
             <div className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {TAGS.map((tag) => {
-                const checked = selectedTags.includes(tag);
+              {TAG_OPTIONS.map((tag) => {
+                const checked = selectedTags.includes(tag.value);
                 return (
-                  <label key={tag} className="flex items-center gap-2 border border-[var(--rule)] bg-[var(--paper)] px-2 py-1.5">
+                  <label key={tag.value} className="flex items-center gap-2 border border-[var(--rule)] bg-[var(--paper)] px-2 py-1.5">
                     <Checkbox
                       checked={checked}
                       onCheckedChange={(value) => {
                         if (value === true) {
-                          setSelectedTags((current) => [...current, tag]);
+                          setSelectedTags((current) => [...current, tag.value]);
                         } else {
-                          setSelectedTags((current) => current.filter((item) => item !== tag));
+                          setSelectedTags((current) => current.filter((item) => item !== tag.value));
                         }
                       }}
                     />
-                    <span className="mono-value">{tag}</span>
+                    <span className="mono-value">{tag.label}</span>
                   </label>
                 );
               })}
             </div>
           </div>
 
-          <p className="mono-value text-[var(--ink-faded)]">Showing {formatNumber(filteredColumns.length)} columns</p>
+          <p className="mono-value text-[var(--ink-faded)]">Showing {formatNumber(filteredColumns.length)} questions</p>
 
           <ScrollArea className="max-h-[calc(100vh-380px)] min-h-[300px] border border-[var(--rule)]">
             {filteredColumns.map((column) => {
@@ -205,21 +235,24 @@ function ColumnsPage() {
                   onClick={() => setSelectedColumnName(column.name)}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
-                    <span className="mono-value text-[var(--ink)]">{column.name}</span>
+                    <div>
+                      <span className="mono-value text-[var(--ink)]">{getColumnDisplayName(column)}</span>
+                      {column.displayName ? <p className="mono-value text-[var(--ink-faded)]">{column.name}</p> : null}
+                    </div>
                     <div className="flex flex-wrap items-center gap-1">
-                      <span className="null-badge">{column.logicalType}</span>
-                      <MissingnessBadge meaning={column.nullMeaning} />
+                      <span className="null-badge">{LOGICAL_TYPE_LABELS[column.logicalType] ?? column.logicalType}</span>
+                      {column.nullMeaning && column.nullMeaning !== "UNKNOWN" ? <MissingnessBadge meaning={column.nullMeaning} /> : null}
                     </div>
                   </div>
                   <div className="mt-1 grid gap-2 md:grid-cols-[1fr,auto,auto] md:items-end">
                     <div>
-                      <p className="mono-value text-[var(--ink-faded)]">Null ratio: {formatPercent(column.nullRatio * 100, 1)}</p>
+                      <p className="mono-value text-[var(--ink-faded)]">Missing answers: {formatPercent(column.nullRatio * 100, 1)}</p>
                       <div className="inline-ratio">
                         <span style={{ width: `${Math.max(0, Math.min(100, column.nullRatio * 100))}%` }} />
                       </div>
                     </div>
-                    <p className="mono-value text-[var(--ink-faded)]">Cardinality: {formatNumber(column.approxCardinality)}</p>
-                    <p className="mono-value text-[var(--ink-faded)]">Caveats: {column.caveatKeys.length}</p>
+                    <p className="mono-value text-[var(--ink-faded)]">Answer choices: {formatNumber(column.approxCardinality)}</p>
+                    <p className="mono-value text-[var(--ink-faded)]">Data notes: {column.caveatKeys.length}</p>
                   </div>
                 </button>
               );

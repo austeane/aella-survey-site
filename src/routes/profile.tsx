@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
+import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 
 import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { useDuckDB } from "@/lib/duckdb/provider";
@@ -106,6 +107,7 @@ interface ComparisonPercentileRow {
 type Mode = "single" | "compare";
 
 const NONE = "__none__";
+const SUGGESTED_COHORTS = DEFAULTS_BY_PAGE.profile?.suggestedCohorts ?? [];
 
 type FilterPair = { column: string; value: string };
 
@@ -788,6 +790,28 @@ function ProfilePage() {
     setTimeout(() => setNotebookSaved(false), 2000);
   }, [mode, summary, comparison, filterPairs, filterPairsA, filterPairsB]);
 
+  const applySuggestedCohort = useCallback((filters: Array<{ column: string; value: string }>) => {
+    if (!schema) return;
+
+    const available = new Set(schema.columns.map((column) => column.name));
+    const validFilters = filters.filter((filter) => available.has(filter.column)).slice(0, 3);
+
+    const columns: [string, string, string] = ["", "", ""];
+    const values: Record<string, string> = {};
+
+    validFilters.forEach((filter, index) => {
+      columns[index] = filter.column;
+      values[filter.column] = filter.value;
+    });
+
+    setMode("single");
+    setSummary(null);
+    setComparison(null);
+    setRunError(null);
+    setSelectedColumns(columns);
+    setSelectedValues(values);
+  }, [schema]);
+
   const deltaDirection = (delta: number): string => {
     if (delta > 0) return "higher";
     if (delta < 0) return "lower";
@@ -797,15 +821,33 @@ function ProfilePage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Profile Builder</h1>
-        <p className="page-subtitle">Define a demographic cohort and see what over-indexes against the full dataset.</p>
+        <h1 className="page-title">Build a Profile</h1>
+        <p className="page-subtitle">Pick a group and see what is unusually common compared with everyone else.</p>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
 
       {schema ? (
         <section className="raised-panel space-y-4">
-          <SectionHeader number="01" title="Profile Inputs" />
+          <SectionHeader number="01" title="Choose your group" />
+
+          {SUGGESTED_COHORTS.length > 0 ? (
+            <div className="space-y-2">
+              <p className="mono-label">Suggested starters</p>
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTED_COHORTS.map((cohort) => (
+                  <button
+                    key={cohort.label}
+                    type="button"
+                    className="editorial-button"
+                    onClick={() => applySuggestedCohort(cohort.filters)}
+                  >
+                    {cohort.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div className="flex gap-0 border border-[var(--rule)]" style={{ width: "fit-content" }}>
             <button
@@ -821,7 +863,7 @@ function ProfilePage() {
                 setRunError(null);
               }}
             >
-              Single Cohort
+              One Group
             </button>
             <button
               type="button"
@@ -836,7 +878,7 @@ function ProfilePage() {
                 setRunError(null);
               }}
             >
-              Compare Cohorts
+              Compare Two Groups
             </button>
           </div>
 
@@ -876,7 +918,7 @@ function ProfilePage() {
             {running
               ? "Running..."
               : mode === "single"
-                ? "Build Profile"
+                ? "Run Group Analysis"
                 : "Compare"}
           </Button>
 
@@ -892,7 +934,7 @@ function ProfilePage() {
       {summary ? (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <SectionHeader number="02" title="People-Like-You Summary" />
+            <SectionHeader number="02" title="Your Group Summary" />
             <button type="button" className="editorial-button" onClick={saveToNotebook}>
               {notebookSaved ? "Saved!" : "Add to Notebook"}
             </button>
@@ -920,12 +962,19 @@ function ProfilePage() {
           ) : null}
 
           <div className="raised-panel space-y-3">
-            <SectionHeader number="03" title="Percentile Metrics" />
+            <SectionHeader number="03" title="Percentile Snapshot" />
             <DataTable
               rows={summary.percentileCards}
               rowKey={(row) => row.metric}
               columns={[
-                { id: "metric", header: "Metric", cell: (row) => row.metric },
+                {
+                  id: "metric",
+                  header: "Metric",
+                  cell: (row) => {
+                    const columnMeta = columnByName.get(row.metric);
+                    return columnMeta ? getColumnDisplayName(columnMeta) : row.metric;
+                  },
+                },
                 {
                   id: "cohort",
                   header: "Cohort Median",
@@ -949,7 +998,7 @@ function ProfilePage() {
           </div>
 
           <div className="raised-panel space-y-3">
-            <SectionHeader number="04" title="Top Over-Indexing Signals" />
+            <SectionHeader number="04" title="Most Unusually Common Signals" />
             <DataTable
               rows={summary.overIndexing}
               rowKey={(row, index) => `${row.columnName}-${row.value}-${index}`}
@@ -972,7 +1021,7 @@ function ProfilePage() {
                 },
                 {
                   id: "ratio",
-                  header: "Lift",
+                  header: "Times more likely",
                   align: "right",
                   cell: (row) => `${row.ratio.toFixed(2)}x`,
                 },
@@ -1001,7 +1050,7 @@ function ProfilePage() {
       {comparison ? (
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <SectionHeader number="02" title="Cohort Comparison" />
+            <SectionHeader number="02" title="Group Comparison" />
             <button type="button" className="editorial-button" onClick={saveToNotebook}>
               {notebookSaved ? "Saved!" : "Add to Notebook"}
             </button>
@@ -1053,7 +1102,14 @@ function ProfilePage() {
               rows={comparisonPercentileRows}
               rowKey={(row) => row.metric}
               columns={[
-                { id: "metric", header: "Metric", cell: (row) => row.metric },
+                {
+                  id: "metric",
+                  header: "Metric",
+                  cell: (row) => {
+                    const columnMeta = columnByName.get(row.metric);
+                    return columnMeta ? getColumnDisplayName(columnMeta) : row.metric;
+                  },
+                },
                 {
                   id: "medianA",
                   header: "Cohort A Median",
@@ -1098,7 +1154,7 @@ function ProfilePage() {
           {/* Over-indexing side by side */}
           <div className="grid gap-4 md:grid-cols-2">
             <div className="raised-panel space-y-3">
-              <SectionHeader number="04a" title="Cohort A Over-Indexing" />
+              <SectionHeader number="04a" title="Group A Unusually Common" />
               <DataTable
                 rows={comparison.a.overIndexing}
                 rowKey={(row, index) => `a-${row.columnName}-${row.value}-${index}`}
@@ -1121,7 +1177,7 @@ function ProfilePage() {
                   },
                   {
                     id: "ratio",
-                    header: "Lift",
+                    header: "Times more likely",
                     align: "right",
                     cell: (row) => `${row.ratio.toFixed(2)}x`,
                   },
@@ -1137,7 +1193,7 @@ function ProfilePage() {
               />
             </div>
             <div className="raised-panel space-y-3">
-              <SectionHeader number="04b" title="Cohort B Over-Indexing" />
+              <SectionHeader number="04b" title="Group B Unusually Common" />
               <DataTable
                 rows={comparison.b.overIndexing}
                 rowKey={(row, index) => `b-${row.columnName}-${row.value}-${index}`}
@@ -1160,7 +1216,7 @@ function ProfilePage() {
                   },
                   {
                     id: "ratio",
-                    header: "Lift",
+                    header: "Times more likely",
                     align: "right",
                     cell: (row) => `${row.ratio.toFixed(2)}x`,
                   },
