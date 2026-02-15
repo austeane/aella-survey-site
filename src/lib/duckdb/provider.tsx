@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import type { AsyncDuckDB } from "@duckdb/duckdb-wasm";
 
+import { track } from "@/lib/client/track";
 import { getDuckDB, subscribeDuckDBPhase, type DuckDBInitPhase } from "./init";
 
 interface DuckDBContextValue {
@@ -17,6 +18,8 @@ const DuckDBContext = createContext<DuckDBContextValue>({
   phase: "idle",
 });
 
+const SLOW_DUCKDB_INIT_MS = 3_000;
+
 export function DuckDBProvider({ children }: { children: React.ReactNode }) {
   const [db, setDb] = useState<AsyncDuckDB | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +28,9 @@ export function DuckDBProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let cancelled = false;
+    const initStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const currentPage = typeof window !== "undefined" ? window.location.pathname : "/";
+
     const unsubscribe = subscribeDuckDBPhase((nextPhase) => {
       if (!cancelled) {
         setPhase(nextPhase);
@@ -34,13 +40,32 @@ export function DuckDBProvider({ children }: { children: React.ReactNode }) {
     getDuckDB()
       .then((instance) => {
         if (!cancelled) {
+          const initDuration =
+            (typeof performance !== "undefined" ? performance.now() : Date.now()) - initStartedAt;
+          if (initDuration >= SLOW_DUCKDB_INIT_MS) {
+            track({
+              event: "slow_experience",
+              page: currentPage,
+              action: "duckdb_init",
+              value: Math.round(initDuration),
+            });
+          }
+
           setDb(instance);
           setLoading(false);
         }
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          setError(err instanceof Error ? err.message : "Failed to initialize DuckDB-WASM");
+          const message = err instanceof Error ? err.message : "Failed to initialize DuckDB-WASM";
+          track({
+            event: "error",
+            page: currentPage,
+            action: "duckdb_init",
+            error_code: "DUCKDB_INIT_ERROR",
+            label: message,
+          });
+          setError(message);
           setLoading(false);
         }
       });

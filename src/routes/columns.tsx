@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
+import { track } from "@/lib/client/track";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 import { ColumnNameTooltip } from "@/components/column-name-tooltip";
 import { getColumnDisplayName, stripHashSuffix } from "@/lib/format-labels";
@@ -233,7 +234,15 @@ function ColumnsPage() {
                   className={`w-full border-b border-[var(--rule-light)] px-3 py-2 text-left ${
                     active ? "bg-[var(--paper-warm)]" : "bg-[var(--paper)]"
                   }`}
-                  onClick={() => setSelectedColumnName(column.name)}
+                  onClick={() => {
+                    track({
+                      event: "interaction",
+                      page: typeof window !== "undefined" ? window.location.pathname : "/columns",
+                      action: "select_column",
+                      label: column.name,
+                    });
+                    setSelectedColumnName(column.name);
+                  }}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>

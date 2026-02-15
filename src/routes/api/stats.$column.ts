@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
+
 import { StatsDataSchema } from "@/lib/api/contracts";
 import { errorResponse, okResponse } from "@/lib/server/api-response";
 import { QueryExecutionError, runQuery, runSingleRow } from "@/lib/server/db";
+import { getClientIp, getUserAgent, logApiRequest } from "@/lib/server/logger";
 import { quoteIdentifier } from "@/lib/server/sql-guards";
 import { getCaveatKeysForColumn } from "@/lib/schema/caveats";
 import { getColumnMetadata } from "@/lib/schema/metadata";
@@ -28,14 +30,38 @@ function asNullableNumber(value: unknown): number | null {
   return Number.isNaN(numeric) ? null : numeric;
 }
 
+function durationMs(startedAt: number): number {
+  return Math.round(performance.now() - startedAt);
+}
+
 export const Route = createFileRoute("/api/stats/$column")({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
+        const startedAt = performance.now();
+        const route = "/api/stats/$column";
+        const method = request.method;
+        const ip = getClientIp(request);
+        const userAgent = getUserAgent(request);
+
+        const log = (status: number, errorCode?: string, meta?: Record<string, unknown>) => {
+          logApiRequest({
+            route,
+            method,
+            status,
+            durationMs: durationMs(startedAt),
+            errorCode,
+            ip,
+            userAgent,
+            meta,
+          });
+        };
+
         const column = decodeURIComponent(params.column);
         const metadata = getColumnMetadata(column);
 
         if (!metadata) {
+          log(404, "COLUMN_NOT_FOUND");
           return errorResponse(404, {
             code: "COLUMN_NOT_FOUND",
             message: `Column '${column}' not found.`,
@@ -90,6 +116,10 @@ export const Route = createFileRoute("/api/stats/$column")({
               },
             });
 
+            log(200, undefined, {
+              column,
+              logicalType: metadata.logicalType,
+            });
             return okResponse(data);
           }
 
@@ -129,15 +159,22 @@ export const Route = createFileRoute("/api/stats/$column")({
             },
           });
 
+          log(200, undefined, {
+            column,
+            logicalType: metadata.logicalType,
+          });
           return okResponse(data);
         } catch (error) {
           if (error instanceof QueryExecutionError) {
-            return errorResponse(error.code === "QUERY_TIMEOUT" ? 408 : 400, {
+            const status = error.code === "QUERY_TIMEOUT" ? 408 : 400;
+            log(status, error.code, { column });
+            return errorResponse(status, {
               code: error.code,
               message: error.message,
             });
           }
 
+          log(500, "STATS_FAILED", { column });
           return errorResponse(500, {
             code: "STATS_FAILED",
             message: "Failed to compute column statistics.",

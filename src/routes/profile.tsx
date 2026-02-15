@@ -24,6 +24,7 @@ import {
 import type { SchemaData } from "@/lib/api/contracts";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 import { getSchema } from "@/lib/client/api";
+import { track } from "@/lib/client/track";
 import {
   PROFILE_METRICS,
   buildCondition,
@@ -795,6 +796,14 @@ function ProfilePage() {
       setRunError("DuckDB is not ready yet.");
       return;
     }
+
+    track({
+      event: "query",
+      page: typeof window !== "undefined" ? window.location.pathname : "/profile",
+      action: "run_profile",
+      label: mode,
+      value: mode === "single" ? filterPairs.length : filterPairsA.length + filterPairsB.length,
+    });
 
     setRunning(true);
     setRunError(null);

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 import re
 import time
@@ -9,6 +10,8 @@ from datetime import date, datetime, time as datetime_time
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 import duckdb
 from duckdb import DuckDBPyConnection
@@ -28,6 +31,12 @@ MAX_TIMEOUT_MS = int(os.environ.get("BKS_QUERY_MAX_TIMEOUT_MS", "30000"))
 DEFAULT_TOP_N = int(os.environ.get("BKS_TOP_N_DEFAULT", "20"))
 MAX_TOP_N = int(os.environ.get("BKS_TOP_N_MAX", "100"))
 NULL_LABEL = "<NULL>"
+
+ANALYTICS_API_URL = os.environ.get(
+    "BKS_ANALYTICS_API_URL",
+    "https://bks-explorer-production.up.railway.app/survey/api/analytics",
+)
+ANALYTICS_API_KEY = os.environ.get("BKS_ANALYTICS_KEY")
 
 READ_ONLY_PREFIXES = {"SELECT", "WITH", "DESCRIBE", "EXPLAIN"}
 MUTATING_KEYWORDS_RE = re.compile(
@@ -330,6 +339,129 @@ def query_data(
     finally:
         if conn is not None:
             conn.close()
+
+
+@mcp.tool()
+def query_analytics(
+    sql: str,
+    limit: int = DEFAULT_LIMIT,
+    timeout_ms: int = DEFAULT_TIMEOUT_MS,
+) -> dict[str, Any]:
+    """Proxy a bounded read-only analytics SQL query to the Explorer `/api/analytics` endpoint."""
+    if not ANALYTICS_API_KEY:
+        return failure(
+          "ANALYTICS_KEY_MISSING",
+          "Set BKS_ANALYTICS_KEY on the MCP service to enable analytics queries.",
+      )
+
+    if not ANALYTICS_API_URL:
+        return failure(
+          "ANALYTICS_URL_MISSING",
+          "Set BKS_ANALYTICS_API_URL to the Explorer analytics endpoint.",
+      )
+
+    if not isinstance(sql, str) or not sql.strip():
+        return failure("MISSING_SQL", "sql field is required")
+
+    cleaned, sql_error = validate_read_only_sql(sql)
+    if sql_error:
+        return failure("UNSAFE_SQL", sql_error)
+    if cleaned is None:
+        return failure("UNSAFE_SQL", "Invalid SQL query")
+
+    bounded_limit = normalize_limit(limit)
+    timeout = normalize_timeout_ms(timeout_ms)
+
+    payload_bytes = json.dumps(
+        {
+            "sql": cleaned,
+            "limit": bounded_limit,
+        }
+    ).encode("utf-8")
+
+    request = Request(
+        ANALYTICS_API_URL,
+        data=payload_bytes,
+        headers={
+            "Content-Type": "application/json",
+            "x-bks-analytics-key": ANALYTICS_API_KEY,
+        },
+        method="POST",
+    )
+
+    started_at = time.perf_counter()
+
+    try:
+        with urlopen(request, timeout=max(timeout / 1000, 1)) as response:
+            status_code = response.status
+            body = response.read().decode("utf-8")
+    except HTTPError as exc:
+        try:
+            parsed = json.loads(exc.read().decode("utf-8"))
+        except Exception:
+            parsed = None
+
+        if isinstance(parsed, dict) and parsed.get("ok") is False:
+            return parsed
+
+        return failure(
+            "ANALYTICS_PROXY_FAILED",
+            f"Analytics API request failed with status {exc.code}.",
+            {
+                "status": exc.code,
+                "reason": str(exc),
+            },
+        )
+    except URLError as exc:
+        return failure(
+            "ANALYTICS_PROXY_FAILED",
+            "Failed to reach analytics API.",
+            {"reason": str(exc.reason)},
+        )
+    except Exception as exc:
+        code = "QUERY_TIMEOUT" if is_timeout_error(exc) else "ANALYTICS_PROXY_FAILED"
+        message = (
+            "Analytics query exceeded the configured timeout."
+            if code == "QUERY_TIMEOUT"
+            else "Failed to execute analytics query."
+        )
+        return failure(code, message, {"reason": str(exc)})
+
+    try:
+        envelope = json.loads(body)
+    except Exception:
+        return failure(
+            "ANALYTICS_PROXY_FAILED",
+            "Analytics API returned invalid JSON.",
+            {
+                "status": status_code,
+                "body": body[:500],
+            },
+        )
+
+    if not isinstance(envelope, dict):
+        return failure("ANALYTICS_PROXY_FAILED", "Analytics API response was not an object.")
+
+    elapsed_ms = round((time.perf_counter() - started_at) * 1000, 2)
+
+    if envelope.get("ok") is True:
+        data = envelope.get("data")
+        meta = envelope.get("meta") if isinstance(envelope.get("meta"), dict) else {}
+        merged_meta = {
+            **meta,
+            "durationMs": elapsed_ms,
+            "source": "analytics_proxy",
+            "url": ANALYTICS_API_URL,
+        }
+        return success(data, merged_meta)
+
+    if envelope.get("ok") is False and isinstance(envelope.get("error"), dict):
+        return {
+            "ok": False,
+            "error": envelope["error"],
+        }
+
+    return failure("ANALYTICS_PROXY_FAILED", "Unexpected analytics API response envelope.")
 
 
 @mcp.tool()

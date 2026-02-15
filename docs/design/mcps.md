@@ -43,13 +43,14 @@ Tools:
 - `get_stats(column, top_n?, timeout_ms?)`
 - `cross_tabulate(x_column, y_column, top_n?, include_nulls?, timeout_ms?)`
 - `query_data(sql, limit?, timeout_ms?)`
+- `query_analytics(sql, limit?, timeout_ms?)` (proxies to Explorer `/api/analytics` with API key)
 - `search_columns(query, limit?)`
 
 Behavior parity with plan/API conventions:
 - Typed envelopes on every tool call:
   - success: `{ ok: true, data, meta? }`
   - error: `{ ok: false, error: { code, message, details? } }`
-- Read-only SQL guardrails for `query_data`:
+- Read-only SQL guardrails for `query_data` and `query_analytics`:
   - only `SELECT`, `WITH`, `DESCRIBE`, `EXPLAIN` statement types
   - mutating keywords blocked (`INSERT`, `UPDATE`, `DELETE`, `DROP`, etc.)
   - single-statement only (no chained statements via `;`)

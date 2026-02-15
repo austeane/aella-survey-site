@@ -8,6 +8,7 @@
 - **Data engine (metadata generation)**: `@duckdb/node-api` in `scripts/profile-schema.mjs`
 - **Data engine (MCP)**: DuckDB Python bindings in `mcp-server/server.py`
 - **Deploy**: Railway (web service + optional MCP service)
+- **Observability**: Pino structured JSON logs + JSONL analytics event store on mounted volume
 
 ## Key Technical Decisions
 
@@ -25,7 +26,8 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 1. Validate request boundaries via Zod contracts in `src/lib/api/contracts.ts`.
 2. Apply SQL/read-only guardrails in `src/lib/server/sql-guards.ts`.
 3. Execute bounded queries via `src/lib/server/db.ts`.
-4. Return typed JSON envelopes (`ok`/`error`) via `src/lib/server/api-response.ts`.
+4. Emit structured request logs via `src/lib/server/logger.ts`.
+5. Return typed JSON envelopes (`ok`/`error`) via `src/lib/server/api-response.ts`.
 
 ### Why DuckDB CLI in the server layer
 `@duckdb/node-api` is used for schema profiling scripts but currently avoided as the primary runtime engine because Nitro build/bundling with native `.node` bindings is fragile. Runtime API queries execute via the `duckdb` binary and JSON output, with timeout and row-limit controls. A fallback to `@duckdb/node-api` activates automatically when the CLI binary is not available (e.g., on Railway), with bigint normalization for JSON compatibility.
@@ -35,7 +37,9 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 2. `pnpm sync-public-data` copies parquet to `public/BKSPublic.parquet`.
 3. `pnpm profile-schema` regenerates `src/lib/schema/columns.generated.json`.
 4. `/api/schema`, `/api/stats/$column`, `/api/crosstab`, `/api/query` consume that metadata and parquet data.
-5. UI pages and AI docs route (`/llms.txt`) call the shared schema metadata layer and API endpoints.
+5. Client tracking batches events to `/api/events`, which appends JSONL files (`events-YYYY-MM-DD.jsonl`) via `src/lib/server/event-store.ts`.
+6. `/api/analytics` executes bounded read-only SQL against analytics JSONL via DuckDB temp view `events`.
+7. UI pages and AI docs route (`/llms.txt`) call the shared schema metadata layer and API endpoints.
 
 ## Current Route Coverage
 
@@ -54,7 +58,7 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 - `/llms.txt` — machine-readable AI integration docs generated from schema metadata (`getSchemaMetadata`, `listColumns`)
 
 ### API Endpoints
-- `/api/health`, `/api/schema`, `/api/query`, `/api/stats/$column`, `/api/crosstab`
+- `/api/health`, `/api/schema`, `/api/query`, `/api/stats/$column`, `/api/crosstab`, `/api/events`, `/api/analytics`
 
 ## Shared Components
 - `src/components/pivot-matrix.tsx` — pivot table with normalization, marginals, and bucket metadata for drilldown SQL
@@ -66,6 +70,7 @@ Server routes under `src/routes/api/*` are thin wrappers that:
 - `src/components/sample-size-display.tsx` — N/non-null/used display
 - `src/components/section-header.tsx` — numbered section headers
 - `src/components/stat-card.tsx` — stat display card
+- `src/components/error-boundary.tsx` — render-time fallback boundary with retry + analytics error tracking
 
 ## Ad-Hoc Data Queries (for agents)
 
@@ -95,6 +100,9 @@ Note: `@duckdb/node-api` and Python `duckdb` are also available but require thei
 - `src/lib/schema/metadata.ts` — schema metadata access layer
 - `src/lib/schema/relationships.generated.json` — precomputed pairwise associations (3,065 entries)
 - `src/lib/duckdb/init.ts` — DuckDB initialization with phase callbacks (`idle -> downloading-wasm -> initializing -> loading-parquet -> ready`)
-- `src/lib/duckdb/provider.tsx` — React context exposing `db`, `loading`, `error`, and init `phase`
-- `src/lib/duckdb/use-query.ts` — React hook for DuckDB-WASM queries
+- `src/lib/duckdb/provider.tsx` — React context exposing `db`, `loading`, `error`, and init `phase` (with init telemetry)
+- `src/lib/duckdb/use-query.ts` — React hook for DuckDB-WASM queries (with slow/error telemetry)
 - `src/lib/duckdb/sql-helpers.ts` — SQL quoting and WHERE clause builder
+- `src/lib/client/track.ts` — client analytics batching, session IDs, beacon/fetch flush logic
+- `src/lib/server/logger.ts` — shared Pino logger + API request log helper
+- `src/lib/server/event-store.ts` — analytics JSONL append queue + glob resolver

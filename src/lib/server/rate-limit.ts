@@ -1,32 +1,73 @@
-const WINDOW_MS = 60 * 60 * 1000; // 1 hour
-const MAX_REQUESTS = 5;
-const CLEANUP_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+}
 
-const hits = new Map<string, number[]>();
+interface RateLimiterOptions {
+  windowMs: number;
+  maxRequests: number;
+  cleanupIntervalMs: number;
+}
 
-// Periodic cleanup to prevent memory leaks
-setInterval(() => {
-  const cutoff = Date.now() - WINDOW_MS;
-  for (const [ip, timestamps] of hits) {
-    const valid = timestamps.filter((t) => t > cutoff);
-    if (valid.length === 0) {
-      hits.delete(ip);
-    } else {
-      hits.set(ip, valid);
+function createRateLimiter({
+  windowMs,
+  maxRequests,
+  cleanupIntervalMs,
+}: RateLimiterOptions): (ip: string) => RateLimitResult {
+  const hits = new Map<string, number[]>();
+
+  setInterval(() => {
+    const cutoff = Date.now() - windowMs;
+
+    for (const [ip, timestamps] of hits.entries()) {
+      const validTimestamps = timestamps.filter((timestamp) => timestamp > cutoff);
+
+      if (validTimestamps.length === 0) {
+        hits.delete(ip);
+      } else {
+        hits.set(ip, validTimestamps);
+      }
     }
-  }
-}, CLEANUP_INTERVAL_MS).unref();
+  }, cleanupIntervalMs).unref();
 
-export function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
-  const now = Date.now();
-  const cutoff = now - WINDOW_MS;
-  const timestamps = (hits.get(ip) ?? []).filter((t) => t > cutoff);
+  return (ip: string): RateLimitResult => {
+    const now = Date.now();
+    const cutoff = now - windowMs;
+    const timestamps = (hits.get(ip) ?? []).filter((timestamp) => timestamp > cutoff);
 
-  if (timestamps.length >= MAX_REQUESTS) {
-    return { allowed: false, remaining: 0 };
-  }
+    if (timestamps.length >= maxRequests) {
+      return {
+        allowed: false,
+        remaining: 0,
+      };
+    }
 
-  timestamps.push(now);
-  hits.set(ip, timestamps);
-  return { allowed: true, remaining: MAX_REQUESTS - timestamps.length };
+    timestamps.push(now);
+    hits.set(ip, timestamps);
+
+    return {
+      allowed: true,
+      remaining: maxRequests - timestamps.length,
+    };
+  };
+}
+
+const feedbackLimiter = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  maxRequests: 5,
+  cleanupIntervalMs: 10 * 60 * 1000,
+});
+
+const eventIngestionLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  maxRequests: 120,
+  cleanupIntervalMs: 60 * 1000,
+});
+
+export function checkRateLimit(ip: string): RateLimitResult {
+  return feedbackLimiter(ip);
+}
+
+export function checkEventIngestionRateLimit(ip: string): RateLimitResult {
+  return eventIngestionLimiter(ip);
 }

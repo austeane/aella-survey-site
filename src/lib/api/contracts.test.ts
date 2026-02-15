@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  AnalyticsEventBatchRequestSchema,
+  AnalyticsEventInputSchema,
+  AnalyticsEventTypeSchema,
+  AnalyticsEventV1Schema,
+  AnalyticsQueryRequestSchema,
   ApiErrorEnvelopeSchema,
   ApiSuccessEnvelopeSchema,
   CategoricalStatsSchema,
@@ -384,6 +389,76 @@ describe("StatsDataSchema", () => {
       },
     });
     expect(result.stats.kind).toBe("categorical");
+  });
+});
+
+describe("AnalyticsQueryRequestSchema", () => {
+  it("accepts valid analytics query", () => {
+    const result = AnalyticsQueryRequestSchema.parse({
+      sql: "SELECT event, count(*) FROM events GROUP BY 1",
+      limit: 250,
+    });
+    expect(result.limit).toBe(250);
+  });
+
+  it("rejects empty sql", () => {
+    expect(() => AnalyticsQueryRequestSchema.parse({ sql: "   " })).toThrow();
+  });
+});
+
+describe("Analytics event schemas", () => {
+  const baseEvent = {
+    event: "interaction",
+    page: "/profile",
+    action: "run_profile",
+    label: "single",
+    value: 2,
+    session_id: "session-123",
+    ts: "2026-02-15T00:00:00.000Z",
+  };
+
+  it("accepts event type enum values", () => {
+    for (const eventType of ["page_view", "interaction", "query", "error", "slow_experience"]) {
+      expect(AnalyticsEventTypeSchema.parse(eventType)).toBe(eventType);
+    }
+  });
+
+  it("accepts valid client event payload", () => {
+    const parsed = AnalyticsEventInputSchema.parse(baseEvent);
+    expect(parsed.action).toBe("run_profile");
+  });
+
+  it("strips unknown fields from client payload", () => {
+    const parsed = AnalyticsEventInputSchema.parse({
+      ...baseEvent,
+      ignored: "x",
+    });
+    expect(parsed).not.toHaveProperty("ignored");
+  });
+
+  it("enforces batch size <= 20", () => {
+    const oversized = Array.from({ length: 21 }, (_, index) => ({
+      ...baseEvent,
+      action: `event-${index}`,
+    }));
+
+    expect(() =>
+      AnalyticsEventBatchRequestSchema.parse({
+        events: oversized,
+      }),
+    ).toThrow();
+  });
+
+  it("accepts server-enriched v1 events", () => {
+    const parsed = AnalyticsEventV1Schema.parse({
+      ...baseEvent,
+      v: 1,
+      received_at: "2026-02-15T00:00:02.000Z",
+      user_agent: "Mozilla/5.0",
+    });
+
+    expect(parsed.v).toBe(1);
+    expect(parsed.received_at).toBe("2026-02-15T00:00:02.000Z");
   });
 });
 

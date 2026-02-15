@@ -24,7 +24,9 @@ import { Route as ApiSchemaRouteImport } from './routes/api/schema'
 import { Route as ApiQueryRouteImport } from './routes/api/query'
 import { Route as ApiHealthRouteImport } from './routes/api/health'
 import { Route as ApiFeedbackRouteImport } from './routes/api/feedback'
+import { Route as ApiEventsRouteImport } from './routes/api/events'
 import { Route as ApiCrosstabRouteImport } from './routes/api/crosstab'
+import { Route as ApiAnalyticsRouteImport } from './routes/api/analytics'
 import { Route as ApiStatsColumnRouteImport } from './routes/api/stats.$column'
 
 const SqlRoute = SqlRouteImport.update({
@@ -102,9 +104,19 @@ const ApiFeedbackRoute = ApiFeedbackRouteImport.update({
   path: '/api/feedback',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiEventsRoute = ApiEventsRouteImport.update({
+  id: '/api/events',
+  path: '/api/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiCrosstabRoute = ApiCrosstabRouteImport.update({
   id: '/api/crosstab',
   path: '/api/crosstab',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAnalyticsRoute = ApiAnalyticsRouteImport.update({
+  id: '/api/analytics',
+  path: '/api/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiStatsColumnRoute = ApiStatsColumnRouteImport.update({
@@ -123,7 +135,9 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
+  '/api/analytics': typeof ApiAnalyticsRoute
   '/api/crosstab': typeof ApiCrosstabRoute
+  '/api/events': typeof ApiEventsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/api/health': typeof ApiHealthRoute
   '/api/query': typeof ApiQueryRoute
@@ -142,7 +156,9 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
+  '/api/analytics': typeof ApiAnalyticsRoute
   '/api/crosstab': typeof ApiCrosstabRoute
+  '/api/events': typeof ApiEventsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/api/health': typeof ApiHealthRoute
   '/api/query': typeof ApiQueryRoute
@@ -162,7 +178,9 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/relationships': typeof RelationshipsRoute
   '/sql': typeof SqlRoute
+  '/api/analytics': typeof ApiAnalyticsRoute
   '/api/crosstab': typeof ApiCrosstabRoute
+  '/api/events': typeof ApiEventsRoute
   '/api/feedback': typeof ApiFeedbackRoute
   '/api/health': typeof ApiHealthRoute
   '/api/query': typeof ApiQueryRoute
@@ -183,7 +201,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/relationships'
     | '/sql'
+    | '/api/analytics'
     | '/api/crosstab'
+    | '/api/events'
     | '/api/feedback'
     | '/api/health'
     | '/api/query'
@@ -202,7 +222,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/relationships'
     | '/sql'
+    | '/api/analytics'
     | '/api/crosstab'
+    | '/api/events'
     | '/api/feedback'
     | '/api/health'
     | '/api/query'
@@ -221,7 +243,9 @@ export interface FileRouteTypes {
     | '/profile'
     | '/relationships'
     | '/sql'
+    | '/api/analytics'
     | '/api/crosstab'
+    | '/api/events'
     | '/api/feedback'
     | '/api/health'
     | '/api/query'
@@ -241,7 +265,9 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   RelationshipsRoute: typeof RelationshipsRoute
   SqlRoute: typeof SqlRoute
+  ApiAnalyticsRoute: typeof ApiAnalyticsRoute
   ApiCrosstabRoute: typeof ApiCrosstabRoute
+  ApiEventsRoute: typeof ApiEventsRoute
   ApiFeedbackRoute: typeof ApiFeedbackRoute
   ApiHealthRoute: typeof ApiHealthRoute
   ApiQueryRoute: typeof ApiQueryRoute
@@ -358,11 +384,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiFeedbackRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/events': {
+      id: '/api/events'
+      path: '/api/events'
+      fullPath: '/api/events'
+      preLoaderRoute: typeof ApiEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/crosstab': {
       id: '/api/crosstab'
       path: '/api/crosstab'
       fullPath: '/api/crosstab'
       preLoaderRoute: typeof ApiCrosstabRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/analytics': {
+      id: '/api/analytics'
+      path: '/api/analytics'
+      fullPath: '/api/analytics'
+      preLoaderRoute: typeof ApiAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/stats/$column': {
@@ -385,7 +425,9 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   RelationshipsRoute: RelationshipsRoute,
   SqlRoute: SqlRoute,
+  ApiAnalyticsRoute: ApiAnalyticsRoute,
   ApiCrosstabRoute: ApiCrosstabRoute,
+  ApiEventsRoute: ApiEventsRoute,
   ApiFeedbackRoute: ApiFeedbackRoute,
   ApiHealthRoute: ApiHealthRoute,
   ApiQueryRoute: ApiQueryRoute,

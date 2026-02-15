@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColumnCombobox } from "@/components/column-combobox";
 import { SimpleBarChart } from "@/components/charts/bar-chart";
@@ -21,6 +21,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
+import { track } from "@/lib/client/track";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 
 import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
@@ -162,6 +163,7 @@ function ExplorePage() {
   const [filterColumn, setFilterColumn] = useState("");
   const [selectedFilterValues, setSelectedFilterValues] = useState<string[]>([]);
   const [selectedCell, setSelectedCell] = useState<PivotCellDetail | null>(null);
+  const lastCrosstabTrackKey = useRef<string | null>(null);
 
   useEffect(() => {
     if (searchKey === appliedKey && schema) return;
@@ -384,6 +386,50 @@ function ExplorePage() {
   const crosstabQuery = useDuckDBQuery(crosstabSql);
   const mixedChartQuery = useDuckDBQuery(mixedChartSql);
   const sampleSizeQuery = useDuckDBQuery(sampleSizeSql);
+
+  const crosstabTrackKey = useMemo(
+    () => `${xColumn}|${yColumn}|${whereClause}|${normalization}|${topN}|${limit}`,
+    [xColumn, yColumn, whereClause, normalization, topN, limit],
+  );
+
+  useEffect(() => {
+    if (!crosstabSql || crosstabQuery.loading || crosstabQuery.error || !crosstabQuery.data) {
+      return;
+    }
+
+    if (lastCrosstabTrackKey.current === crosstabTrackKey) {
+      return;
+    }
+
+    lastCrosstabTrackKey.current = crosstabTrackKey;
+
+    track({
+      event: "query",
+      page: typeof window !== "undefined" ? window.location.pathname : "/explore/crosstab",
+      action: "run_crosstab",
+      label: isPivotable ? "pivot" : isMixedCategoricalNumeric ? "mixed" : "table",
+      value: crosstabQuery.data.rows.length,
+    });
+  }, [
+    crosstabSql,
+    crosstabQuery.loading,
+    crosstabQuery.error,
+    crosstabQuery.data,
+    crosstabTrackKey,
+    isPivotable,
+    isMixedCategoricalNumeric,
+  ]);
+
+  useEffect(() => {
+    if (!selectedCell) return;
+
+    track({
+      event: "interaction",
+      page: typeof window !== "undefined" ? window.location.pathname : "/explore/crosstab",
+      action: "cell_drilldown",
+      label: `${selectedCell.x} × ${selectedCell.y}`,
+    });
+  }, [selectedCell]);
 
   const rows = useMemo(() => {
     if (!crosstabQuery.data) return [];
@@ -773,7 +819,19 @@ LIMIT 250
                       <span>How to count</span>
                       <ControlHelp text="Row % means percentage within each row. Column % means percentage within each column." />
                     </div>
-                    <Select value={normalization} onValueChange={(value) => setNormalization(value as PivotNormalization)}>
+                    <Select
+                      value={normalization}
+                      onValueChange={(value) => {
+                        const nextNormalization = value as PivotNormalization;
+                        track({
+                          event: "interaction",
+                          page: typeof window !== "undefined" ? window.location.pathname : "/explore/crosstab",
+                          action: "change_normalization",
+                          label: nextNormalization,
+                        });
+                        setNormalization(nextNormalization);
+                      }}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>

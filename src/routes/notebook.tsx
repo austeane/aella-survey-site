@@ -12,6 +12,7 @@ import {
   exportNotebookAsJson,
   type NotebookEntry,
 } from "@/lib/notebook-store";
+import { track } from "@/lib/client/track";
 
 export const Route = createFileRoute("/notebook")({
   component: NotebookPage,
@@ -96,6 +97,11 @@ function NotebookPage() {
   const handleDelete = useCallback(
     (id: string) => {
       if (!window.confirm("Delete this notebook entry? This cannot be undone.")) return;
+      track({
+        event: "interaction",
+        page: typeof window !== "undefined" ? window.location.pathname : "/notebook",
+        action: "delete_notebook_entry",
+      });
       deleteNotebookEntry(id);
       refreshEntries();
     },
@@ -103,6 +109,13 @@ function NotebookPage() {
   );
 
   const handleExport = useCallback(() => {
+    track({
+      event: "interaction",
+      page: typeof window !== "undefined" ? window.location.pathname : "/notebook",
+      action: "export_notebook_json",
+      value: entries.length,
+    });
+
     const json = exportNotebookAsJson();
     const blob = new Blob([json], { type: "application/json;charset=utf-8" });
     const href = URL.createObjectURL(blob);
@@ -111,7 +124,7 @@ function NotebookPage() {
     link.download = `bks-notebook-${Date.now()}.json`;
     link.click();
     URL.revokeObjectURL(href);
-  }, []);
+  }, [entries.length]);
 
   return (
     <div className="page">

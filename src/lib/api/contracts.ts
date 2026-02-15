@@ -76,10 +76,48 @@ export const QueryRequestSchema = z.object({
   limit: z.number().int().positive().max(10_000).optional(),
 });
 
+export const AnalyticsQueryRequestSchema = z.object({
+  sql: z.string().trim().min(1),
+  limit: z.number().int().positive().max(10_000).optional(),
+});
+
 export const QueryDataSchema = z.object({
   columns: z.array(z.string()),
   rows: z.array(z.array(z.unknown())),
 });
+
+export const AnalyticsEventTypeSchema = z.enum([
+  "page_view",
+  "interaction",
+  "query",
+  "error",
+  "slow_experience",
+]);
+
+const BaseAnalyticsEventSchema = z.object({
+  event: AnalyticsEventTypeSchema,
+  page: z.string().trim().min(1).max(500),
+  action: z.string().trim().min(1).max(120).optional(),
+  label: z.string().trim().min(1).max(200).optional(),
+  value: z.number().finite().optional(),
+  error_code: z.string().trim().min(1).max(120).optional(),
+  session_id: z.string().trim().min(1).max(120),
+  ts: z.string().datetime(),
+});
+
+export const AnalyticsEventInputSchema = BaseAnalyticsEventSchema.strip();
+
+export const AnalyticsEventBatchRequestSchema = z
+  .object({
+    events: z.array(AnalyticsEventInputSchema).min(1).max(20),
+  })
+  .strip();
+
+export const AnalyticsEventV1Schema = BaseAnalyticsEventSchema.extend({
+  v: z.literal(1),
+  received_at: z.string().datetime(),
+  user_agent: z.string().trim().max(512).optional(),
+}).strip();
 
 export const FilterValueSchema = z.union([z.string(), z.number(), z.boolean(), z.null()]);
 
@@ -161,6 +199,10 @@ export const ApiErrorEnvelopeSchema = z.object({
 });
 
 export type QueryRequest = z.infer<typeof QueryRequestSchema>;
+export type AnalyticsQueryRequest = z.infer<typeof AnalyticsQueryRequestSchema>;
+export type AnalyticsEventInput = z.infer<typeof AnalyticsEventInputSchema>;
+export type AnalyticsEventBatchRequest = z.infer<typeof AnalyticsEventBatchRequestSchema>;
+export type AnalyticsEventV1 = z.infer<typeof AnalyticsEventV1Schema>;
 export type CrosstabRequest = z.infer<typeof CrosstabRequestSchema>;
 export type SchemaData = z.infer<typeof SchemaDataSchema>;
 export type QueryData = z.infer<typeof QueryDataSchema>;

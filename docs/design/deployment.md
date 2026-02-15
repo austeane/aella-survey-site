@@ -49,6 +49,8 @@ All endpoints are under the base path (`/survey/` in production):
 - `POST /survey/api/query` - bounded read-only SQL query
 - `GET /survey/api/stats/:column` - typed numeric/categorical summary stats
 - `GET /survey/api/crosstab` - x/y grouped counts with optional filters
+- `POST /survey/api/events` - analytics event batch ingestion (JSONL append)
+- `POST /survey/api/analytics` - authenticated read-only analytics SQL (`x-bks-analytics-key`)
 
 ## App Surface
 All pages are under the base path:
@@ -93,6 +95,8 @@ AWS_PROFILE=prod npx sst deploy --stage production
 Environment variables set on the service:
 - `MCP_TRANSPORT=streamable-http`
 - `BKS_PARQUET_PATH=/app/data/BKSPublic.parquet`
+- `BKS_ANALYTICS_API_URL=https://bks-explorer-production.up.railway.app/survey/api/analytics`
+- `BKS_ANALYTICS_KEY=<same secret as web service>`
 - `RAILWAY_DOCKERFILE_PATH=mcp-server/Dockerfile`
 - `PORT` — injected by Railway (default 8080)
 
@@ -134,8 +138,12 @@ curl -X POST https://www.austinwallace.ca/survey/api/query \
 |----------|-------|---------|
 | `VITE_BASE_PATH` | `/survey/` | Build-time base path for Vite + Nitro |
 | `NITRO_APP_BASE_URL` | `/survey/` | Runtime Nitro base URL override |
+| `BKS_LOG_LEVEL` | `info` (example) | Pino JSON logging verbosity |
+| `BKS_ANALYTICS_DIR` | `/data/analytics` (prod) | Persistent JSONL analytics directory |
+| `BKS_ANALYTICS_KEY` | `<secret>` | API key required by `/api/analytics` |
 
 ## Notes
+- Mount a Railway volume at `/data/analytics` for the `bks-explorer` service so analytics JSONL files persist across deploys.
 - Local dev runs at `/` (no `VITE_BASE_PATH` set). Production runs at `/survey/`.
 - The CloudFront proxy in austin-site passes requests through without rewriting paths.
 - If production shows stale content, redeploy with `railway up --service bks-explorer`.

@@ -28,6 +28,10 @@ const MCP_TOOLS = [
     name: "search_columns",
     description: "Finds columns by case-insensitive substring match.",
   },
+  {
+    name: "query_analytics",
+    description: "Queries event analytics through the authenticated `/api/analytics` proxy.",
+  },
 ] as const;
 
 function getAppBaseUrl(request: Request): string {
@@ -104,6 +108,8 @@ function buildDocument(request: Request): string {
     "- `POST /api/query` body: `{ sql: string, limit?: number }`",
     "- `GET /api/stats/:column` params: `column` path segment",
     "- `GET /api/crosstab` query: `x`, `y`, optional `limit`, optional `filters` (JSON)",
+    "- `POST /api/events` body: `{ events: AnalyticsEvent[] }` (max 20 events)",
+    "- `POST /api/analytics` body: `{ sql: string, limit?: number }` + header `x-bks-analytics-key`",
     "",
     "## Columns",
     ...columnLines,

@@ -1,6 +1,6 @@
 import type { AsyncDuckDB } from "@duckdb/duckdb-wasm";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ColumnCombobox } from "@/components/column-combobox";
 import { ColumnNameTooltip } from "@/components/column-name-tooltip";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { MiniHeatmap, type MiniHeatmapCell } from "@/components/charts/mini-heatmap";
 import { NetworkGraph, type NetworkEdge, type NetworkNode } from "@/components/charts/network-graph";
 import { QuestionIdentityCard } from "@/components/question-identity-card";
+import { track } from "@/lib/client/track";
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
@@ -367,6 +368,21 @@ function RelationshipsPage() {
   );
   const [expandedRelationship, setExpandedRelationship] = useState<string | null>(null);
 
+  const handleSelectColumn = useCallback(
+    (column: string, action: string) => {
+      if (column && column !== selectedColumn) {
+        track({
+          event: "interaction",
+          page: typeof window !== "undefined" ? window.location.pathname : "/relationships",
+          action,
+          label: column,
+        });
+      }
+      setSelectedColumn(column);
+    },
+    [selectedColumn],
+  );
+
   useEffect(() => {
     if (search.column && allRelationshipColumns.includes(search.column)) {
       setSelectedColumn(search.column);
@@ -523,7 +539,7 @@ function RelationshipsPage() {
             <ColumnCombobox
               columns={columnOptions}
               value={selectedColumn}
-              onValueChange={setSelectedColumn}
+              onValueChange={(value) => handleSelectColumn(value, "select_relationship_column")}
               includeNoneOption
               noneOptionLabel="Network overview"
               placeholder="Search for a question"
@@ -535,7 +551,7 @@ function RelationshipsPage() {
               type="button"
               variant="ghost"
               size="sm"
-              onClick={() => setSelectedColumn("")}
+              onClick={() => handleSelectColumn("", "clear_relationship_column")}
               className="w-full md:w-auto"
             >
               Clear selection
@@ -547,7 +563,7 @@ function RelationshipsPage() {
           nodes={nodes}
           edges={edges}
           selectedId={selectedColumn || null}
-          onSelect={setSelectedColumn}
+          onSelect={(value) => handleSelectColumn(value, "select_network_node")}
           compact={Boolean(selectedColumn)}
         />
 
@@ -601,7 +617,7 @@ function RelationshipsPage() {
                           <button
                             key={member}
                             type="button"
-                            onClick={() => setSelectedColumn(member)}
+                            onClick={() => handleSelectColumn(member, "select_cluster_member")}
                             className="null-badge"
                             style={
                               isActive

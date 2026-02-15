@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import type { SchemaData } from "@/lib/api/contracts";
 import { getSchema } from "@/lib/client/api";
+import { track } from "@/lib/client/track";
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { addNotebookEntry } from "@/lib/notebook-store";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
@@ -24,6 +25,12 @@ export const Route = createFileRoute("/sql")({
 interface QueryResult {
   columns: string[];
   rows: unknown[][];
+}
+
+const SLOW_DUCKDB_QUERY_MS = 1_500;
+
+function queryKind(sql: string): string {
+  return sql.trim().split(/\s+/)[0]?.toUpperCase() ?? "UNKNOWN";
 }
 
 const TEMPLATE_SQL: Array<{ name: string; sql: string }> = [
@@ -137,9 +144,19 @@ function SqlConsolePage() {
   const execute = useCallback(async () => {
     if (!db) return;
 
+    const statementType = queryKind(sql);
+    track({
+      event: "query",
+      page: typeof window !== "undefined" ? window.location.pathname : "/sql",
+      action: "execute_sql",
+      label: statementType,
+      value: limit,
+    });
+
     setRunning(true);
     setError(null);
 
+    const queryStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
     const conn = await db.connect();
 
     try {
@@ -159,10 +176,30 @@ function SqlConsolePage() {
         rows.push(row);
       }
 
+      const elapsedMs =
+        (typeof performance !== "undefined" ? performance.now() : Date.now()) - queryStartedAt;
+      if (elapsedMs >= SLOW_DUCKDB_QUERY_MS) {
+        track({
+          event: "slow_experience",
+          page: typeof window !== "undefined" ? window.location.pathname : "/sql",
+          action: "duckdb_query",
+          label: statementType,
+          value: Math.round(elapsedMs),
+        });
+      }
+
       setResult({ columns, rows });
       setRowCount(rows.length);
     } catch (executionError) {
-      setError(executionError instanceof Error ? executionError.message : "Query failed");
+      const message = executionError instanceof Error ? executionError.message : "Query failed";
+      track({
+        event: "error",
+        page: typeof window !== "undefined" ? window.location.pathname : "/sql",
+        action: "duckdb_query",
+        error_code: "DUCKDB_QUERY_ERROR",
+        label: `${statementType}: ${message}`,
+      });
+      setError(message);
       setResult(null);
       setRowCount(undefined);
     } finally {
@@ -218,6 +255,13 @@ function SqlConsolePage() {
   function exportCsv() {
     if (!result) return;
 
+    track({
+      event: "interaction",
+      page: typeof window !== "undefined" ? window.location.pathname : "/sql",
+      action: "export_csv",
+      value: result.rows.length,
+    });
+
     const escaped = (value: unknown) => {
       const text = String(value ?? "");
       return `"${text.replaceAll('"', '""')}"`;
@@ -256,7 +300,15 @@ function SqlConsolePage() {
                   type="button"
                   variant="ghost"
                   className="w-full justify-start"
-                  onClick={() => setSql(template.sql)}
+                  onClick={() => {
+                    track({
+                      event: "interaction",
+                      page: typeof window !== "undefined" ? window.location.pathname : "/sql",
+                      action: "select_template",
+                      label: template.name,
+                    });
+                    setSql(template.sql);
+                  }}
                 >
                   {template.name}
                 </Button>

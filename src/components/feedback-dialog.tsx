@@ -1,6 +1,8 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import { track } from "@/lib/client/track";
 
 type Status = "idle" | "sending" | "sent" | "error";
 
@@ -18,6 +20,16 @@ export function FeedbackDialog({
   const [message, setMessage] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<Status>("idle");
+
+  useEffect(() => {
+    if (!open) return;
+
+    track({
+      event: "interaction",
+      page: pathname,
+      action: "feedback_open",
+    });
+  }, [open, pathname]);
 
   const reset = () => {
     setMessage("");
@@ -49,14 +61,32 @@ export function FeedbackDialog({
       if (!res.ok) {
         const body = await res.json().catch(() => null);
         if (body?.error?.code === "RATE_LIMITED") {
+          track({
+            event: "interaction",
+            page: pathname,
+            action: "feedback_submit",
+            label: "rate_limited",
+          });
           setStatus("error");
           return;
         }
         throw new Error("Send failed");
       }
 
+      track({
+        event: "interaction",
+        page: pathname,
+        action: "feedback_submit",
+        label: "success",
+      });
       setStatus("sent");
     } catch {
+      track({
+        event: "interaction",
+        page: pathname,
+        action: "feedback_submit",
+        label: "error",
+      });
       setStatus("error");
     }
   };

@@ -8,7 +8,9 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
+import { ErrorBoundary } from "@/components/error-boundary";
 import { FeedbackDialog } from "@/components/feedback-dialog";
+import { track } from "@/lib/client/track";
 import { DuckDBProvider } from "@/lib/duckdb/provider";
 import appCss from "../styles.css?url";
 
@@ -101,6 +103,14 @@ function RootComponent() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileExploreOpen, setMobileExploreOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+
+  useEffect(() => {
+    track({
+      event: "page_view",
+      page: pathname,
+      action: "route_change",
+    });
+  }, [pathname]);
 
   useEffect(() => {
     if (!mobileMenuOpen) return;
@@ -279,7 +289,9 @@ function RootComponent() {
           </div>
         </nav>
         <main className="app-main">
-          <Outlet />
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
         </main>
       </div>
       <FeedbackDialog open={feedbackOpen} onOpenChange={setFeedbackOpen} />

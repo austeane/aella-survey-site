@@ -27,6 +27,12 @@ export interface QueryResult {
   rowObjects: Array<Record<string, unknown>>;
 }
 
+export interface RunQueryWithSetupOptions {
+  timeoutMs?: number;
+  setupStatements?: string[];
+  requireParquet?: boolean;
+}
+
 function parquetPath(): string {
   return process.env.BKS_PARQUET_PATH ?? resolve(process.cwd(), "data", "BKSPublic.parquet");
 }
@@ -42,13 +48,8 @@ function ensureParquetExists() {
   }
 }
 
-function prepareSql(userSql: string): string {
-  return `
-    CREATE OR REPLACE TEMP VIEW ${DATA_TABLE_NAME} AS
-    SELECT * FROM read_parquet('${parquetLiteral()}');
-
-    ${userSql}
-  `;
+function dataViewStatement(): string {
+  return `CREATE OR REPLACE TEMP VIEW ${DATA_TABLE_NAME} AS SELECT * FROM read_parquet('${parquetLiteral()}')`;
 }
 
 function normalizeValue(value: unknown): unknown {
@@ -86,6 +87,17 @@ function isMissingExecutable(error: unknown): boolean {
   );
 }
 
+function cleanedSetupStatements(statements: string[]): string[] {
+  return statements
+    .map((statement) => statement.trim())
+    .filter((statement) => statement.length > 0);
+}
+
+function composeCliSql(userSql: string, setupStatements: string[]): string {
+  const statements = [...cleanedSetupStatements(setupStatements), userSql.trim()];
+  return `${statements.join(";\n")};`;
+}
+
 async function getNodeApiInstance() {
   if (!nodeApiInstancePromise) {
     const moduleName = "@duckdb/node-api";
@@ -98,21 +110,25 @@ async function getNodeApiInstance() {
 }
 
 async function executeDuckDbNodeApi(
-  sql: string,
+  userSql: string,
   timeoutMs: number,
+  setupStatements: string[],
+  requireParquet: boolean,
 ): Promise<Array<Record<string, unknown>>> {
-  ensureParquetExists();
+  if (requireParquet) {
+    ensureParquetExists();
+  }
 
   const instance = await getNodeApiInstance();
   const connection = await instance.connect();
   let timer: ReturnType<typeof setTimeout> | undefined;
 
   try {
-    await connection.run(
-      `CREATE OR REPLACE TEMP VIEW ${DATA_TABLE_NAME} AS SELECT * FROM read_parquet('${parquetLiteral()}')`,
-    );
+    for (const statement of cleanedSetupStatements(setupStatements)) {
+      await connection.run(statement);
+    }
 
-    const queryPromise = connection.runAndReadAll(sql).then((reader: any) =>
+    const queryPromise = connection.runAndReadAll(userSql).then((reader: any) =>
       reader.getRowObjectsJS() as Array<Record<string, unknown>>,
     );
 
@@ -151,10 +167,18 @@ async function executeDuckDbNodeApi(
   }
 }
 
-async function executeDuckDbJson(sql: string, timeoutMs: number): Promise<Array<Record<string, unknown>>> {
-  ensureParquetExists();
+async function executeDuckDbJson(
+  userSql: string,
+  timeoutMs: number,
+  setupStatements: string[],
+  requireParquet: boolean,
+): Promise<Array<Record<string, unknown>>> {
+  if (requireParquet) {
+    ensureParquetExists();
+  }
 
   try {
+    const sql = composeCliSql(userSql, setupStatements);
     const { stdout } = await execFileAsync(
       "duckdb",
       ["-json", ":memory:", "-c", sql],
@@ -177,7 +201,7 @@ async function executeDuckDbJson(sql: string, timeoutMs: number): Promise<Array<
     return parsed.map((row) => normalizeRow((row ?? {}) as Record<string, unknown>));
   } catch (error: unknown) {
     if (isMissingExecutable(error)) {
-      return executeDuckDbNodeApi(sql, timeoutMs);
+      return executeDuckDbNodeApi(userSql, timeoutMs, setupStatements, requireParquet);
     }
 
     if (error && typeof error === "object" && "code" in error && error.code === "ETIMEDOUT") {
@@ -195,11 +219,15 @@ async function executeDuckDbJson(sql: string, timeoutMs: number): Promise<Array<
   }
 }
 
-export async function runQuery(
+async function executeQuery(
   userSql: string,
-  timeoutMs = DEFAULT_QUERY_TIMEOUT_MS,
+  {
+    timeoutMs = DEFAULT_QUERY_TIMEOUT_MS,
+    setupStatements = [],
+    requireParquet = false,
+  }: RunQueryWithSetupOptions = {},
 ): Promise<QueryResult> {
-  const rowObjects = await executeDuckDbJson(prepareSql(userSql), timeoutMs);
+  const rowObjects = await executeDuckDbJson(userSql, timeoutMs, setupStatements, requireParquet);
   const columns = rowObjects.length > 0 ? Object.keys(rowObjects[0]) : [];
   const rows = rowObjects.map((row) => columns.map((column) => row[column] ?? null));
 
@@ -208,6 +236,32 @@ export async function runQuery(
     rows,
     rowObjects,
   };
+}
+
+export async function runQuery(
+  userSql: string,
+  timeoutMs = DEFAULT_QUERY_TIMEOUT_MS,
+): Promise<QueryResult> {
+  return executeQuery(userSql, {
+    timeoutMs,
+    setupStatements: [dataViewStatement()],
+    requireParquet: true,
+  });
+}
+
+export async function runQueryWithSetup(
+  userSql: string,
+  {
+    timeoutMs = DEFAULT_QUERY_TIMEOUT_MS,
+    setupStatements = [],
+    requireParquet = false,
+  }: RunQueryWithSetupOptions = {},
+): Promise<QueryResult> {
+  return executeQuery(userSql, {
+    timeoutMs,
+    setupStatements,
+    requireParquet,
+  });
 }
 
 export async function runSingleRow(

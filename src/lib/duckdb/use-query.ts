@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { track } from "@/lib/client/track";
 import { useDuckDB } from "./provider";
 
 export interface DuckDBQueryResult {
@@ -13,6 +14,12 @@ interface UseDuckDBQueryReturn {
   error: string | null;
   /** Re-run the query manually. */
   refetch: () => void;
+}
+
+const SLOW_DUCKDB_QUERY_MS = 1_500;
+
+function queryKind(sql: string): string {
+  return sql.trim().split(/\s+/)[0]?.toUpperCase() ?? "UNKNOWN";
 }
 
 function normalizeValue(value: unknown): unknown {
@@ -38,6 +45,7 @@ export function useDuckDBQuery(sql: string | null): UseDuckDBQueryReturn {
   const [error, setError] = useState<string | null>(null);
 
   const generationRef = useRef(0);
+  const lastErrorSignatureRef = useRef<string | null>(null);
 
   const execute = useCallback(async () => {
     if (!db || !sql) {
@@ -49,6 +57,9 @@ export function useDuckDBQuery(sql: string | null): UseDuckDBQueryReturn {
     setError(null);
 
     let conn;
+    const queryStartedAt = typeof performance !== "undefined" ? performance.now() : Date.now();
+    const page = typeof window !== "undefined" ? window.location.pathname : "/";
+
     try {
       conn = await db.connect();
       const arrowResult = await conn.query(sql);
@@ -66,11 +77,37 @@ export function useDuckDBQuery(sql: string | null): UseDuckDBQueryReturn {
         rows.push(row);
       }
 
+      const elapsedMs =
+        (typeof performance !== "undefined" ? performance.now() : Date.now()) - queryStartedAt;
+      if (elapsedMs >= SLOW_DUCKDB_QUERY_MS) {
+        track({
+          event: "slow_experience",
+          page,
+          action: "duckdb_query",
+          label: queryKind(sql),
+          value: Math.round(elapsedMs),
+        });
+      }
+
       setData({ columns, rows });
       setLoading(false);
+      lastErrorSignatureRef.current = null;
     } catch (err: unknown) {
       if (generation !== generationRef.current) return;
-      setError(err instanceof Error ? err.message : "Query execution failed");
+      const message = err instanceof Error ? err.message : "Query execution failed";
+      const signature = `${queryKind(sql)}::${message}`;
+      if (lastErrorSignatureRef.current !== signature) {
+        track({
+          event: "error",
+          page,
+          action: "duckdb_query",
+          error_code: "DUCKDB_QUERY_ERROR",
+          label: `${queryKind(sql)}: ${message}`,
+        });
+        lastErrorSignatureRef.current = signature;
+      }
+
+      setError(message);
       setData(null);
       setLoading(false);
     } finally {

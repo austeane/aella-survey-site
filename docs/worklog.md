@@ -399,3 +399,47 @@ Also includes schema enhancement plan (add `nullMeaning`, `displayName` fields),
 - Notes:
   - Vitest still reports the pre-existing shutdown warning (`close timed out after 10000ms`) after passing tests.
   - Build still reports large chunk warnings (including generated relationships artifact size); no functional build failures.
+
+### Observability plan implementation completed (2026-02-15)
+
+**Plan document**: `docs/plans/active/observability.md`
+
+- Implemented Phase 1 (server structured logging):
+  - Added `src/lib/server/logger.ts` using Pino.
+  - Wired route-level structured request logging across API endpoints (`/api/query`, `/api/crosstab`, `/api/stats/$column`, `/api/schema`, `/api/feedback`) and debug-level health logs (`/api/health`).
+
+- Implemented Phase 2 (event ingestion + storage):
+  - Added analytics contracts in `src/lib/api/contracts.ts`.
+  - Added `src/lib/server/event-store.ts` with daily JSONL rotation and serialized append queue.
+  - Added `src/routes/api/events.ts` with Zod validation, payload cap, event-ingestion rate limiting, enrichment (`received_at`, `user_agent`), and `202` acceptance responses.
+  - Extended rate limiting in `src/lib/server/rate-limit.ts` with a separate high-throughput ingestion limiter.
+
+- Implemented Phase 3 (client telemetry wiring):
+  - Added `src/lib/client/track.ts` (sessionStorage session IDs, in-memory batching, `sendBeacon` + fetch fallback, lifecycle flush).
+  - Added automatic `page_view` tracking in `src/routes/__root.tsx`.
+  - Wired high-value interactions:
+    - `src/routes/sql.tsx`: `execute_sql`, `select_template`, `export_csv`
+    - `src/routes/explore/crosstab.tsx`: `run_crosstab`, `cell_drilldown`, `change_normalization`
+    - `src/routes/profile.tsx`: `run_profile`
+    - `src/routes/columns.tsx` + `src/routes/relationships.tsx`: selection interactions
+    - `src/components/feedback-dialog.tsx`: `feedback_open`, `feedback_submit`
+    - `src/routes/notebook.tsx`: export/delete interactions
+  - Added frustration signals:
+    - `src/lib/duckdb/provider.tsx`: `DUCKDB_INIT_ERROR`, slow init telemetry
+    - `src/lib/duckdb/use-query.ts`: `DUCKDB_QUERY_ERROR`, slow query telemetry
+
+- Implemented Phase 4 (analytics query API):
+  - Added `src/routes/api/analytics.ts` with API-key auth (`x-bks-analytics-key`), read-only SQL guardrails, bounded limit enforcement, DuckDB temp `events` view over JSONL, and empty-result behavior when no files exist.
+  - Extended DuckDB server utilities in `src/lib/server/db.ts` with `runQueryWithSetup(...)` for custom temp-view query contexts.
+  - Updated `/llms.txt` route docs (`src/routes/llms[.]txt.ts`) to include new analytics endpoints and MCP tool surface.
+
+- Implemented Phase 5 (UI error boundary):
+  - Added `src/components/error-boundary.tsx` and wrapped root outlet in `src/routes/__root.tsx`.
+  - Boundary fallback includes retry path and emits analytics error events.
+
+- Implemented optional Phase 6 (MCP extension):
+  - Added `query_analytics` tool to `mcp-server/server.py`, proxying authenticated analytics SQL requests to Explorer `/api/analytics`.
+
+- Documentation sync completed per session hygiene:
+  - Updated `docs/plans/active/observability.md` status to implemented + completion snapshot.
+  - Updated `docs/design/architecture.md`, `docs/design/deployment.md`, and `docs/design/mcps.md` with observability/analytics architecture, endpoints, env vars, and MCP tool updates.
