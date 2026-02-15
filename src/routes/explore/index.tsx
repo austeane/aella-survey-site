@@ -18,13 +18,21 @@ type ExploreDestination = {
 
 const DESTINATIONS: ExploreDestination[] = [
   {
-    title: "Compare Questions",
+    title: "Build a Profile",
     tag: "Most popular",
+    question: "\"What makes bisexual women different from the rest of the sample?\"",
+    description: "Define a group with filters, see personality snapshots, and discover which traits over-index.",
+    to: "/profile",
+    cta: "Open Profile Builder",
+    featured: true,
+  },
+  {
+    title: "Compare Questions",
+    tag: "Crosstabs",
     question: "\"How does political orientation break down by gender?\"",
     description: "Pick any two questions, compare their distributions side-by-side, and drill into specific cells.",
     to: "/explore/crosstab",
     cta: "Open Compare Questions",
-    featured: true,
   },
   {
     title: "Browse Topics",
@@ -33,14 +41,6 @@ const DESTINATIONS: ExploreDestination[] = [
     description: "Search all 365 questions by keyword or topic, and inspect answer distributions and metadata.",
     to: "/columns",
     cta: "Open Browse Topics",
-  },
-  {
-    title: "Build a Profile",
-    tag: "Cohorts",
-    question: "\"What makes bisexual women different from the rest of the sample?\"",
-    description: "Define a group with filters and see which answers over-index compared with everyone else.",
-    to: "/profile",
-    cta: "Open Profile Builder",
   },
   {
     title: "What's Connected?",
