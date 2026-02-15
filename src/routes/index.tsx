@@ -461,9 +461,39 @@ function HomePage() {
         <SectionHeader number="04" title="About the Data" />
         <p>
           The original survey collected ~970,000 responses. This public dataset is a 15,503-respondent anonymized
-          subsample — limited to ages 18–32 in Western countries, with noise injection and binning to protect privacy.
-          Use patterns directionally rather than as exact population estimates.
+          subsample, representative by age, gender, and politics but aggressively noised and binned.
         </p>
+
+        <div className="border border-[var(--rule)] mt-2">
+          <article className="caveat-item px-4">
+            <p className="caveat-title">Anonymization</p>
+            <p className="caveat-description">
+              98.4% of responses were dropped into a representative subsample, columns were aggressively binned,
+              demographic info was reduced, and multiple layers of noise were added. If a row looks like someone
+              specific, it almost certainly isn't.
+            </p>
+          </article>
+          <article className="caveat-item px-4">
+            <p className="caveat-title">Correlations are dampened</p>
+            <p className="caveat-description">
+              Noise reduces correlations by roughly 25% (range 15–30%). A correlation of 0.5 in this data was
+              likely ~0.62 in the original. Patterns are real in direction, weaker in magnitude.
+            </p>
+          </article>
+          <article className="caveat-item px-4">
+            <p className="caveat-title">Limited demographic window</p>
+            <p className="caveat-description">
+              Ages 14–32, US/Canada and Europe only. Some extreme fetishes were removed.
+            </p>
+          </article>
+          <article className="caveat-item px-4">
+            <p className="caveat-title">Directional, not definitive</p>
+            <p className="caveat-description">
+              Good for spotting patterns and generating hypotheses. Not a source of precise measurements.
+            </p>
+          </article>
+        </div>
+
         <p className="mono-value text-[var(--ink-faded)]">
           Tip: use Data Quality to see which questions have missing answers before making strong claims.
         </p>

@@ -267,9 +267,49 @@ function DashboardPage() {
             />
           </section>
 
+          <section className="editorial-panel">
+            <SectionHeader number="01" title="Anonymization &amp; Noise" />
+            <p className="mt-3 mb-2">
+              The public dataset is heavily anonymized. These trade-offs affect every query you run.
+            </p>
+            <div className="mt-3">
+              <article className="caveat-item">
+                <p className="caveat-title">How the data was anonymized</p>
+                <p className="caveat-description">
+                  Sampled down to 1.6% of responses (representative by age, gender, politics), columns binned,
+                  demographics reduced, multiple layers of noise added. Methods deliberately undisclosed to
+                  protect privacy.
+                </p>
+              </article>
+              <article className="caveat-item">
+                <p className="caveat-title">Effect on correlations</p>
+                <p className="caveat-description">
+                  Correlations are preserved in direction but reduced ~25% in magnitude (range 15–30%). For
+                  example, r=0.5 here was likely ~0.62 in the original. Almost all correlations are smaller
+                  than reality.
+                </p>
+              </article>
+              <article className="caveat-item">
+                <p className="caveat-title">What this means for your analysis</p>
+                <p className="caveat-description">
+                  Patterns you find are probably real but weaker than shown. Counterintuitive results may be
+                  cleaning artifacts. Aella has invited people to flag oddities.
+                </p>
+              </article>
+              <article className="caveat-item">
+                <p className="caveat-title">Demographic scope</p>
+                <p className="caveat-description">
+                  Ages 14–32, Western countries (US/Canada, Europe). Some extreme fetishes removed. The
+                  representative sampling means base rates are likely closer to reality than the full unsampled
+                  dataset.
+                </p>
+              </article>
+            </div>
+          </section>
+
           <section className="grid gap-8 lg:grid-cols-2">
             <div>
-              <SectionHeader number="01" title="Global Caveats" />
+              <SectionHeader number="02" title="Global Caveats" />
               <div className="mt-3">
                 {schema.caveats.global.map((key) => {
                   const definition = schema.caveats.definitions.find((item) => item.key === key);
@@ -287,7 +327,7 @@ function DashboardPage() {
             </div>
 
             <div>
-              <SectionHeader number="02" title="Most Missing-Answer Questions" />
+              <SectionHeader number="03" title="Most Missing-Answer Questions" />
               <div className="mt-3">
                 <DataTable
                   rows={topMissingColumns}
@@ -334,7 +374,7 @@ function DashboardPage() {
 
           <section className="grid gap-8 lg:grid-cols-2">
             <div>
-              <SectionHeader number="03" title="Tag Breakdown" />
+              <SectionHeader number="04" title="Tag Breakdown" />
               <div className="mt-3">
                 <SimpleBarChart
                   data={tagBreakdown.map((row) => ({
@@ -349,7 +389,7 @@ function DashboardPage() {
             </div>
 
             <div>
-              <SectionHeader number="04" title="Missing-Answer Distribution" />
+              <SectionHeader number="05" title="Missing-Answer Distribution" />
               <div className="mt-3">
                 <SimpleBarChart
                   data={missingnessHistogram.map((row) => ({
@@ -366,7 +406,7 @@ function DashboardPage() {
 
           <section className="grid gap-8 lg:grid-cols-2">
             <div>
-              <SectionHeader number="05" title="Best-Answered Questions" />
+              <SectionHeader number="06" title="Best-Answered Questions" />
               <div className="mt-3">
                 <DataTable
                   rows={analysisFriendlyColumns}
@@ -409,7 +449,7 @@ function DashboardPage() {
             </div>
 
             <div>
-              <SectionHeader number="06" title="Most-Skipped Questions" />
+              <SectionHeader number="07" title="Most-Skipped Questions" />
               <div className="mt-3">
                 <DataTable
                   rows={gatedColumns}
@@ -455,7 +495,7 @@ function DashboardPage() {
           </section>
 
           <section className="raised-panel space-y-4">
-            <SectionHeader number="07" title="Inspect a Question" />
+            <SectionHeader number="08" title="Inspect a Question" />
 
             <label className="editorial-label max-w-[460px]">
               Question
