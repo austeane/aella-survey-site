@@ -314,14 +314,35 @@ async function main() {
     const approxCardinality = normalizeInteger(metrics.approx_cardinality, 0);
 
     const nullRatio = totalCount > 0 ? (totalCount - nonNullCount) / totalCount : 0;
+    const logicalType = inferLogicalType(name, duckdbType, approxCardinality);
+
+    let approxTopValues;
+    if (logicalType === "categorical" && approxCardinality <= 120 && nonNullCount > 0) {
+      const topValuesReader = await connection.runAndReadAll(
+        `SELECT
+           cast(${quotedColumn} AS VARCHAR) AS value,
+           count(*)::BIGINT AS cnt
+         FROM data
+         WHERE ${quotedColumn} IS NOT NULL
+         GROUP BY 1
+         ORDER BY cnt DESC
+         LIMIT 5`,
+      );
+
+      const topRows = topValuesReader.getRowObjectsJS();
+      approxTopValues = topRows
+        .map((topRow) => String(topRow.value ?? ""))
+        .filter(Boolean);
+    }
 
     columns.push({
       name,
       displayName: buildDisplayName(name),
       duckdbType,
-      logicalType: inferLogicalType(name, duckdbType, approxCardinality),
+      logicalType,
       nullRatio: roundRatio(nullRatio),
       approxCardinality,
+      ...(approxTopValues && approxTopValues.length > 0 ? { approxTopValues } : {}),
       tags: inferTags(name),
       nullMeaning: inferNullMeaning(name, nullRatio),
     });

@@ -47,6 +47,7 @@ export const ColumnMetadataSchema = z.object({
   logicalType: LogicalTypeSchema,
   nullRatio: z.number().min(0).max(1),
   approxCardinality: z.number().int().nonnegative(),
+  approxTopValues: z.array(z.string()).optional(),
   tags: z.array(CategoryTagSchema),
   valueLabels: z.record(z.string(), z.string()).optional(),
   nullMeaning: NullMeaningSchema.default("UNKNOWN"),

@@ -2,7 +2,7 @@
   "dataset": {
     "name": "Big Kink Survey (Public Sample)",
     "sourcePath": "/Users/austin/dev/kink/data/BKSPublic.parquet",
-    "generatedAt": "2026-02-14T11:07:13.376Z",
+    "generatedAt": "2026-02-15T01:49:19.332Z",
     "rowCount": 15503,
     "columnCount": 365
   },
@@ -14,6 +14,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "3.0",
+        "-2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -26,6 +33,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0333,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "2.0",
+        "1.0",
+        "3.0",
+        "0.0",
+        "-2.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -38,6 +52,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0333,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "2.0",
+        "3.0",
+        "1.0",
+        "0.0",
+        "-2.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -51,6 +72,13 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "1.0",
+        "2.0",
+        "-2.0",
+        "3.0",
+        "0.0"
+      ],
       "tags": [
         "other"
       ],
@@ -63,6 +91,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "2.0",
+        "1.0",
+        "-1.0",
+        "0.0",
+        "-2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -75,6 +110,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6457,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -87,6 +129,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7276,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -99,6 +148,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0002,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "3.0",
+        "1.0",
+        "4.0",
+        "5.0"
+      ],
       "tags": [
         "other"
       ],
@@ -111,6 +167,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "-8.0",
+        "-5.0",
+        "-3.0",
+        "-2.0",
+        "-1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -123,6 +186,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "-8.0",
+        "-5.0",
+        "-3.0",
+        "-2.0",
+        "-1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -135,6 +205,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "-8.0",
+        "-5.0",
+        "-3.0",
+        "-2.0",
+        "-1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -147,6 +224,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0003,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "2.0",
+        "1.0",
+        "-3.0",
+        "-2.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -160,6 +244,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.8238,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "The other person",
+        "Me"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -173,6 +261,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5832,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "2.0",
+        "3.0",
+        "1.0",
+        "0.0",
+        "-3.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -185,6 +280,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4361,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "0.0",
+        "2.0",
+        "5.0"
+      ],
       "tags": [
         "other"
       ],
@@ -197,6 +299,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6697,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "3.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -209,6 +318,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2497,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "4.0",
+        "5.0",
+        "1.0",
+        "3.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -222,6 +338,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2497,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -248,6 +371,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.1762,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "-3.0",
+        "-2.0",
+        "0.0",
+        "1.0",
+        "-1.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -261,6 +391,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.1762,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "-3.0",
+        "0.0",
+        "-2.0",
+        "1.0",
+        "2.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -274,6 +411,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.1762,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "2.0",
+        "1.0",
+        "3.0",
+        "0.0",
+        "-3.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -287,6 +431,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.1762,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "2.0",
+        "1.0",
+        "-3.0",
+        "3.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -300,6 +451,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "-3.0",
+        "-2.0",
+        "1.0",
+        "2.0",
+        "0.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -313,6 +471,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8295,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Agree",
+        "I haven't had a relationship end",
+        "Strongly agree",
+        "Neutral",
+        "Disagree"
+      ],
       "tags": [
         "demographic"
       ],
@@ -325,6 +490,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "-2.0",
+        "1.0",
+        "-1.0",
+        "0.0",
+        "2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -337,6 +509,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5109,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "-3.0",
+        "-2.0",
+        "1.0",
+        "0.0",
+        "-1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -349,6 +528,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "1.0",
+        "2.0",
+        "0.0",
+        "3.0",
+        "-1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -361,6 +547,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8295,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "I haven't hooked up",
+        "Kinda good",
+        "Neutral",
+        "Kinda bad",
+        "Really good"
+      ],
       "tags": [
         "fetish"
       ],
@@ -373,6 +566,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6698,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Very eager/wants it",
+        "Moderately eager/wants it",
+        "Slightly eager/wants it",
+        "Slightly upset/doesn't want it",
+        "Moderately upset/doesn't want it"
+      ],
       "tags": [
         "other"
       ],
@@ -385,6 +585,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6698,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Equally mild and severe",
+        "Slightly mild",
+        "Moderately mild",
+        "Slightly severe",
+        "Very mild"
+      ],
       "tags": [
         "other"
       ],
@@ -397,6 +604,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0004,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Full, enthusiastic consent",
+        "Mostly consenting, slightly nonconsenting",
+        "Equally consenting and nonconsenting",
+        "Mostly nonconsenting, slightly consenting",
+        "Full nonconsent"
+      ],
       "tags": [
         "demographic",
         "fetish",
@@ -411,6 +625,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.8296,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "I do",
+        "Equally them and me",
+        "I haven't had a relationship end",
+        "The other person does"
+      ],
       "tags": [
         "demographic"
       ],
@@ -435,6 +655,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6698,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -447,6 +674,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.916,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "-2.0",
+        "-3.0",
+        "1.0",
+        "-1.0",
+        "0.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -459,6 +693,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8478,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "3.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -471,6 +712,13 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "29-32",
+        "25-28",
+        "21-24",
+        "14-17",
+        "18-20"
+      ],
       "tags": [
         "demographic"
       ],
@@ -483,6 +731,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7329,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -508,6 +763,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.2995,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "-1.0",
+        "1.0",
+        "2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -532,6 +792,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0847,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "0.0",
+        "-1.0",
+        "-2.0",
+        "1.0",
+        "2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -544,6 +811,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.3414,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -556,6 +830,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.9518,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "No",
+        "Uncertain",
+        "Yes"
+      ],
       "tags": [
         "other"
       ],
@@ -568,6 +847,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.9005,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "No",
+        "Yes",
+        "Don't want to answer"
+      ],
       "tags": [
         "other"
       ],
@@ -580,6 +864,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.0002,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "No",
+        "Yes"
+      ],
       "tags": [
         "fetish"
       ],
@@ -604,6 +892,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0853,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "13-14yo",
+        "11-12yo",
+        "15-16yo",
+        "9-10yo",
+        "17-18yo"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -617,6 +912,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0003,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "12-13",
+        "10-11",
+        "14-15",
+        "8-9",
+        "7 or younger"
+      ],
       "tags": [
         "demographic"
       ],
@@ -629,6 +931,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9478,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "5.0",
+        "4.0",
+        "3.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -641,6 +950,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.902,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "2.0",
+        "4.0",
+        "1.0",
+        "0.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -653,6 +969,10 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "1.0",
+        "0.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -665,6 +985,10 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "Overweight+",
+        "Not overweight"
+      ],
       "tags": [
         "demographic"
       ],
@@ -691,6 +1015,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4586,
       "approxCardinality": 21,
+      "approxTopValues": [
+        "Handcuffs",
+        "Blindfolds",
+        "Leashes/collars",
+        "Shibari",
+        "Gags"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -704,6 +1035,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9452,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -716,6 +1054,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.8444,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "No",
+        "Yes, sometimes/often",
+        "Rarely/with great effort"
+      ],
       "tags": [
         "other"
       ],
@@ -728,6 +1071,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.733,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "4.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -764,6 +1114,10 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "None",
+        "Any"
+      ],
       "tags": [
         "demographic",
         "derived"
@@ -777,6 +1131,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.0007,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Medium",
+        "Intolerant",
+        "Tolerant"
+      ],
       "tags": [
         "demographic",
         "derived"
@@ -790,6 +1149,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4673,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -814,6 +1180,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0002,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "About average attractiveness",
+        "Slightly more attractive",
+        "Slightly less attractive",
+        "Moderately more attractive",
+        "Moderately less attractive"
+      ],
       "tags": [
         "demographic"
       ],
@@ -839,6 +1212,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9557,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "2.0",
+        "5.0",
+        "4.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -851,6 +1231,13 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "-8.0",
+        "-5.0",
+        "-3.0",
+        "-2.0",
+        "-1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -863,6 +1250,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9686,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "0.0",
+        "1.0",
+        "2.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -875,6 +1269,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Yes: New but still similar to my preexisting fetishes",
+        "Yes: Variations on my current preexisting fetishes",
+        "Yes: New and totally different to my preexisting fetishes",
+        "No",
+        "I don't really have fetishes"
+      ],
       "tags": [
         "fetish"
       ],
@@ -887,6 +1288,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7829,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "Yes, maybe/slightly",
+        "Yes, moderately",
+        "Yes, severely",
+        "No",
+        "I don't menstruate/I don't know"
+      ],
       "tags": [
         "other"
       ],
@@ -899,6 +1307,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.9897,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "A little maybe?",
+        "Not at all",
+        "Yeah I want baby"
+      ],
       "tags": [
         "other"
       ],
@@ -911,6 +1324,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2415,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -924,6 +1344,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5663,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -936,6 +1363,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5663,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -948,6 +1382,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4388,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "5.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1000,6 +1441,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9198,
       "approxCardinality": 15,
+      "approxTopValues": [
+        "aunt/nephew",
+        "uncle/niece",
+        "aunt/nephew,uncle/niece",
+        "aunt/nephew,aunt/niece,uncle/niece",
+        "aunt/nephew,aunt/niece"
+      ],
       "tags": [
         "other"
       ],
@@ -1012,6 +1460,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9821,
       "approxCardinality": 104,
+      "approxTopValues": [
+        "Others bleeding",
+        "Bleeding myself",
+        "Consuming it myself",
+        "Others bleeding,Playing with it myself (e.g., smearing),Others playing with it (e.g., smearing)",
+        "Playing with it myself (e.g., smearing)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1048,6 +1503,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.936,
       "approxCardinality": 55,
+      "approxTopValues": [
+        "Other",
+        "Becoming giant (growing in size/height)",
+        "Becoming giant (growing in size/height),Becoming tiny (shrinking in size/height)",
+        "Becoming tiny (shrinking in size/height)",
+        "Substance changes (e.g., turning into goo)"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1061,6 +1523,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9846,
       "approxCardinality": 48,
+      "approxTopValues": [
+        "Grandfather and granddaughter",
+        "Grandmother and grandson",
+        "Grandmother and granddaughter,Grandmother and grandson,Grandfather and granddaughter,Grandfather and grandson,Grandmother/father together and granddaughter,Grandmother/father together and grandson,Grandmother and granddaughter/grandson together,Grandfather and granddaughter/grandson together",
+        "Grandmother and grandson,Grandfather and granddaughter",
+        "Grandfather and grandson"
+      ],
       "tags": [
         "other"
       ],
@@ -1134,6 +1603,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8765,
       "approxCardinality": 46,
+      "approxTopValues": [
+        "brother/sister",
+        "brother/sister,brother/sister (with age gap)",
+        "brother/sister,brother/sister (with age gap),sister/sister,sister/sister (with age gap)",
+        "brother/sister,sister/sister",
+        "brother/sister (with age gap)"
+      ],
       "tags": [
         "other"
       ],
@@ -1146,6 +1622,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.993,
       "approxCardinality": 75,
+      "approxTopValues": [
+        "Consuming it myself,Others consuming it,Making smegma myself,Others making smegma,Playing with it myself (e.g., smearing),Others playing with it (e.g., smearing),Putting smegma into my orifices,Putting smegma into others' orifices,Huge amounts of smegma,Unusual smegma (e.g., coloring, thickness)",
+        "Others making smegma",
+        "Consuming it myself,Others making smegma",
+        "Others consuming it",
+        "Others consuming it,Making smegma myself,Others playing with it (e.g., smearing)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1194,6 +1677,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9923,
       "approxCardinality": 66,
+      "approxTopValues": [
+        "Others vomiting",
+        "Consuming it myself,Others consuming it,Vomiting myself,Others vomiting,Playing with it myself (e.g., smearing),Others playing with it (e.g., smearing),Putting vomit into my orifices,Putting vomit into others' orifices,Huge amounts of vomit,Unusual vomit (e.g., coloring, thickness)",
+        "Others vomiting,Huge amounts of vomit",
+        "Others vomiting,Others playing with it (e.g., smearing),Huge amounts of vomit",
+        "Consuming it myself,Others vomiting"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1218,6 +1708,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.943,
       "approxCardinality": 53,
+      "approxTopValues": [
+        "Women with a penis,Women with both a penis and a vagina",
+        "Women with a penis",
+        "Women with both a penis and a vagina",
+        "Men with breasts,Men with a vagina,Men with both a penis and vagina,Women with a penis,Women without breasts,Women with both a penis and a vagina",
+        "Women with a penis,Women without breasts,Women with both a penis and a vagina"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1231,6 +1728,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.0005,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Sometimes",
+        "Never",
+        "Often"
+      ],
       "tags": [
         "demographic"
       ],
@@ -1255,6 +1757,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.436,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -1267,6 +1776,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8238,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "0.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1279,6 +1795,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8176,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "5.0",
+        "4.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -1291,6 +1814,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8902,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "3.0",
+        "1.0",
+        "4.0",
+        "2.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -1303,6 +1833,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.43,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1315,6 +1852,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4581,
       "approxCardinality": 9,
+      "approxTopValues": [
+        "Affection",
+        "Cuddling",
+        "Romance",
+        "Clear, enthusiastic consent",
+        "Caretaker/caretakee dynamics"
+      ],
       "tags": [
         "other"
       ],
@@ -1327,6 +1871,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6363,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "A bit positive",
+        "Neutral",
+        "Awesome",
+        "A bit negative",
+        "Awful"
+      ],
       "tags": [
         "other"
       ],
@@ -1339,6 +1890,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6697,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -1351,6 +1909,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9478,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "4.0",
+        "2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -1363,6 +1928,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.0002,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "No",
+        "Yes, slightly",
+        "Yes, significantly",
+        "Yes, extremely"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1375,6 +1946,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "No",
+        "Once or twice",
+        "Occasionally",
+        "Regularly"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1387,6 +1964,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0261,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "0.0",
+        "2.0",
+        "1.0",
+        "-3.0",
+        "-1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -1399,6 +1983,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.0005,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Repressed",
+        "Liberated",
+        "Neutral"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1412,6 +2001,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.0002,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "Totally honest",
+        "Mostly honest"
+      ],
       "tags": [
         "other"
       ],
@@ -1424,6 +2017,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.8247,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "A little horny",
+        "Not horny at all",
+        "Moderately horny",
+        "Real horny"
+      ],
       "tags": [
         "other"
       ],
@@ -1436,6 +2035,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.8247,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "Moderately horny",
+        "Real horny",
+        "A little horny",
+        "Not horny at all"
+      ],
       "tags": [
         "other"
       ],
@@ -1448,6 +2053,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6697,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Very important",
+        "Moderately important",
+        "Slightly important",
+        "Not important",
+        "Actively prefer ungrafitying pain"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1460,6 +2072,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0852,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "A little bit",
+        "None of it",
+        "A moderate amount",
+        "Most of it",
+        "All of it"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1472,6 +2091,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8901,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "19-25yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "other"
       ],
@@ -1484,6 +2110,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7329,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "13-14yo",
+        "15-16yo",
+        "19-25yo",
+        "11-12yo",
+        "17-18yo"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1497,6 +2130,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.915,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1509,6 +2149,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9478,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1521,6 +2168,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4777,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "13-14yo",
+        "15-16yo",
+        "11-12yo",
+        "17-18yo",
+        "19-25yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1533,6 +2187,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9592,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1545,6 +2206,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.974,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "13-14yo",
+        "15-16yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1557,6 +2225,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2497,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1570,6 +2245,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8238,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "19-25yo",
+        "13-14yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1583,6 +2265,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4357,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1595,6 +2284,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7791,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "19-25yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1607,6 +2303,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8453,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "19-25yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "other"
       ],
@@ -1619,6 +2322,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8015,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "19-25yo",
+        "15-16yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1631,6 +2341,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4618,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "19-25yo",
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "other"
       ],
@@ -1643,6 +2360,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8144,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "19-25yo",
+        "15-16yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1655,6 +2379,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5643,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "13-14yo",
+        "15-16yo",
+        "11-12yo",
+        "17-18yo",
+        "19-25yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1667,6 +2398,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8882,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1680,6 +2418,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.967,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1692,6 +2437,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.3529,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "13-14yo",
+        "15-16yo",
+        "11-12yo",
+        "17-18yo",
+        "9-10yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1704,6 +2456,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8129,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "19-25yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1716,6 +2475,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4389,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "19-25yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1729,6 +2495,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5665,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "19-25yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1741,6 +2514,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8108,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "19-25yo",
+        "15-16yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1753,6 +2533,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6003,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "19-25yo",
+        "13-14yo",
+        "17-18yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1765,6 +2552,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7589,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1777,6 +2571,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6472,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "17-18yo",
+        "19-25yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1789,6 +2590,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4362,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "19-25yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1801,6 +2609,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6698,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "19-25yo",
+        "17-18yo",
+        "13-14yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1813,6 +2628,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.581,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1825,6 +2647,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8011,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "15-16yo",
+        "13-14yo",
+        "17-18yo",
+        "19-25yo",
+        "11-12yo"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1837,6 +2666,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7711,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1849,6 +2685,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.789,
       "approxCardinality": 23,
+      "approxTopValues": [
+        "Humiliation for sluttiness",
+        "Verbal degredation",
+        "Facesitting",
+        "Cuckoldry",
+        "Objectification"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1861,6 +2704,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "With an extreme amount of effort, maybe",
+        "With some effort, yes",
+        "With a lot of effort, yes",
+        "Impossible",
+        "With little effort, yes"
+      ],
       "tags": [
         "other"
       ],
@@ -1873,6 +2723,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.7701,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "Younger",
+        "Older"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1886,6 +2740,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.6473,
       "approxCardinality": 1,
+      "approxTopValues": [
+        "Me",
+        "Someone else"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1898,6 +2756,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.4389,
       "approxCardinality": 1,
+      "approxTopValues": [
+        "Me",
+        "Someone else"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -1911,6 +2773,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.4778,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Other people",
+        "Both",
+        "Yourself"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1923,6 +2790,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0262,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Equally gentle and intense",
+        "Moderately intense, high-energy",
+        "Slightly intense, high-energy",
+        "Totally intense, high-energy",
+        "Slightly gentle, low-energy"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1935,6 +2809,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.7792,
       "approxCardinality": 1,
+      "approxTopValues": [
+        "Me",
+        "Someone else"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1947,6 +2825,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.0262,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "Somewhat one specific role",
+        "Totally one specific role",
+        "Somewhat all the roles at once",
+        "Totally all the roles at once"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1959,6 +2843,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8436,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1971,6 +2862,12 @@
       "logicalType": "categorical",
       "nullRatio": 0.1133,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "2.0",
+        "1.0",
+        "3.0",
+        "0.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -1983,6 +2880,13 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "2.0",
+        "1.0",
+        "3.0",
+        "-1.0",
+        "-2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -1995,6 +2899,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4387,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -2020,6 +2931,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.436,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "3.0",
+        "4.0",
+        "1.0",
+        "5.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2032,6 +2950,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4388,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -2057,6 +2982,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8209,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "Hypnotism",
+        "Mind control",
+        "Sleeping",
+        "Drugs",
+        "Drunkenness"
+      ],
       "tags": [
         "other"
       ],
@@ -2069,6 +3001,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.436,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2081,6 +3020,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5959,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2093,6 +3039,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.462,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Me and the other person equally",
+        "Mostly me",
+        "Mostly the other person",
+        "Totally the other person",
+        "Totally me"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2105,6 +3058,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7544,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2131,6 +3091,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6386,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2143,6 +3110,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6685,
       "approxCardinality": 18,
+      "approxTopValues": [
+        "Forced orgasms",
+        "Rapeplay",
+        "Struggling/fighting",
+        "Sexual slavery",
+        "Dub-consensual (unclear consent)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2155,6 +3129,13 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "-8.0",
+        "-5.0",
+        "-3.0",
+        "-2.0",
+        "-1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2167,6 +3148,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.436,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2179,6 +3167,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7917,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2191,6 +3186,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.3299,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "Intentionally revealing clothing",
+        "Strip teases",
+        "Worshipping female body parts",
+        "Trying to get impregnated",
+        "Heat/rutting (in the way animals \"go into heat\")"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2203,6 +3205,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8774,
       "approxCardinality": 12,
+      "approxTopValues": [
+        "Sissification (degredation by feminization)",
+        "Crossdressing (passably; people can't tell)",
+        "Transgenderism",
+        "Androgyny",
+        "Hermaphroditism"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2215,6 +3224,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4583,
       "approxCardinality": 9,
+      "approxTopValues": [
+        "Affection",
+        "Cuddling",
+        "Romance",
+        "Clear, enthusiastic consent",
+        "Caretaker/caretakee dynamics"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2227,6 +3243,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7891,
       "approxCardinality": 23,
+      "approxTopValues": [
+        "Humiliation for sluttiness",
+        "Verbal degredation",
+        "Facesitting",
+        "Cuckoldry",
+        "Objectification"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2239,6 +3262,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9251,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Mother and son",
+        "Father and daughter",
+        "Mother and daughter/son together",
+        "Mother and daughter",
+        "Mother/father together and daughter"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2251,6 +3281,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8209,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "Hypnotism",
+        "Mind control",
+        "Sleeping",
+        "Drugs",
+        "Drunkenness"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2263,6 +3300,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.625,
       "approxCardinality": 20,
+      "approxTopValues": [
+        "Threesomes",
+        "Double penetration",
+        "Freeuse (society where people casually have sex with anyone)",
+        "Harems",
+        "Gang bangs"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2275,6 +3319,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7686,
       "approxCardinality": 20,
+      "approxTopValues": [
+        "Hentai characters",
+        "Vampires",
+        "Demons",
+        "Werewolves",
+        "Elves/fae"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2287,6 +3338,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6685,
       "approxCardinality": 18,
+      "approxTopValues": [
+        "Forced orgasms",
+        "Rapeplay",
+        "Struggling/fighting",
+        "Sexual slavery",
+        "Dub-consensual (unclear consent)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2299,6 +3357,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.853,
       "approxCardinality": 20,
+      "approxTopValues": [
+        "Rope",
+        "Clothing",
+        "Chains",
+        "Hairbrushes/clips/scrunchies",
+        "Condoms (used)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2311,6 +3376,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4658,
       "approxCardinality": 18,
+      "approxTopValues": [
+        "Physical struggle/overpowering (e.g., pinning)",
+        "Breath play (choking, asphyxiation)",
+        "Orgasm overload",
+        "Orgasm denial",
+        "Sexual training (e.g., to give deeper blowjobs)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2323,6 +3395,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8716,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Breeding/impregnation",
+        "Pregnancy",
+        "Ovisposition (laying eggs into someone/birthing the eggs)",
+        "Anal pregnancy",
+        "Male pregnancy"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2335,6 +3414,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.659,
       "approxCardinality": 21,
+      "approxTopValues": [
+        "Teachers",
+        "Maids",
+        "Catgirls",
+        "Students",
+        "Nurses"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2347,6 +3433,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8507,
       "approxCardinality": 10,
+      "approxTopValues": [
+        "Asians",
+        "Caucasians",
+        "Black people",
+        "East asians",
+        "Middle eastern/arabic"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2359,6 +3452,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6948,
       "approxCardinality": 16,
+      "approxTopValues": [
+        "Biting/scratching/scrapes",
+        "Sexual exhaustion (e.g., long sex until raw, then continuing)",
+        "Slapping",
+        "Impact: thuddy (e.g., paddle, flogger, fist)",
+        "Impact: stingy (e.g. riding crop, belt)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2371,6 +3471,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.82,
       "approxCardinality": 24,
+      "approxTopValues": [
+        "Breathplay (choking, asphyxiation)",
+        "Oil/lotion",
+        "ASMR",
+        "Earplugs/blindfolds",
+        "Sensory deprivation"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2383,6 +3490,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4804,
       "approxCardinality": 24,
+      "approxTopValues": [
+        "Vibrators",
+        "Remote control toys",
+        "Buttplugs",
+        "Fuck machines",
+        "Vaginal dildos (normal)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2395,6 +3509,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9023,
       "approxCardinality": 12,
+      "approxTopValues": [
+        "Gender transform (male to female)",
+        "Furries",
+        "Shapeshifting",
+        "Body transformation (general)",
+        "Body swapping"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2407,6 +3528,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.96,
       "approxCardinality": 20,
+      "approxTopValues": [
+        "Wolves",
+        "Cats",
+        "Dogs",
+        "Foxes",
+        "Horses/ponies"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2419,6 +3547,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9808,
       "approxCardinality": 12,
+      "approxTopValues": [
+        "Octopi/squid",
+        "Foxes",
+        "More/other",
+        "Dolphins/whales",
+        "Insects/arachnids"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2431,6 +3566,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8346,
       "approxCardinality": 16,
+      "approxTopValues": [
+        "Squirt",
+        "Cum (male ejaculate)",
+        "Urine",
+        "Saliva",
+        "Breast milk"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2443,6 +3585,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9005,
       "approxCardinality": 20,
+      "approxTopValues": [
+        "Fangs",
+        "Tails",
+        "Horns",
+        "Very tall people (e.g., tall as a tree)",
+        "More sexual body parts (e.g. 3 breasts, 2 penises)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2455,6 +3604,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5706,
       "approxCardinality": 32,
+      "approxTopValues": [
+        "Buttocks",
+        "Hands",
+        "Thighs",
+        "Eyes",
+        "Arms"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2467,6 +3623,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9634,
       "approxCardinality": 14,
+      "approxTopValues": [
+        "Cutting",
+        "Branding",
+        "Burning (e.g., cigarettes)",
+        "Snuff",
+        "Wound fucking"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2479,6 +3642,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6795,
       "approxCardinality": 20,
+      "approxTopValues": [
+        "Lingerie",
+        "Miniskirts",
+        "Chokers",
+        "Fishnets",
+        "Socks/stockings"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2491,6 +3661,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9676,
       "approxCardinality": 9,
+      "approxTopValues": [
+        "Scary characters (e.g., monsters)",
+        "Necrophilia",
+        "Creepy characters (e.g., clowns)",
+        "Living insertions (live creatures in orifices)",
+        "Cannibalism/meatslaves"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2503,6 +3680,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9928,
       "approxCardinality": 11,
+      "approxTopValues": [
+        "Mutations",
+        "Destructive pregnancy",
+        "Malicious surgeries/medical horror",
+        "Mutilations",
+        "Infestations/parasites"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2515,6 +3699,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.986,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Bodily fluids (vomit, poop, etc.)",
+        "Dirty locations (alleys, bathrooms, etc.)",
+        "Salirophilia (someone getting disheviling/soiled)",
+        "WAM/sploshing/messiness",
+        "Gross insects (maggots, flies, etc.)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2527,6 +3718,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.94,
       "approxCardinality": 11,
+      "approxTopValues": [
+        "Dogs",
+        "Horses",
+        "More not listed here",
+        "Cats",
+        "Lions"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2539,6 +3737,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7329,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "3.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2564,6 +3769,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9151,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "5.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2576,6 +3788,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9152,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "3.0",
+        "2.0",
+        "5.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2588,6 +3807,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0561,
       "approxCardinality": 24,
+      "approxTopValues": [
+        "Eagerness or desire",
+        "Love or romance",
+        "Wildness or primalness",
+        "Power or smugness",
+        "Powerlessness or vulnerability"
+      ],
       "tags": [
         "other"
       ],
@@ -2624,6 +3850,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.0002,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "Monogamous",
+        "Not monogamous"
+      ],
       "tags": [
         "demographic"
       ],
@@ -2636,6 +3866,11 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Moderate",
+        "Liberal",
+        "Conservative"
+      ],
       "tags": [
         "demographic"
       ],
@@ -2648,6 +3883,13 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 11,
+      "approxTopValues": [
+        "7.0",
+        "8.0",
+        "5.0",
+        "9.0",
+        "6.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2660,6 +3902,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4324,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2672,6 +3921,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4658,
       "approxCardinality": 18,
+      "approxTopValues": [
+        "Physical struggle/overpowering (e.g., pinning)",
+        "Breath play (choking, asphyxiation)",
+        "Orgasm overload",
+        "Orgasm denial",
+        "Sexual training (e.g., to give deeper blowjobs)"
+      ],
       "tags": [
         "other"
       ],
@@ -2696,6 +3952,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7984,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2708,6 +3971,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8716,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Breeding/impregnation",
+        "Pregnancy",
+        "Ovisposition (laying eggs into someone/birthing the eggs)",
+        "Anal pregnancy",
+        "Male pregnancy"
+      ],
       "tags": [
         "other"
       ],
@@ -2720,6 +3990,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.733,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "3.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2732,6 +4009,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6697,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2744,6 +4028,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.733,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "2.0",
+        "3.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2756,6 +4047,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5653,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2768,6 +4066,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6635,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2780,6 +4085,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.796,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "3.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2804,6 +4116,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7932,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "1.0",
+        "5.0",
+        "2.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2816,6 +4135,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0155,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "0",
+        "1-2",
+        "3-7",
+        "8-20",
+        "21+"
+      ],
       "tags": [
         "other"
       ],
@@ -2828,6 +4154,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.6697,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2840,6 +4173,10 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "Straight",
+        "Not straight"
+      ],
       "tags": [
         "demographic",
         "derived"
@@ -2853,6 +4190,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4113,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "2.0",
+        "1.0",
+        "3.0",
+        "0.0",
+        "-2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2865,6 +4209,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2496,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "5.0",
+        "4.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2877,6 +4228,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9687,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "2.0",
+        "3.0",
+        "8.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2889,6 +4247,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9414,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "8.0",
+        "3.0",
+        "0.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "other"
       ],
@@ -2901,6 +4266,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0847,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Equal/even split",
+        "Mostly live action vid/photos",
+        "Entirely live action vid/photos",
+        "Mostly animated/drawn",
+        "Entirely animated/drawn"
+      ],
       "tags": [
         "fetish"
       ],
@@ -2913,6 +4285,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0848,
       "approxCardinality": 4,
+      "approxTopValues": [
+        "Mostly visual",
+        "Equally written and visual",
+        "Entirely visual",
+        "Mostly written",
+        "Entirely written"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3161,6 +4540,10 @@
       "logicalType": "categorical",
       "nullRatio": 0,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "None",
+        "Any"
+      ],
       "tags": [
         "derived"
       ],
@@ -3381,6 +4764,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4577,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3393,6 +4783,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4802,
       "approxCardinality": 24,
+      "approxTopValues": [
+        "Vibrators",
+        "Remote control toys",
+        "Buttplugs",
+        "Fuck machines",
+        "Vaginal dildos (normal)"
+      ],
       "tags": [
         "other"
       ],
@@ -3405,6 +4802,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8798,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "5.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -3429,6 +4833,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0848,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "1.0",
+        "0.0",
+        "2.0",
+        "3.0",
+        "4.0"
+      ],
       "tags": [
         "other"
       ],
@@ -3441,6 +4852,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9609,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "0.0",
+        "2.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3453,6 +4871,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5663,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "4.0",
+        "1.0",
+        "3.0",
+        "2.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3465,6 +4890,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5663,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "3.0",
+        "1.0",
+        "4.0",
+        "2.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3477,6 +4909,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9697,
       "approxCardinality": 39,
+      "approxTopValues": [
+        "Mouthplay (not swallowed, just in mouth)",
+        "Soft vore (swallowing, no digestion),Mouthplay (not swallowed, just in mouth)",
+        "Soft vore (swallowing, no digestion)",
+        "Soft vore (swallowing, no digestion),Soft digestive vore (swallowing with digestion),Mouthplay (not swallowed, just in mouth)",
+        "Other"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3489,6 +4928,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.941,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "8.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -3501,6 +4947,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9684,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "2.0",
+        "3.0",
+        "5.0",
+        "1.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -3513,6 +4966,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8775,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "1.0",
+        "8.0",
+        "5.0",
+        "3.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -3525,6 +4985,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9217,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "2.0",
+        "3.0",
+        "1.0",
+        "5.0"
+      ],
       "tags": [
         "demographic"
       ],
@@ -3549,6 +5016,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9913,
       "approxCardinality": 83,
+      "approxTopValues": [
+        "Mutations",
+        "Body combinations (joined with another person),Body swaps (e.g. limbs replaced with other things),Disease,Decay,Destructive pregnancy,Extreme plastic surgery,Infestations/parasites,Malicious surgeries/medical horror,Mutations,Mutilations",
+        "Mutilations",
+        "Malicious surgeries/medical horror,Mutilations",
+        "Decay,Mutations"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3561,6 +5035,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.9826,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Not the dead body",
+        "The dead body",
+        "Both"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3573,6 +5052,10 @@
       "logicalType": "categorical",
       "nullRatio": 0.9826,
       "approxCardinality": 2,
+      "approxTopValues": [
+        "New/fresh",
+        "Old/rotting"
+      ],
       "tags": [
         "other"
       ],
@@ -3585,6 +5068,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4361,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Equally brutal and caring",
+        "Slightly brutal/cruel",
+        "Slightly caring/gentle",
+        "Moderately brutal/cruel",
+        "Moderately caring/gentle"
+      ],
       "tags": [
         "other"
       ],
@@ -3597,6 +5087,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9087,
       "approxCardinality": 9,
+      "approxTopValues": [
+        "Week 2 since period",
+        "Currently on period (week 1)",
+        "Don't want to answer or don't know",
+        "Currently ovulating",
+        "N/A (irregular or don't get periods)"
+      ],
       "tags": [
         "other"
       ],
@@ -3621,6 +5118,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9902,
       "approxCardinality": 117,
+      "approxTopValues": [
+        "Facial features,Tongue,Breasts,Nipples,Belly,Hips,Butt,Vagina,Clitoris,Penis,Testicles,Anus,Legs,Feet,Arms,Hands",
+        "Penis,Testicles",
+        "Penis",
+        "Vagina",
+        "Breasts,Penis"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3645,6 +5149,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0263,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Switch/equal/no preference",
+        "Moderately submissive",
+        "Moderately dominant",
+        "Slightly submissive",
+        "Slightly dominant"
+      ],
       "tags": [
         "other"
       ],
@@ -3681,6 +5192,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4637,
       "approxCardinality": 54,
+      "approxTopValues": [
+        "Very tall people",
+        "Very flexible people",
+        "Very tall people,Very flexible people",
+        "Very short people,Very flexible people",
+        "Very tall people,Very short people,Very flexible people"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3693,6 +5211,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.3528,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Average",
+        "Slightly chubby",
+        "Slightly skinny",
+        "Very skinny",
+        "Overweight"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3705,6 +5230,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.5914,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Professions (e.g., firefighter, nurse, cheerleader)",
+        "Professions (e.g., firefighter, nurse, cheerleader),Stereotypes (e.g., nerd, jock)",
+        "Professions (e.g., firefighter, nurse, cheerleader),Stereotypes (e.g., nerd, jock),Races (ethnicity)",
+        "Professions (e.g., firefighter, nurse, cheerleader),Races (ethnicity)",
+        "Races (ethnicity)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3730,6 +5262,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9766,
       "approxCardinality": 78,
+      "approxTopValues": [
+        "Bodily fluids (vomit, poop, etc.)",
+        "WAM/sploshing/messiness",
+        "Dirty locations (alleys, bathrooms, etc.)",
+        "Bodily fluids (vomit, poop, etc.),Dirty locations (alleys, bathrooms, etc.)",
+        "Bodily fluids (vomit, poop, etc.),Dirty locations (alleys, bathrooms, etc.),Salirophilia (someone getting disheviling/soiled)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3754,6 +5293,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.776,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Clothing items (shoes, chokers, diapers, etc.)",
+        "Clothing items (shoes, chokers, diapers, etc.),Clothing materials (latex, leather, etc.),Clothing states (cameltoe, malfunctions, etc.)",
+        "Clothing states (cameltoe, malfunctions, etc.)",
+        "Clothing items (shoes, chokers, diapers, etc.),Clothing states (cameltoe, malfunctions, etc.)",
+        "Clothing materials (latex, leather, etc.)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -3910,6 +5456,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7142,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Clothing items (shoes, chokers, diapers, etc.)",
+        "Clothing items (shoes, chokers, diapers, etc.),Clothing materials (latex, leather, etc.),Clothing states (cameltoe, malfunctions, etc.)",
+        "Clothing materials (latex, leather, etc.)",
+        "Clothing items (shoes, chokers, diapers, etc.),Clothing materials (latex, leather, etc.)",
+        "Clothing items (shoes, chokers, diapers, etc.),Clothing states (cameltoe, malfunctions, etc.)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4018,6 +5571,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9753,
       "approxCardinality": 120,
+      "approxTopValues": [
+        "Crossdressing (passably; people can't tell),Sissification (degredation by feminization)",
+        "Crossdressing (passably; people can't tell)",
+        "Crossdressing (passably; people can't tell),Acting like the opposite gender,Sissification (degredation by feminization)",
+        "Sissification (degredation by feminization)",
+        "Transgenderism"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4138,6 +5698,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9843,
       "approxCardinality": 118,
+      "approxTopValues": [
+        "Creepy characters (e.g., clowns),Scary characters (e.g., monsters)",
+        "Necrophilia,Creepy characters (e.g., clowns),Scary characters (e.g., monsters)",
+        "Necrophilia,Scary characters (e.g., monsters)",
+        "Necrophilia",
+        "Scary characters (e.g., monsters)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4162,6 +5729,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9142,
       "approxCardinality": 112,
+      "approxTopValues": [
+        "Aphrodesiacs (arousal drugs)",
+        "Aphrodesiacs (arousal drugs),Psychedelics",
+        "Aphrodesiacs (arousal drugs),Psychedelics,Ecstasy",
+        "Aphrodesiacs (arousal drugs),Psychedelics,Ecstasy,Cocaine",
+        "Aphrodesiacs (arousal drugs),Ecstasy"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4174,6 +5748,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8052,
       "approxCardinality": 86,
+      "approxTopValues": [
+        "Breeding/impregnation",
+        "Breeding/impregnation,Pregnancy",
+        "Pregnancy",
+        "Anal pregnancy,Breeding/impregnation,Pregnancy",
+        "Breeding/impregnation,Ovisposition (laying eggs into someone/birthing the eggs),Pregnancy"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4186,6 +5767,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.7052,
       "approxCardinality": 17,
+      "approxTopValues": [
+        "Anxiety",
+        "Depression",
+        "ADHD",
+        "Social anxiety",
+        "Body Dysmorphia"
+      ],
       "tags": [
         "other"
       ],
@@ -4198,6 +5786,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.9919,
       "approxCardinality": 72,
+      "approxTopValues": [
+        "Placing messy things inside clothes,Liquid food (milk, ketchup, etc.),Normal food (cake, beans, etc.),Lotion/lubricant,Mud,Paint,Oil,Shampoo/soap,Other",
+        "Other",
+        "Lotion/lubricant",
+        "Placing messy things inside clothes,Liquid food (milk, ketchup, etc.),Normal food (cake, beans, etc.),Lotion/lubricant",
+        "Lotion/lubricant,Other"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4222,6 +5817,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8473,
       "approxCardinality": 15,
+      "approxTopValues": [
+        "Parent/child,Siblings,Aunt/uncle, niece/nephew",
+        "Parent/child,Siblings",
+        "Siblings",
+        "Siblings,Aunt/uncle, niece/nephew",
+        "Parent/child"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4306,6 +5908,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4776,
       "approxCardinality": 13,
+      "approxTopValues": [
+        "250.0",
+        "150.0",
+        "400.0",
+        "100.0",
+        "300.0"
+      ],
       "tags": [
         "other"
       ],
@@ -4318,6 +5927,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2496,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "4.0",
+        "5.0",
+        "3.0",
+        "2.0",
+        "1.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4330,6 +5946,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.2496,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "3.0",
+        "4.0",
+        "0.0",
+        "1.0",
+        "2.0"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4342,6 +5965,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0848,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "-1.0",
+        "0.0",
+        "-2.0",
+        "1.0",
+        "2.0"
+      ],
       "tags": [
         "other"
       ],
@@ -4354,6 +5984,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Moderately know",
+        "Slightly know",
+        "Fully know",
+        "Slightly don't know",
+        "Moderately don't know"
+      ],
       "tags": [
         "other"
       ],
@@ -4366,6 +6003,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.8787,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "0.0",
+        "3.0",
+        "1.0",
+        "2.0",
+        "5.0"
+      ],
       "tags": [
         "other"
       ],
@@ -4378,6 +6022,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.969,
       "approxCardinality": 49,
+      "approxTopValues": [
+        "Mouth",
+        "Mouth,Cock,Breast,Anal,Vaginal (unbirth)",
+        "Mouth,Breast,Anal,Vaginal (unbirth)",
+        "Mouth,Vaginal (unbirth)",
+        "Mouth,Anal,Vaginal (unbirth)"
+      ],
       "tags": [
         "fetish"
       ],
@@ -4390,6 +6041,11 @@
       "logicalType": "categorical",
       "nullRatio": 0.8109,
       "approxCardinality": 3,
+      "approxTopValues": [
+        "Other people",
+        "Both",
+        "Me"
+      ],
       "tags": [
         "other"
       ],
@@ -4402,6 +6058,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.001,
       "approxCardinality": 5,
+      "approxTopValues": [
+        "Does match (cis)",
+        "Equally attracted to both",
+        "Slightly does match (cis)",
+        "Does not match (trans/enby)",
+        "Slightly does not match (trans/enby)"
+      ],
       "tags": [
         "demographic",
         "fetish"
@@ -4415,6 +6078,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0341,
       "approxCardinality": 24,
+      "approxTopValues": [
+        "Eagerness or desire",
+        "Love or romance",
+        "Wildness or primalness",
+        "Powerlessness or vulnerability",
+        "Safety or warmth"
+      ],
       "tags": [
         "other"
       ],
@@ -4427,6 +6097,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.4471,
       "approxCardinality": 6,
+      "approxTopValues": [
+        "Medium-big",
+        "Medium",
+        "Small-medium",
+        "Big",
+        "Small"
+      ],
       "tags": [
         "other"
       ],
@@ -4439,6 +6116,13 @@
       "logicalType": "categorical",
       "nullRatio": 0.0003,
       "approxCardinality": 7,
+      "approxTopValues": [
+        "Somewhat broad",
+        "Equally narrow and broad",
+        "A little broad",
+        "Very broad",
+        "A little narrow"
+      ],
       "tags": [
         "fetish"
       ],

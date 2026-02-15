@@ -1,7 +1,13 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { CohortFingerprint, type FingerprintAxisPoint } from "@/components/charts/cohort-fingerprint";
+import { DistributionStrip, type DistributionBin } from "@/components/charts/distribution-strip";
+import { DumbbellChart, type DumbbellRow } from "@/components/charts/dumbbell-chart";
+import { OverIndexChart, type OverIndexChartRow } from "@/components/charts/over-index-chart";
+import { PercentileChart, type PercentileChartDatum } from "@/components/charts/percentile-chart";
 import { ColumnCombobox } from "@/components/column-combobox";
+import { ColumnNameTooltip } from "@/components/column-name-tooltip";
 import { DataTable } from "@/components/data-table";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { SectionHeader } from "@/components/section-header";
@@ -15,15 +21,26 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { SchemaData } from "@/lib/api/contracts";
-import { getSchema } from "@/lib/client/api";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
-
-import { ColumnNameTooltip } from "@/components/column-name-tooltip";
-import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
+import { getSchema } from "@/lib/client/api";
+import {
+  PROFILE_METRICS,
+  buildCondition,
+  buildDirectComparisonQuery,
+  buildDistributionHistogramQuery,
+  buildMetricComparisonQuery,
+  buildOverIndexingQuery,
+  buildPercentileCardsQuery,
+  buildProfileSizeQuery,
+  type FilterPair as QueryFilterPair,
+} from "@/lib/duckdb/profile-queries";
 import { useDuckDB } from "@/lib/duckdb/provider";
-import { quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
+import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
+import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import { addNotebookEntry } from "@/lib/notebook-store";
+import { getConfidenceStyle, reliabilityScore } from "@/lib/statistics/confidence";
+import { contextualizeDifference } from "@/lib/statistics/effect-context";
 
 export const Route = createFileRoute("/profile")({
   validateSearch: (
@@ -72,60 +89,256 @@ export const Route = createFileRoute("/profile")({
   component: ProfilePage,
 });
 
+type Mode = "single" | "compare";
+
+type RunStage = "idle" | "identity" | "percentile" | "overindex" | "distribution" | "done";
+
+interface PercentileCard {
+  metric: string;
+  label: string;
+  cohortMedian: number | null;
+  cohortMean: number | null;
+  cohortSD: number | null;
+  cohortN: number;
+  globalMedian: number | null;
+  globalSD: number | null;
+  globalPercentile: number | null;
+  ciLower: number | null;
+  ciUpper: number | null;
+}
+
+interface OverIndexingItem extends OverIndexChartRow {
+  direction: "over" | "under";
+  href: {
+    x: string;
+    y?: string;
+  };
+}
+
+interface DistributionSummary {
+  metric: string;
+  label: string;
+  bins: DistributionBin[];
+  min: number;
+  max: number;
+  cohortMedian: number | null;
+  cohortSD: number | null;
+  cohortN: number;
+  globalMedian: number | null;
+}
+
+interface SurpriseFinding {
+  id: string;
+  sentence: string;
+  score: number;
+  href: {
+    to: "/relationships" | "/explore/crosstab";
+    search: Record<string, string | undefined>;
+  };
+}
+
 interface ProfileSummary {
   totalSize: number;
   cohortSize: number;
   cohortSharePercent: number;
   cohortRarity: number;
-  percentileCards: Array<{
-    metric: string;
-    cohortMedian: number | null;
-    globalPercentile: number | null;
-  }>;
-  overIndexing: Array<{
-    columnName: string;
-    value: string;
-    cohortCount: number;
-    globalCount: number;
-    cohortPct: number;
-    globalPct: number;
-    ratio: number;
-  }>;
+  filterSummary: string;
+  percentileCards: PercentileCard[];
+  overIndexing: OverIndexingItem[];
+  topOverIndexing: OverIndexingItem[];
+  underIndexing: OverIndexingItem[];
+  distributions: DistributionSummary[];
+  surpriseFindings: SurpriseFinding[];
+}
+
+interface DirectDifferenceRow extends DumbbellRow {
+  columnName: string;
+  value: string;
+  pctA: number;
+  pctB: number;
+  countA: number;
+  countB: number;
+  absDelta: number;
+  isGated: boolean;
+  href: {
+    x: string;
+    y?: string;
+  };
+}
+
+interface SharedTraitRow {
+  key: string;
+  label: string;
+  ratioA: number;
+  ratioB: number;
+  href: {
+    x: string;
+    y?: string;
+  };
+}
+
+interface MetricCompareRow {
+  metric: string;
+  label: string;
+  medianA: number | null;
+  medianB: number | null;
+  meanA: number | null;
+  meanB: number | null;
+  sdA: number | null;
+  sdB: number | null;
+  nA: number;
+  nB: number;
 }
 
 interface ComparisonResult {
   a: ProfileSummary;
   b: ProfileSummary;
+  differences: DirectDifferenceRow[];
+  sharedTraits: SharedTraitRow[];
+  metricRows: MetricCompareRow[];
+  topDifferenceContext: string;
 }
 
-interface ComparisonPercentileRow {
-  metric: string;
-  medianA: number | null;
-  medianB: number | null;
-  delta: number | null;
-}
-
-type Mode = "single" | "compare";
+type FilterPair = QueryFilterPair;
 
 const NONE = "__none__";
 const SUGGESTED_COHORTS = DEFAULTS_BY_PAGE.profile?.suggestedCohorts ?? [];
 
-type FilterPair = { column: string; value: string };
+const METRIC_LABELS: Record<string, string> = {
+  totalfetishcategory: "Kink breadth",
+  opennessvariable: "Openness",
+  extroversionvariable: "Extroversion",
+  neuroticismvariable: "Neuroticism",
+  agreeablenessvariable: "Agreeableness",
+  consciensiousnessvariable: "Conscientiousness",
+  powerlessnessvariable: "Powerlessness",
+};
 
-function getWarning(cohortSize: number) {
-  if (cohortSize < 30) {
-    return {
-      kind: "critical" as const,
-      message: "Fewer than 30 people - too few for meaningful results.",
-    };
+const FINGERPRINT_ORDER: string[] = [
+  "totalfetishcategory",
+  "opennessvariable",
+  "extroversionvariable",
+  "neuroticismvariable",
+  "agreeablenessvariable",
+  "consciensiousnessvariable",
+  "powerlessnessvariable",
+];
+
+function metricLabel(metric: string): string {
+  return METRIC_LABELS[metric] ?? metric;
+}
+
+interface QueryResultLike {
+  numRows: number;
+  schema: { fields: unknown[] };
+  getChildAt(index: number): { get(rowIndex: number): unknown } | null | undefined;
+}
+
+function toRows(result: QueryResultLike): unknown[][] {
+  const rows: unknown[][] = [];
+  for (let i = 0; i < result.numRows; i += 1) {
+    const row: unknown[] = [];
+    for (let c = 0; c < result.schema.fields.length; c += 1) {
+      const value = result.getChildAt(c)?.get(i);
+      row.push(typeof value === "bigint" ? Number(value) : value ?? null);
+    }
+    rows.push(row);
   }
-  if (cohortSize < 100) {
+  return rows;
+}
+
+function confidenceLabelForN(n: number): string {
+  return getConfidenceStyle(n).label;
+}
+
+function formatFilterSummary(filters: FilterPair[], columnByName: Map<string, SchemaData["columns"][number]>): string {
+  if (filters.length === 0) return "All respondents";
+
+  return filters
+    .map((filter) => {
+      const columnMeta = columnByName.get(filter.column);
+      const columnLabel = columnMeta ? getColumnDisplayName(columnMeta) : filter.column;
+      const valueLabel = formatValueWithLabel(filter.value, columnMeta?.valueLabels);
+      return `${columnLabel}: ${valueLabel}`;
+    })
+    .join(" · ");
+}
+
+function buildSurpriseFindings(summary: {
+  percentileCards: PercentileCard[];
+  overIndexing: OverIndexingItem[];
+  defaultFilterColumn?: string;
+}): SurpriseFinding[] {
+  const metricFindings: SurpriseFinding[] = summary.percentileCards
+    .filter((row) => row.globalPercentile != null)
+    .map<SurpriseFinding>((row) => {
+      const percentile = row.globalPercentile ?? 50;
+      const rounded = Math.round(percentile);
+      return {
+        id: `metric-${row.metric}`,
+        score: Math.abs(percentile - 50),
+        sentence: `Your group sits in the ${rounded}th percentile on ${row.label}.`,
+        href: {
+          to: "/relationships",
+          search: { column: row.metric },
+        },
+      };
+    });
+
+  const traitFindings: SurpriseFinding[] = summary.overIndexing
+    .map<SurpriseFinding>((row) => {
+      const ratioScore = row.ratio >= 1 ? row.ratio : 1 / Math.max(row.ratio, 0.0001);
+      const direction = row.ratio >= 1 ? "more common" : "less common";
+      return {
+        id: `trait-${row.key}`,
+        score: ratioScore,
+        sentence: `${row.label} is ${direction} in this cohort (${row.ratio.toFixed(2)}x vs global).`,
+        href: {
+          to: "/explore/crosstab",
+          search: {
+            x: row.columnName,
+            y: summary.defaultFilterColumn,
+          },
+        },
+      };
+    })
+    .slice(0, 12);
+
+  return [...metricFindings, ...traitFindings]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5);
+}
+
+function fingerprintPoints(percentileCards: PercentileCard[]): FingerprintAxisPoint[] {
+  const byMetric = new Map(percentileCards.map((row) => [row.metric, row]));
+
+  return FINGERPRINT_ORDER.map((metric) => {
+    const row = byMetric.get(metric);
+    const percentile = row?.globalPercentile;
     return {
-      kind: "warn" as const,
-      message: "Fewer than 100 people - results may not be reliable.",
+      axis: metricLabel(metric),
+      value: percentile == null ? 50 : Math.max(0, Math.min(100, percentile)),
     };
-  }
-  return null;
+  });
+}
+
+function ConfidenceIndicator({ n }: { n: number }) {
+  const score = reliabilityScore(n);
+  const width = Math.round(score * 100);
+  return (
+    <div className="space-y-1 border border-[var(--rule)] bg-[var(--paper)] p-2">
+      <p className="mono-label">confidence</p>
+      <div className="h-2 w-full bg-[var(--rule-light)]">
+        <span
+          className="block h-full bg-[var(--accent)]"
+          style={{ width: `${width}%`, opacity: 0.9 }}
+        />
+      </div>
+      <p className="mono-value text-[0.62rem] text-[var(--ink-faded)]">
+        {confidenceLabelForN(n)} · N={formatNumber(n)}
+      </p>
+    </div>
+  );
 }
 
 function ProfilePage() {
@@ -133,18 +346,17 @@ function ProfilePage() {
   const [initialSearch] = useState(search);
   const navigate = useNavigate({ from: "/profile" });
   const { db, phase } = useDuckDB();
+
   const [schema, setSchema] = useState<SchemaData | null>(null);
   const [schemaError, setSchemaError] = useState<string | null>(null);
   const [searchReady, setSearchReady] = useState(false);
 
   const [mode, setMode] = useState<Mode>("single");
 
-  // Single-cohort state
   const [selectedColumns, setSelectedColumns] = useState<[string, string, string]>(["", "", ""]);
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
   const [valueOptionsByColumn, setValueOptionsByColumn] = useState<Record<string, string[]>>({});
 
-  // Compare-cohort state
   const [columnsA, setColumnsA] = useState<[string, string, string]>(["", "", ""]);
   const [valuesA, setValuesA] = useState<Record<string, string>>({});
   const [valueOptionsA, setValueOptionsA] = useState<Record<string, string[]>>({});
@@ -157,7 +369,75 @@ function ProfilePage() {
   const [comparison, setComparison] = useState<ComparisonResult | null>(null);
   const [runError, setRunError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
+  const [runStage, setRunStage] = useState<RunStage>("idle");
   const [notebookSaved, setNotebookSaved] = useState(false);
+
+  const availableFilterColumns = useMemo(() => {
+    if (!schema) return [];
+    return schema.columns.filter(
+      (column) =>
+        column.tags.includes("demographic") &&
+        (column.logicalType === "categorical" || column.logicalType === "boolean"),
+    );
+  }, [schema]);
+
+  const candidateColumns = useMemo(() => {
+    if (!schema) return [];
+
+    return schema.columns
+      .filter(
+        (column) =>
+          (column.logicalType === "categorical" || column.logicalType === "boolean") &&
+          (column.tags.includes("demographic") ||
+            column.tags.includes("ocean") ||
+            column.tags.includes("fetish")),
+      )
+      .sort((a, b) => a.nullRatio - b.nullRatio)
+      .slice(0, 100)
+      .map((column) => column.name);
+  }, [schema]);
+
+  const metricColumns = useMemo(() => {
+    if (!schema) return [] as string[];
+    const available = new Set(schema.columns.map((column) => column.name));
+    return PROFILE_METRICS.filter((metric) => available.has(metric));
+  }, [schema]);
+
+  const columnByName = useMemo(() => {
+    if (!schema) return new Map<string, SchemaData["columns"][number]>();
+    return new Map(schema.columns.map((column) => [column.name, column]));
+  }, [schema]);
+
+  const loadValueOptions = useCallback(
+    async (columns: string[]): Promise<Record<string, string[]>> => {
+      if (!db || columns.length === 0) return {};
+
+      const conn = await db.connect();
+      try {
+        const output: Record<string, string[]> = {};
+
+        for (const column of columns) {
+          const sql = `
+            SELECT cast(${quoteIdentifier(column)} AS VARCHAR) AS value, count(*)::BIGINT AS cnt
+            FROM data
+            WHERE ${quoteIdentifier(column)} IS NOT NULL
+            GROUP BY 1
+            ORDER BY cnt DESC
+            LIMIT 30
+          `;
+
+          const result = await conn.query(sql);
+          const rows = toRows(result);
+          output[column] = rows.map((row) => String(row[0] ?? "NULL"));
+        }
+
+        return output;
+      } finally {
+        await conn.close();
+      }
+    },
+    [db],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -168,65 +448,61 @@ function ProfilePage() {
         const nextSchema = response.data;
         setSchema(nextSchema);
 
-        const demographicColumns = nextSchema.columns
-          .filter((c) => c.tags.includes("demographic") && c.logicalType === "categorical")
+        const defaults = nextSchema.columns
+          .filter(
+            (column) =>
+              column.tags.includes("demographic") &&
+              (column.logicalType === "categorical" || column.logicalType === "boolean"),
+          )
           .slice(0, 3)
-          .map((c) => c.name);
-        const availableColumns = new Set(nextSchema.columns.map((column) => column.name));
+          .map((column) => column.name);
 
-        const resolveColumn = (candidate: string | undefined, fallback: string) => {
-          if (candidate && availableColumns.has(candidate)) {
-            return candidate;
-          }
-          return fallback;
+        const resolve = (candidate: string | undefined, fallback: string) => {
+          if (!candidate) return fallback;
+          return nextSchema.columns.some((column) => column.name === candidate) ? candidate : fallback;
         };
 
-        const defaults: [string, string, string] = [
-          demographicColumns[0] ?? "",
-          demographicColumns[1] ?? "",
-          demographicColumns[2] ?? "",
+        const nextSingleColumns: [string, string, string] = [
+          resolve(initialSearch.c0, defaults[0] ?? ""),
+          resolve(initialSearch.c1, defaults[1] ?? ""),
+          resolve(initialSearch.c2, defaults[2] ?? ""),
         ];
 
-        const initialSingleColumns: [string, string, string] = [
-          resolveColumn(initialSearch.c0, defaults[0]),
-          resolveColumn(initialSearch.c1, defaults[1]),
-          resolveColumn(initialSearch.c2, defaults[2]),
+        const nextColumnsA: [string, string, string] = [
+          resolve(initialSearch.ac0, defaults[0] ?? ""),
+          resolve(initialSearch.ac1, defaults[1] ?? ""),
+          resolve(initialSearch.ac2, defaults[2] ?? ""),
         ];
-        const initialColumnsA: [string, string, string] = [
-          resolveColumn(initialSearch.ac0, defaults[0]),
-          resolveColumn(initialSearch.ac1, defaults[1]),
-          resolveColumn(initialSearch.ac2, defaults[2]),
+
+        const nextColumnsB: [string, string, string] = [
+          resolve(initialSearch.bc0, defaults[0] ?? ""),
+          resolve(initialSearch.bc1, defaults[1] ?? ""),
+          resolve(initialSearch.bc2, defaults[2] ?? ""),
         ];
-        const initialColumnsB: [string, string, string] = [
-          resolveColumn(initialSearch.bc0, defaults[0]),
-          resolveColumn(initialSearch.bc1, defaults[1]),
-          resolveColumn(initialSearch.bc2, defaults[2]),
-        ];
+
+        const nextSingleValues: Record<string, string> = {};
+        const nextValuesA: Record<string, string> = {};
+        const nextValuesB: Record<string, string> = {};
+
+        if (nextSingleColumns[0] && initialSearch.v0) nextSingleValues[nextSingleColumns[0]] = initialSearch.v0;
+        if (nextSingleColumns[1] && initialSearch.v1) nextSingleValues[nextSingleColumns[1]] = initialSearch.v1;
+        if (nextSingleColumns[2] && initialSearch.v2) nextSingleValues[nextSingleColumns[2]] = initialSearch.v2;
+
+        if (nextColumnsA[0] && initialSearch.av0) nextValuesA[nextColumnsA[0]] = initialSearch.av0;
+        if (nextColumnsA[1] && initialSearch.av1) nextValuesA[nextColumnsA[1]] = initialSearch.av1;
+        if (nextColumnsA[2] && initialSearch.av2) nextValuesA[nextColumnsA[2]] = initialSearch.av2;
+
+        if (nextColumnsB[0] && initialSearch.bv0) nextValuesB[nextColumnsB[0]] = initialSearch.bv0;
+        if (nextColumnsB[1] && initialSearch.bv1) nextValuesB[nextColumnsB[1]] = initialSearch.bv1;
+        if (nextColumnsB[2] && initialSearch.bv2) nextValuesB[nextColumnsB[2]] = initialSearch.bv2;
 
         setMode(initialSearch.mode === "compare" ? "compare" : "single");
-        setSelectedColumns(initialSingleColumns);
-        setColumnsA(initialColumnsA);
-        setColumnsB(initialColumnsB);
-
-        const initialSingleValues: Record<string, string> = {};
-        const initialValuesA: Record<string, string> = {};
-        const initialValuesB: Record<string, string> = {};
-
-        if (initialSingleColumns[0] && initialSearch.v0) initialSingleValues[initialSingleColumns[0]] = initialSearch.v0;
-        if (initialSingleColumns[1] && initialSearch.v1) initialSingleValues[initialSingleColumns[1]] = initialSearch.v1;
-        if (initialSingleColumns[2] && initialSearch.v2) initialSingleValues[initialSingleColumns[2]] = initialSearch.v2;
-
-        if (initialColumnsA[0] && initialSearch.av0) initialValuesA[initialColumnsA[0]] = initialSearch.av0;
-        if (initialColumnsA[1] && initialSearch.av1) initialValuesA[initialColumnsA[1]] = initialSearch.av1;
-        if (initialColumnsA[2] && initialSearch.av2) initialValuesA[initialColumnsA[2]] = initialSearch.av2;
-
-        if (initialColumnsB[0] && initialSearch.bv0) initialValuesB[initialColumnsB[0]] = initialSearch.bv0;
-        if (initialColumnsB[1] && initialSearch.bv1) initialValuesB[initialColumnsB[1]] = initialSearch.bv1;
-        if (initialColumnsB[2] && initialSearch.bv2) initialValuesB[initialColumnsB[2]] = initialSearch.bv2;
-
-        setSelectedValues(initialSingleValues);
-        setValuesA(initialValuesA);
-        setValuesB(initialValuesB);
+        setSelectedColumns(nextSingleColumns);
+        setSelectedValues(nextSingleValues);
+        setColumnsA(nextColumnsA);
+        setValuesA(nextValuesA);
+        setColumnsB(nextColumnsB);
+        setValuesB(nextValuesB);
         setSearchReady(true);
       })
       .catch((error: Error) => {
@@ -292,18 +568,15 @@ function ProfilePage() {
     searchReady,
   ]);
 
-  // Load value options for single-cohort columns
   useEffect(() => {
     if (!db) return;
-
-    const activeColumns = selectedColumns.filter((column) => Boolean(column));
+    const activeColumns = selectedColumns.filter(Boolean);
     if (activeColumns.length === 0) return;
 
     let cancelled = false;
-
     void loadValueOptions(activeColumns)
-      .then((next) => {
-        if (!cancelled) setValueOptionsByColumn(next);
+      .then((options) => {
+        if (!cancelled) setValueOptionsByColumn(options);
       })
       .catch(() => {
         if (!cancelled) setValueOptionsByColumn({});
@@ -312,20 +585,17 @@ function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [selectedColumns, db]);
+  }, [selectedColumns, db, loadValueOptions]);
 
-  // Load value options for cohort A columns
   useEffect(() => {
     if (!db) return;
-
-    const activeColumns = columnsA.filter((column) => Boolean(column));
+    const activeColumns = columnsA.filter(Boolean);
     if (activeColumns.length === 0) return;
 
     let cancelled = false;
-
     void loadValueOptions(activeColumns)
-      .then((next) => {
-        if (!cancelled) setValueOptionsA(next);
+      .then((options) => {
+        if (!cancelled) setValueOptionsA(options);
       })
       .catch(() => {
         if (!cancelled) setValueOptionsA({});
@@ -334,20 +604,17 @@ function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [columnsA, db]);
+  }, [columnsA, db, loadValueOptions]);
 
-  // Load value options for cohort B columns
   useEffect(() => {
     if (!db) return;
-
-    const activeColumns = columnsB.filter((column) => Boolean(column));
+    const activeColumns = columnsB.filter(Boolean);
     if (activeColumns.length === 0) return;
 
     let cancelled = false;
-
     void loadValueOptions(activeColumns)
-      .then((next) => {
-        if (!cancelled) setValueOptionsB(next);
+      .then((options) => {
+        if (!cancelled) setValueOptionsB(options);
       })
       .catch(() => {
         if (!cancelled) setValueOptionsB({});
@@ -356,334 +623,405 @@ function ProfilePage() {
     return () => {
       cancelled = true;
     };
-  }, [columnsB, db]);
+  }, [columnsB, db, loadValueOptions]);
 
-  const loadValueOptions = useCallback(
-    async (activeColumns: string[]): Promise<Record<string, string[]>> => {
-      if (!db) return {};
-
-      const entries = await Promise.all(
-        activeColumns.map(async (column) => {
-          const quoted = quoteIdentifier(column);
-          const sql = `
-            SELECT cast(${quoted} AS VARCHAR) AS value, count(*)::BIGINT AS cnt
-            FROM data
-            WHERE ${quoted} IS NOT NULL
-            GROUP BY 1
-            ORDER BY cnt DESC
-            LIMIT 20
-          `;
-
-          const conn = await db.connect();
-          try {
-            const result = await conn.query(sql);
-            const values: string[] = [];
-            for (let i = 0; i < result.numRows; i++) {
-              values.push(String(result.getChildAt(0)?.get(i) ?? "NULL"));
-            }
-            return [column, values] as const;
-          } finally {
-            await conn.close();
-          }
-        }),
-      );
-
-      const next: Record<string, string[]> = {};
-      for (const [column, options] of entries) {
-        next[column] = options;
-      }
-      return next;
-    },
-    [db],
+  const filterPairs = useMemo(
+    () =>
+      selectedColumns
+        .map((column) => ({ column, value: selectedValues[column] }))
+        .filter((item): item is FilterPair => Boolean(item.column && item.value)),
+    [selectedColumns, selectedValues],
   );
 
-  const availableDemographicColumns = useMemo(() => {
-    if (!schema) return [];
-    return schema.columns.filter(
-      (c) => c.tags.includes("demographic") && c.logicalType === "categorical",
-    );
-  }, [schema]);
+  const filterPairsA = useMemo(
+    () =>
+      columnsA
+        .map((column) => ({ column, value: valuesA[column] }))
+        .filter((item): item is FilterPair => Boolean(item.column && item.value)),
+    [columnsA, valuesA],
+  );
 
-  const columnByName = useMemo(() => {
-    if (!schema) return new Map<string, SchemaData["columns"][number]>();
-    return new Map(schema.columns.map((column) => [column.name, column]));
-  }, [schema]);
+  const filterPairsB = useMemo(
+    () =>
+      columnsB
+        .map((column) => ({ column, value: valuesB[column] }))
+        .filter((item): item is FilterPair => Boolean(item.column && item.value)),
+    [columnsB, valuesB],
+  );
 
-  const filterPairs = useMemo(() => {
-    return selectedColumns
-      .map((column) => ({ column, value: selectedValues[column] }))
-      .filter((item): item is FilterPair => Boolean(item.column && item.value));
-  }, [selectedColumns, selectedValues]);
-
-  const filterPairsA = useMemo(() => {
-    return columnsA
-      .map((column) => ({ column, value: valuesA[column] }))
-      .filter((item): item is FilterPair => Boolean(item.column && item.value));
-  }, [columnsA, valuesA]);
-
-  const filterPairsB = useMemo(() => {
-    return columnsB
-      .map((column) => ({ column, value: valuesB[column] }))
-      .filter((item): item is FilterPair => Boolean(item.column && item.value));
-  }, [columnsB, valuesB]);
-
-  const canRun = mode === "single"
-    ? filterPairs.length > 0 && !running && !!db
-    : filterPairsA.length > 0 && filterPairsB.length > 0 && !running && !!db;
-
-  const buildCondition = useCallback((pairs: FilterPair[]) => {
-    return pairs
-      .map((pair) => `${quoteIdentifier(pair.column)} = ${quoteLiteral(pair.value)}`)
-      .join(" AND ");
-  }, []);
+  const canRun =
+    mode === "single"
+      ? Boolean(db) && filterPairs.length > 0 && !running
+      : Boolean(db) && filterPairsA.length > 0 && filterPairsB.length > 0 && !running;
 
   const runSingleCohort = useCallback(
-    async (condition: string): Promise<ProfileSummary> => {
-      if (!db) throw new Error("DuckDB not available");
+    async (
+      condition: string,
+      filters: FilterPair[],
+      onStage?: (stage: RunStage) => void,
+    ): Promise<ProfileSummary> => {
+      if (!db) throw new Error("DuckDB is not ready yet.");
 
       const conn = await db.connect();
       try {
         const runSql = async (sql: string) => {
           const result = await conn.query(sql);
-          const rows: unknown[][] = [];
-          for (let i = 0; i < result.numRows; i++) {
-            const row: unknown[] = [];
-            for (let c = 0; c < result.schema.fields.length; c++) {
-              let val = result.getChildAt(c)?.get(i);
-              if (typeof val === "bigint") val = Number(val);
-              row.push(val ?? null);
-            }
-            rows.push(row);
-          }
-          return rows;
+          return toRows(result);
         };
 
-        const sizeRows = await runSql(`
-          SELECT
-            count(*)::BIGINT AS total_size,
-            count(*) FILTER (WHERE ${condition})::BIGINT AS cohort_size
-          FROM data
-        `);
-
+        onStage?.("identity");
+        const sizeRows = await runSql(buildProfileSizeQuery(condition));
         const totalSize = asNumber(sizeRows[0]?.[0]);
         const cohortSize = asNumber(sizeRows[0]?.[1]);
         const cohortSharePercent = totalSize > 0 ? (cohortSize / totalSize) * 100 : 0;
         const cohortRarity = Math.max(0, Math.min(100, 100 - cohortSharePercent));
 
-        const metricCandidates = [
-          "totalfetishcategory",
-          "powerlessnessvariable",
-          "opennessvariable",
-          "extroversionvariable",
-          "neuroticismvariable",
-        ].filter((metric) => schema?.columns.some((c) => c.name === metric));
+        onStage?.("percentile");
+        const percentileRows =
+          metricColumns.length > 0
+            ? await runSql(buildPercentileCardsQuery(condition, metricColumns))
+            : [];
 
-        const percentileCards = await Promise.all(
-          metricCandidates.map(async (metric) => {
-            const rows = await runSql(`
-              WITH cohort AS (
-                SELECT quantile_cont(${quoteIdentifier(metric)}, 0.5)::DOUBLE AS cohort_median
-                FROM data
-                WHERE ${condition} AND ${quoteIdentifier(metric)} IS NOT NULL
+        const percentileCards: PercentileCard[] = percentileRows.map((row) => {
+          const metric = String(row[0] ?? "");
+          const n = asNumber(row[4]);
+          const percentile = row[7] == null ? null : Number(row[7]);
+          const margin = n > 0 ? Math.min(28, 120 / Math.sqrt(n)) : 40;
+
+          return {
+            metric,
+            label: metricLabel(metric),
+            cohortMedian: row[1] == null ? null : Number(row[1]),
+            cohortMean: row[2] == null ? null : Number(row[2]),
+            cohortSD: row[3] == null ? null : Number(row[3]),
+            cohortN: n,
+            globalMedian: row[5] == null ? null : Number(row[5]),
+            globalSD: row[6] == null ? null : Number(row[6]),
+            globalPercentile: percentile,
+            ciLower: percentile == null ? null : Math.max(0, percentile - margin),
+            ciUpper: percentile == null ? null : Math.min(100, percentile + margin),
+          };
+        });
+
+        onStage?.("overindex");
+        const overRows =
+          candidateColumns.length > 0
+            ? await runSql(
+                buildOverIndexingQuery(condition, candidateColumns, {
+                  topLimit: 12,
+                  underLimit: 5,
+                  minCount: 30,
+                }),
               )
-              SELECT
-                (SELECT cohort_median FROM cohort) AS cohort_median,
-                CASE
-                  WHEN (SELECT cohort_median FROM cohort) IS NULL THEN NULL
-                  ELSE (
-                    SELECT
-                      100.0 *
-                      SUM(CASE WHEN ${quoteIdentifier(metric)} <= (SELECT cohort_median FROM cohort) THEN 1 ELSE 0 END)::DOUBLE /
-                      COUNT(*)::DOUBLE
-                    FROM data
-                    WHERE ${quoteIdentifier(metric)} IS NOT NULL
-                  )
-                END AS percentile
-            `);
+            : [];
+
+        const overIndexing: OverIndexingItem[] = overRows.map((row, index) => {
+          const columnName = String(row[0] ?? "");
+          const value = String(row[1] ?? "");
+          const columnMeta = columnByName.get(columnName);
+          const label = `${columnMeta ? getColumnDisplayName(columnMeta) : columnName}: ${formatValueWithLabel(value, columnMeta?.valueLabels)}`;
+
+          return {
+            key: `${columnName}-${value}-${index}`,
+            label,
+            columnName,
+            value,
+            cohortCount: asNumber(row[2]),
+            globalCount: asNumber(row[3]),
+            cohortPct: asNumber(row[4]) * 100,
+            globalPct: asNumber(row[5]) * 100,
+            ratio: asNumber(row[6]),
+            direction: String(row[7] ?? "over") === "under" ? "under" : "over",
+            isGated: columnMeta?.nullMeaning === "GATED",
+            href: {
+              x: columnName,
+              y: filters[0]?.column,
+            },
+          };
+        });
+
+        const topOverIndexing = overIndexing.filter((row) => row.direction === "over");
+        const underIndexing = overIndexing.filter((row) => row.direction === "under");
+
+        onStage?.("distribution");
+        const distributions: DistributionSummary[] = await Promise.all(
+          percentileCards.map(async (card) => {
+            const rows = await runSql(buildDistributionHistogramQuery(condition, card.metric, 40));
 
             return {
-              metric,
-              cohortMedian: rows[0]?.[0] == null ? null : Number(rows[0][0]),
-              globalPercentile: rows[0]?.[1] == null ? null : Number(rows[0][1]),
+              metric: card.metric,
+              label: card.label,
+              bins: rows.map((histRow) => ({
+                bin: asNumber(histRow[0]),
+                globalCount: asNumber(histRow[1]),
+                cohortCount: asNumber(histRow[2]),
+              })),
+              min: rows[0]?.[3] == null ? 0 : Number(rows[0][3]),
+              max: rows[0]?.[4] == null ? 0 : Number(rows[0][4]),
+              cohortMedian: card.cohortMedian,
+              cohortSD: card.cohortSD,
+              cohortN: card.cohortN,
+              globalMedian: card.globalMedian,
             };
           }),
         );
 
-        const candidateCategoricalColumns =
-          schema?.columns
-            .filter(
-              (column) =>
-                column.logicalType === "categorical" &&
-                (column.tags.includes("demographic") || column.tags.includes("ocean")),
-            )
-            .slice(0, 30)
-            .map((column) => column.name) ?? [];
+        const surpriseFindings = buildSurpriseFindings({
+          percentileCards,
+          overIndexing,
+          defaultFilterColumn: filters[0]?.column,
+        });
 
-        const overIndexingRows =
-          candidateCategoricalColumns.length === 0
-            ? []
-            : await runSql(`
-                WITH counts AS (
-                  ${candidateCategoricalColumns
-                    .map((columnName) => {
-                      const quoted = quoteIdentifier(columnName);
-                      return `
-                        SELECT
-                          ${quoteLiteral(columnName)} AS column_name,
-                          cast(${quoted} AS VARCHAR) AS value,
-                          SUM(CASE WHEN ${condition} THEN 1 ELSE 0 END)::DOUBLE AS cohort_count,
-                          COUNT(*)::DOUBLE AS global_count
-                        FROM data
-                        WHERE ${quoted} IS NOT NULL
-                        GROUP BY 1, 2
-                      `;
-                    })
-                    .join(" UNION ALL ")}
-                ),
-                sizes AS (
-                  SELECT
-                    count(*) FILTER (WHERE ${condition})::DOUBLE AS cohort_size,
-                    count(*)::DOUBLE AS global_size
-                  FROM data
-                ),
-                scored AS (
-                  SELECT
-                    counts.column_name,
-                    counts.value,
-                    counts.cohort_count,
-                    counts.global_count,
-                    CASE WHEN sizes.cohort_size = 0 THEN 0 ELSE counts.cohort_count / sizes.cohort_size END AS cohort_pct,
-                    CASE WHEN sizes.global_size = 0 THEN 0 ELSE counts.global_count / sizes.global_size END AS global_pct
-                  FROM counts
-                  CROSS JOIN sizes
-                ),
-                ranked AS (
-                  SELECT
-                    column_name,
-                    value,
-                    cohort_count,
-                    global_count,
-                    cohort_pct,
-                    global_pct,
-                    CASE WHEN global_pct <= 0 THEN NULL ELSE cohort_pct / global_pct END AS ratio
-                  FROM scored
-                )
-                SELECT
-                  column_name,
-                  value,
-                  cohort_count,
-                  global_count,
-                  cohort_pct,
-                  global_pct,
-                  ratio
-                FROM ranked
-                WHERE cohort_count >= 30
-                  AND global_count >= 30
-                  AND ratio IS NOT NULL
-                ORDER BY ratio DESC, cohort_count DESC
-                LIMIT 8
-              `);
-
-        const overIndexing = overIndexingRows.map((row) => ({
-          columnName: String(row[0] ?? ""),
-          value: String(row[1] ?? ""),
-          cohortCount: asNumber(row[2]),
-          globalCount: asNumber(row[3]),
-          cohortPct: asNumber(row[4]) * 100,
-          globalPct: asNumber(row[5]) * 100,
-          ratio: asNumber(row[6]),
-        }));
-
+        onStage?.("done");
         return {
           totalSize,
           cohortSize,
           cohortSharePercent,
           cohortRarity,
+          filterSummary: formatFilterSummary(filters, columnByName),
           percentileCards,
           overIndexing,
+          topOverIndexing,
+          underIndexing,
+          distributions,
+          surpriseFindings,
         };
       } finally {
         await conn.close();
       }
     },
-    [db, schema],
+    [db, metricColumns, candidateColumns, columnByName],
   );
 
   const runProfile = useCallback(async () => {
-    if (mode === "single") {
-      if (filterPairs.length === 0 || !db) {
-        setRunError("Select at least one demographic value before running profile analysis.");
-        return;
-      }
+    if (!db) {
+      setRunError("DuckDB is not ready yet.");
+      return;
+    }
 
-      setRunning(true);
-      setRunError(null);
-      setComparison(null);
+    setRunning(true);
+    setRunError(null);
+    setRunStage("identity");
+    setSummary(null);
+    setComparison(null);
 
-      try {
+    try {
+      if (mode === "single") {
+        if (filterPairs.length === 0) {
+          throw new Error("Select at least one field value to define your cohort.");
+        }
+
         const condition = buildCondition(filterPairs);
-        const result = await runSingleCohort(condition);
+        const result = await runSingleCohort(condition, filterPairs, setRunStage);
         setSummary(result);
-      } catch (error) {
-        setRunError(error instanceof Error ? error.message : "Failed to run profile analysis.");
-      } finally {
-        setRunning(false);
-      }
-    } else {
-      if (filterPairsA.length === 0 || filterPairsB.length === 0 || !db) {
-        setRunError("Select at least one value for each group.");
-        return;
-      }
+      } else {
+        if (filterPairsA.length === 0 || filterPairsB.length === 0) {
+          throw new Error("Select at least one value for each group.");
+        }
 
-      setRunning(true);
-      setRunError(null);
-      setSummary(null);
-
-      try {
         const conditionA = buildCondition(filterPairsA);
         const conditionB = buildCondition(filterPairsB);
+
         const [a, b] = await Promise.all([
-          runSingleCohort(conditionA),
-          runSingleCohort(conditionB),
+          runSingleCohort(conditionA, filterPairsA),
+          runSingleCohort(conditionB, filterPairsB),
         ]);
-        setComparison({ a, b });
-      } catch (error) {
-        setRunError(error instanceof Error ? error.message : "Failed to run comparison analysis.");
-      } finally {
-        setRunning(false);
+
+        setRunStage("overindex");
+        const conn = await db.connect();
+        try {
+          const runSql = async (sql: string) => {
+            const result = await conn.query(sql);
+            return toRows(result);
+          };
+
+          const diffRowsRaw = await runSql(
+            buildDirectComparisonQuery(conditionA, conditionB, candidateColumns, 20),
+          );
+
+          const differences: DirectDifferenceRow[] = diffRowsRaw.map((row, index) => {
+            const columnName = String(row[0] ?? "");
+            const value = String(row[1] ?? "");
+            const columnMeta = columnByName.get(columnName);
+            const label = `${columnMeta ? getColumnDisplayName(columnMeta) : columnName}: ${formatValueWithLabel(value, columnMeta?.valueLabels)}`;
+
+            const pctA = asNumber(row[4]) * 100;
+            const pctB = asNumber(row[5]) * 100;
+            return {
+              key: `${columnName}-${value}-${index}`,
+              label,
+              columnName,
+              value,
+              valueA: pctA,
+              valueB: pctB,
+              nA: asNumber(row[2]),
+              nB: asNumber(row[3]),
+              pctA,
+              pctB,
+              countA: asNumber(row[2]),
+              countB: asNumber(row[3]),
+              absDelta: asNumber(row[6]),
+              isGated: columnMeta?.nullMeaning === "GATED",
+              href: {
+                x: columnName,
+                y: filterPairsA[0]?.column,
+              },
+            };
+          });
+
+          const metricRowsRaw = await runSql(
+            buildMetricComparisonQuery(conditionA, conditionB, metricColumns),
+          );
+
+          const metricRows: MetricCompareRow[] = metricRowsRaw.map((row) => {
+            const metric = String(row[0] ?? "");
+            return {
+              metric,
+              label: metricLabel(metric),
+              medianA: row[1] == null ? null : Number(row[1]),
+              medianB: row[2] == null ? null : Number(row[2]),
+              meanA: row[3] == null ? null : Number(row[3]),
+              meanB: row[4] == null ? null : Number(row[4]),
+              sdA: row[5] == null ? null : Number(row[5]),
+              sdB: row[6] == null ? null : Number(row[6]),
+              nA: asNumber(row[7]),
+              nB: asNumber(row[8]),
+            };
+          });
+
+          const sharedByKey = new Map<string, { a: OverIndexingItem; b: OverIndexingItem }>();
+          const overA = new Map(
+            a.topOverIndexing.map((row) => [`${row.columnName}\0${row.value}`, row]),
+          );
+          const overB = new Map(
+            b.topOverIndexing.map((row) => [`${row.columnName}\0${row.value}`, row]),
+          );
+
+          for (const [key, rowA] of overA.entries()) {
+            const rowB = overB.get(key);
+            if (!rowB) continue;
+            sharedByKey.set(key, { a: rowA, b: rowB });
+          }
+
+          const sharedTraits: SharedTraitRow[] = [...sharedByKey.entries()]
+            .map(([key, rows]) => ({
+              key,
+              label: rows.a.label,
+              ratioA: rows.a.ratio,
+              ratioB: rows.b.ratio,
+              href: rows.a.href,
+            }))
+            .sort((left, right) => Math.min(right.ratioA, right.ratioB) - Math.min(left.ratioA, left.ratioB))
+            .slice(0, 8);
+
+          const topDifference = differences[0];
+          const topDifferenceContext = topDifference
+            ? contextualizeDifference({
+                traitLabel: topDifference.label,
+                absDelta: topDifference.absDelta,
+                groupALabel: "Group A",
+                groupBLabel: "Group B",
+              })
+            : "These groups look similar across the selected traits.";
+
+          setRunStage("done");
+          setComparison({
+            a,
+            b,
+            differences,
+            sharedTraits,
+            metricRows,
+            topDifferenceContext,
+          });
+        } finally {
+          await conn.close();
+        }
       }
+    } catch (error) {
+      setRunError(error instanceof Error ? error.message : "Failed to run profile analysis.");
+    } finally {
+      setRunning(false);
     }
-  }, [mode, db, filterPairs, filterPairsA, filterPairsB, buildCondition, runSingleCohort]);
+  }, [
+    db,
+    mode,
+    filterPairs,
+    filterPairsA,
+    filterPairsB,
+    runSingleCohort,
+    candidateColumns,
+    columnByName,
+    metricColumns,
+  ]);
 
-  const warning = useMemo(() => {
-    if (!summary) return null;
-    return getWarning(summary.cohortSize);
-  }, [summary]);
+  const saveToNotebook = useCallback(() => {
+    const activeSummary = mode === "single" ? summary : null;
+    const activeComparison = mode === "compare" ? comparison : null;
+    if (!activeSummary && !activeComparison) return;
 
-  const comparisonPercentileRows = useMemo((): ComparisonPercentileRow[] => {
-    if (!comparison) return [];
-    const { a, b } = comparison;
+    const filters = mode === "single" ? filterPairs : [...filterPairsA, ...filterPairsB];
+    const filterDesc = filters.map((pair) => `${pair.column}=${pair.value}`).join(", ");
 
-    const metricsSet = new Set([
-      ...a.percentileCards.map((c) => c.metric),
-      ...b.percentileCards.map((c) => c.metric),
-    ]);
-
-    return Array.from(metricsSet).map((metric) => {
-      const cardA = a.percentileCards.find((c) => c.metric === metric);
-      const cardB = b.percentileCards.find((c) => c.metric === metric);
-      const medianA = cardA?.cohortMedian ?? null;
-      const medianB = cardB?.cohortMedian ?? null;
-      const delta = medianA != null && medianB != null ? medianB - medianA : null;
-      return { metric, medianA, medianB, delta };
+    addNotebookEntry({
+      title: `Profile: ${filterDesc}`,
+      sourceUrl: window.location.href,
+      queryDefinition: {
+        type: "profile",
+        params:
+          mode === "single"
+            ? { mode: "single", filters: filterPairs }
+            : { mode: "compare", filtersA: filterPairsA, filtersB: filterPairsB },
+      },
+      resultsSnapshot: {
+        summary:
+          activeSummary != null
+            ? {
+                cohortSize: activeSummary.cohortSize,
+                topTraits: activeSummary.topOverIndexing.slice(0, 5).map((row) => row.label),
+              }
+            : {
+                groupASize: activeComparison?.a.cohortSize,
+                groupBSize: activeComparison?.b.cohortSize,
+                topDifference: activeComparison?.differences[0]?.label,
+              },
+      },
+      notes: "",
     });
-  }, [comparison]);
+
+    setNotebookSaved(true);
+    setTimeout(() => setNotebookSaved(false), 1800);
+  }, [mode, summary, comparison, filterPairs, filterPairsA, filterPairsB]);
+
+  const applySuggestedCohort = useCallback(
+    (filters: Array<{ column: string; value: string }>) => {
+      if (!schema) return;
+
+      const available = new Set(schema.columns.map((column) => column.name));
+      const valid = filters.filter((filter) => available.has(filter.column)).slice(0, 3);
+
+      const nextColumns: [string, string, string] = ["", "", ""];
+      const nextValues: Record<string, string> = {};
+
+      valid.forEach((filter, index) => {
+        nextColumns[index] = filter.column;
+        nextValues[filter.column] = filter.value;
+      });
+
+      setMode("single");
+      setSummary(null);
+      setComparison(null);
+      setRunError(null);
+      setSelectedColumns(nextColumns);
+      setSelectedValues(nextValues);
+    },
+    [schema],
+  );
 
   const renderFilterSlots = (
     columns: [string, string, string],
-    setColumns: React.Dispatch<React.SetStateAction<[string, string, string]>>,
+    setColumns: (next: [string, string, string]) => void,
     values: Record<string, string>,
-    setValues: React.Dispatch<React.SetStateAction<Record<string, string>>>,
+    setValues: (next: Record<string, string>) => void,
     valueOptions: Record<string, string[]>,
     layout: "grid" | "stack" = "grid",
   ) => (
@@ -691,14 +1029,14 @@ function ProfilePage() {
       {[0, 1, 2].map((slot) => {
         const column = columns[slot] ?? "";
         const options = valueOptions[column] ?? [];
-        const columnMeta = availableDemographicColumns.find((item) => item.name === column);
+        const columnMeta = availableFilterColumns.find((candidate) => candidate.name === column);
 
         return (
           <div key={`slot-${slot}`} className="space-y-2 border border-[var(--rule)] bg-[var(--paper)] p-3">
             <label className="editorial-label">
               Field {slot + 1}
               <ColumnCombobox
-                columns={availableDemographicColumns}
+                columns={availableFilterColumns}
                 value={column}
                 includeNoneOption
                 noneOptionLabel="None"
@@ -715,11 +1053,8 @@ function ProfilePage() {
               <Select
                 value={values[column] || NONE}
                 onValueChange={(value) => {
-                  const resolved = value === NONE ? "" : value;
-                  setValues((current) => ({
-                    ...current,
-                    [column]: resolved,
-                  }));
+                  const next = { ...values, [column]: value === NONE ? "" : value };
+                  setValues(next);
                 }}
                 disabled={!column || options.length === 0}
               >
@@ -742,89 +1077,46 @@ function ProfilePage() {
     </div>
   );
 
-  const renderWarningBanner = (cohortSize: number) => {
-    const w = getWarning(cohortSize);
-    if (!w) return null;
-    return (
-      <p className={`alert ${w.kind === "critical" ? "alert--critical" : "alert--warn"}`}>
-        {w.message}
-      </p>
-    );
-  };
+  const stageLabel =
+    runStage === "identity"
+      ? "Calculating cohort size and identity"
+      : runStage === "percentile"
+        ? "Building personality snapshot"
+        : runStage === "overindex"
+          ? "Ranking standout traits"
+          : runStage === "distribution"
+            ? "Rendering distributions"
+            : runStage === "done"
+              ? "Complete"
+              : "";
 
-  const saveToNotebook = useCallback(() => {
-    const activeSummary = mode === "single" ? summary : null;
-    const activeComparison = mode === "compare" ? comparison : null;
+  const comparisonPercentileA: PercentileChartDatum[] =
+    comparison?.a.percentileCards.map((row) => ({
+      metric: row.metric,
+      label: row.label,
+      percentile: row.globalPercentile,
+      cohortN: row.cohortN,
+      ciLower: row.ciLower,
+      ciUpper: row.ciUpper,
+    })) ?? [];
 
-    if (!activeSummary && !activeComparison) return;
-
-    const filters = mode === "single" ? filterPairs : [...filterPairsA, ...filterPairsB];
-    const filterDesc = filters.map((f) => `${f.column}=${f.value}`).join(", ");
-
-    addNotebookEntry({
-      title: `Profile: ${filterDesc}`,
-      sourceUrl: window.location.href,
-      queryDefinition: {
-        type: "profile",
-        params: {
-          mode,
-          ...(mode === "single" ? { filters: filterPairs } : { filtersA: filterPairsA, filtersB: filterPairsB }),
-        },
-      },
-      resultsSnapshot: {
-        summary: activeSummary
-          ? {
-              cohortSize: activeSummary.cohortSize,
-              cohortShare: activeSummary.cohortSharePercent,
-              topOverIndexing: activeSummary.overIndexing.slice(0, 5).map((o) => `${o.columnName}=${o.value} (${o.ratio.toFixed(1)}x)`),
-            }
-          : activeComparison
-            ? {
-                cohortA: activeComparison.a.cohortSize,
-                cohortB: activeComparison.b.cohortSize,
-              }
-            : {},
-      },
-      notes: "",
-    });
-
-    setNotebookSaved(true);
-    setTimeout(() => setNotebookSaved(false), 2000);
-  }, [mode, summary, comparison, filterPairs, filterPairsA, filterPairsB]);
-
-  const applySuggestedCohort = useCallback((filters: Array<{ column: string; value: string }>) => {
-    if (!schema) return;
-
-    const available = new Set(schema.columns.map((column) => column.name));
-    const validFilters = filters.filter((filter) => available.has(filter.column)).slice(0, 3);
-
-    const columns: [string, string, string] = ["", "", ""];
-    const values: Record<string, string> = {};
-
-    validFilters.forEach((filter, index) => {
-      columns[index] = filter.column;
-      values[filter.column] = filter.value;
-    });
-
-    setMode("single");
-    setSummary(null);
-    setComparison(null);
-    setRunError(null);
-    setSelectedColumns(columns);
-    setSelectedValues(values);
-  }, [schema]);
-
-  const deltaDirection = (delta: number): string => {
-    if (delta > 0) return "higher";
-    if (delta < 0) return "lower";
-    return "equal";
-  };
+  const comparisonPercentileB: PercentileChartDatum[] =
+    comparison?.b.percentileCards.map((row) => ({
+      metric: row.metric,
+      label: row.label,
+      percentile: row.globalPercentile,
+      cohortN: row.cohortN,
+      ciLower: row.ciLower,
+      ciUpper: row.ciUpper,
+    })) ?? [];
 
   return (
     <div className="page">
       <header className="page-header">
         <h1 className="page-title">Build a Profile</h1>
-        <p className="page-subtitle">Pick a group and see what is unusually common compared with everyone else.</p>
+        <p className="page-subtitle">
+          Build a cohort, see where it sits in the landscape, and compare two groups directly.
+        </p>
       </header>
 
       {schemaError ? <section className="alert alert--error">Failed to load schema: {schemaError}</section> : null}
@@ -887,42 +1179,65 @@ function ProfilePage() {
           {mode === "single" ? (
             renderFilterSlots(
               selectedColumns,
-              setSelectedColumns,
+              (next) => setSelectedColumns(next),
               selectedValues,
-              setSelectedValues,
+              (next) => setSelectedValues(next),
               valueOptionsByColumn,
             )
           ) : (
             <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-3 border border-[var(--rule)] p-4">
-                <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                  Group A
-                </p>
-                {renderFilterSlots(columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA, "stack")}
+              <div className="space-y-3 border border-[var(--rule)] bg-[var(--paper)] p-4">
+                <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group A</p>
+                {renderFilterSlots(
+                  columnsA,
+                  (next) => setColumnsA(next),
+                  valuesA,
+                  (next) => setValuesA(next),
+                  valueOptionsA,
+                  "stack",
+                )}
               </div>
-              <div className="space-y-3 border border-[var(--rule)] p-4">
-                <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                  Group B
-                </p>
-                {renderFilterSlots(columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB, "stack")}
+
+              <div className="space-y-3 border border-[var(--rule)] bg-[var(--paper)] p-4">
+                <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group B</p>
+                {renderFilterSlots(
+                  columnsB,
+                  (next) => setColumnsB(next),
+                  valuesB,
+                  (next) => setValuesB(next),
+                  valueOptionsB,
+                  "stack",
+                )}
               </div>
             </div>
           )}
 
-          <Button
-            type="button"
-            onClick={() => {
-              void runProfile();
-            }}
-            disabled={!canRun}
-            variant="default"
-          >
-            {running
-              ? "Running..."
-              : mode === "single"
-                ? "Run Group Analysis"
-                : "Compare"}
-          </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              type="button"
+              variant="default"
+              disabled={!canRun}
+              onClick={() => {
+                void runProfile();
+              }}
+            >
+              {running
+                ? "Running..."
+                : mode === "single"
+                  ? "Run Group Analysis"
+                  : "Compare Groups"}
+            </Button>
+
+            {(summary || comparison) && !running ? (
+              <button type="button" className="editorial-button" onClick={saveToNotebook}>
+                {notebookSaved ? "Saved" : "Add to Notebook"}
+              </button>
+            ) : null}
+
+            {running ? (
+              <p className="mono-value text-[0.72rem] text-[var(--ink-faded)]">{stageLabel}</p>
+            ) : null}
+          </div>
 
           {runError ? <p className="alert alert--error">{runError}</p> : null}
         </section>
@@ -932,318 +1247,469 @@ function ProfilePage() {
         </section>
       )}
 
-      {/* --- Single cohort results --- */}
-      {summary ? (
-        <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <SectionHeader number="02" title="Your Group Summary" />
-            <button type="button" className="editorial-button" onClick={saveToNotebook}>
-              {notebookSaved ? "Saved!" : "Add to Notebook"}
-            </button>
-          </div>
-
-          <div className="stat-grid grid-cols-1 md:grid-cols-4">
-            <StatCard label="Dataset Size" value={formatNumber(summary.totalSize)} />
-            <StatCard label="Group Size" value={formatNumber(summary.cohortSize)} />
-            <StatCard
-              label="Group Share"
-              value={formatPercent(summary.cohortSharePercent, 2)}
-              note={`N = ${formatNumber(summary.cohortSize)}`}
-            />
-            <StatCard
-              label="How Uncommon"
-              value={formatPercent(summary.cohortRarity, 2)}
-              note="of people are not in this group"
-            />
-          </div>
-
-          {warning ? (
-            <p className={`alert ${warning.kind === "critical" ? "alert--critical" : "alert--warn"}`}>
-              {warning.message}
-            </p>
-          ) : null}
-
-          <div className="raised-panel space-y-3">
-            <SectionHeader number="03" title="How This Group Compares" />
-            <DataTable
-              rows={summary.percentileCards}
-              rowKey={(row) => row.metric}
-              columns={[
-                {
-                  id: "metric",
-                  header: "Metric",
-                  cell: (row) => {
-                    const columnMeta = columnByName.get(row.metric);
-                    const name = columnMeta ? getColumnDisplayName(columnMeta) : row.metric;
-                    if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
-                    return name;
-                  },
-                },
-                {
-                  id: "cohort",
-                  header: "Group Median",
-                  align: "right",
-                  cell: (row) => row.cohortMedian == null ? "n/a" : row.cohortMedian.toFixed(3),
-                },
-                {
-                  id: "global",
-                  header: "Ranking vs. Everyone",
-                  align: "right",
-                  cell: (row) => row.globalPercentile == null ? "n/a" : formatPercent(row.globalPercentile, 2),
-                },
-                {
-                  id: "n",
-                  header: "N",
-                  align: "right",
-                  cell: () => formatNumber(summary.cohortSize),
-                },
-              ]}
-            />
-          </div>
-
-          <div className="raised-panel space-y-3">
-            <SectionHeader number="04" title="What Makes This Group Different" />
-            <DataTable
-              rows={summary.overIndexing}
-              rowKey={(row, index) => `${row.columnName}-${row.value}-${index}`}
-              columns={[
-                {
-                  id: "column",
-                  header: "Column",
-                  cell: (row) => {
-                    const columnMeta = columnByName.get(row.columnName);
-                    const name = columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
-                    if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
-                    return name;
-                  },
-                },
-                {
-                  id: "value",
-                  header: "Value",
-                  cell: (row) => {
-                    const columnMeta = columnByName.get(row.columnName);
-                    return formatValueWithLabel(row.value, columnMeta?.valueLabels);
-                  },
-                },
-                {
-                  id: "ratio",
-                  header: "Times more likely",
-                  align: "right",
-                  cell: (row) => `${row.ratio.toFixed(2)}x`,
-                },
-                {
-                  id: "cohort",
-                  header: "Group % (N)",
-                  align: "right",
-                  cell: (row) =>
-                    `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
-                },
-                {
-                  id: "global",
-                  header: "Global % (N)",
-                  align: "right",
-                  cell: (row) =>
-                    `${formatPercent(row.globalPct, 2)} (N=${formatNumber(row.globalCount)})`,
-                },
-              ]}
-              emptyMessage="No distinctive traits found - need at least 30 people in a category to show results"
-            />
-          </div>
+      {running && !summary && !comparison ? (
+        <section className="space-y-3">
+          <SectionHeader number="02" title="Preparing results" subtitle={stageLabel} />
+          <LoadingSkeleton variant="stat-grid" phase={phase} title="Computing profile..." />
         </section>
       ) : null}
 
-      {/* --- Comparison results --- */}
+      {summary ? (
+        <section className="space-y-4">
+          <SectionHeader number="02" title="Your group at a glance" subtitle={summary.filterSummary} />
+
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_240px]">
+            <div className="stat-grid grid-cols-1 md:grid-cols-4">
+              <StatCard label="Dataset Size" value={formatNumber(summary.totalSize)} />
+              <StatCard label="Group Size" value={formatNumber(summary.cohortSize)} />
+              <StatCard
+                label="Group Share"
+                value={formatPercent(summary.cohortSharePercent, 2)}
+                note={`${confidenceLabelForN(summary.cohortSize)}`}
+              />
+              <StatCard
+                label="Cohort Rarity"
+                value={formatPercent(summary.cohortRarity, 2)}
+                note="100% minus cohort share"
+              />
+            </div>
+
+            <div className="space-y-3">
+              <ConfidenceIndicator n={summary.cohortSize} />
+              <CohortFingerprint
+                points={fingerprintPoints(summary.percentileCards)}
+                labelA="This cohort"
+                size={200}
+              />
+            </div>
+          </div>
+
+          <section className="raised-panel space-y-3">
+            <SectionHeader
+              number="03"
+              title="Personality snapshot"
+              subtitle="Percentile ranks versus the full dataset"
+            />
+
+            <PercentileChart
+              data={summary.percentileCards.map((row) => ({
+                metric: row.metric,
+                label: row.label,
+                percentile: row.globalPercentile,
+                cohortN: row.cohortN,
+                ciLower: row.ciLower,
+                ciUpper: row.ciUpper,
+              }))}
+            />
+
+            <details>
+              <summary className="editorial-button inline-flex">Show data table</summary>
+              <div className="mt-3">
+                <DataTable
+                  rows={summary.percentileCards}
+                  rowKey={(row) => row.metric}
+                  columns={[
+                    {
+                      id: "metric",
+                      header: "Metric",
+                      cell: (row) => {
+                        const columnMeta = columnByName.get(row.metric);
+                        if (!columnMeta) return row.label;
+                        return (
+                          <ColumnNameTooltip column={columnMeta}>
+                            <span>{row.label}</span>
+                          </ColumnNameTooltip>
+                        );
+                      },
+                    },
+                    {
+                      id: "median",
+                      header: "Cohort median",
+                      align: "right",
+                      cell: (row) => (row.cohortMedian == null ? "n/a" : row.cohortMedian.toFixed(3)),
+                    },
+                    {
+                      id: "percentile",
+                      header: "Global percentile",
+                      align: "right",
+                      cell: (row) =>
+                        row.globalPercentile == null
+                          ? "n/a"
+                          : formatPercent(row.globalPercentile, 1),
+                    },
+                    {
+                      id: "n",
+                      header: "N",
+                      align: "right",
+                      cell: (row) => formatNumber(row.cohortN),
+                    },
+                  ]}
+                />
+              </div>
+            </details>
+          </section>
+
+          <section className="raised-panel space-y-3">
+            <SectionHeader
+              number="03b"
+              title="Distribution panorama"
+              subtitle="Where the cohort clusters across each metric"
+            />
+
+            <details open={summary.cohortSize > 200}>
+              <summary className="editorial-button inline-flex">
+                {summary.cohortSize > 200 ? "Hide distributions" : "Show distributions"}
+              </summary>
+              <div className="mt-3 space-y-2">
+                {summary.distributions.map((distribution) => (
+                  <DistributionStrip
+                    key={distribution.metric}
+                    label={distribution.label}
+                    bins={distribution.bins}
+                    min={distribution.min}
+                    max={distribution.max}
+                    cohortMedian={distribution.cohortMedian}
+                    cohortSD={distribution.cohortSD}
+                    cohortN={distribution.cohortN}
+                    globalMedian={distribution.globalMedian}
+                  />
+                ))}
+              </div>
+            </details>
+          </section>
+
+          <section className="raised-panel space-y-4">
+            <SectionHeader
+              number="04"
+              title="What stands out"
+              subtitle="Top over-indexed and under-indexed traits versus global"
+            />
+
+            <OverIndexChart
+              rows={summary.topOverIndexing}
+              cohortSize={summary.cohortSize}
+              title="More common in your group"
+            />
+
+            <OverIndexChart
+              rows={summary.underIndexing}
+              cohortSize={summary.cohortSize}
+              title="Less common in your group"
+            />
+
+            <details>
+              <summary className="editorial-button inline-flex">Show data table</summary>
+              <div className="mt-3">
+                <DataTable
+                  rows={summary.overIndexing}
+                  rowKey={(row) => row.key}
+                  columns={[
+                    {
+                      id: "trait",
+                      header: "Trait",
+                      cell: (row) => (
+                        <Link
+                          to="/explore/crosstab"
+                          search={{ x: row.href.x, y: row.href.y }}
+                          className="mono-value text-[var(--accent)]"
+                        >
+                          {row.label}
+                        </Link>
+                      ),
+                    },
+                    {
+                      id: "ratio",
+                      header: "Ratio",
+                      align: "right",
+                      cell: (row) => `${row.ratio.toFixed(2)}x`,
+                    },
+                    {
+                      id: "cohort",
+                      header: "Cohort %",
+                      align: "right",
+                      cell: (row) => formatPercent(row.cohortPct, 2),
+                    },
+                    {
+                      id: "global",
+                      header: "Global %",
+                      align: "right",
+                      cell: (row) => formatPercent(row.globalPct, 2),
+                    },
+                    {
+                      id: "n",
+                      header: "N",
+                      align: "right",
+                      cell: (row) => `${formatNumber(row.cohortCount)} / ${formatNumber(row.globalCount)}`,
+                    },
+                  ]}
+                />
+              </div>
+            </details>
+          </section>
+
+          <section className="raised-panel space-y-3">
+            <SectionHeader
+              number="04b"
+              title="Surprise discoveries"
+              subtitle="A few high-signal findings to explore next"
+            />
+
+            <div className="grid gap-2 md:grid-cols-2">
+              {summary.surpriseFindings.map((finding) => (
+                <Link
+                  key={finding.id}
+                  to={finding.href.to}
+                  search={finding.href.search}
+                  className="border border-[var(--rule)] bg-[var(--paper)] p-3 text-[0.9rem] text-[var(--ink)] hover:border-[var(--accent)]"
+                >
+                  {finding.sentence}
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="raised-panel space-y-3">
+            <SectionHeader number="05" title="Explore deeper" />
+            <ul className="space-y-2 text-[0.9rem]">
+              {summary.topOverIndexing.slice(0, 5).map((row) => (
+                <li key={`deep-${row.key}`}>
+                  <Link
+                    to="/explore/crosstab"
+                    search={{ x: row.href.x, y: row.href.y }}
+                    className="text-[var(--accent)] underline decoration-[var(--rule-light)] underline-offset-2"
+                  >
+                    {row.label}
+                  </Link>
+                </li>
+              ))}
+              {summary.percentileCards.slice(0, 3).map((row) => (
+                <li key={`deep-metric-${row.metric}`}>
+                  <Link
+                    to="/relationships"
+                    search={{ column: row.metric }}
+                    className="text-[var(--accent)] underline decoration-[var(--rule-light)] underline-offset-2"
+                  >
+                    Connections around {row.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        </section>
+      ) : null}
+
       {comparison ? (
         <section className="space-y-4">
-          <div className="flex items-center justify-between">
-            <SectionHeader number="02" title="Group Comparison" />
-            <button type="button" className="editorial-button" onClick={saveToNotebook}>
-              {notebookSaved ? "Saved!" : "Add to Notebook"}
-            </button>
-          </div>
+          <SectionHeader number="C1" title="Dual identity cards" subtitle="Who each group represents" />
 
-          {/* Side-by-side cohort Ns */}
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-2">
-              <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Group A
-              </p>
+            <div className="raised-panel space-y-3">
+              <p className="mono-label">Group A</p>
+              <p className="section-subtitle">{comparison.a.filterSummary}</p>
               <div className="stat-grid grid-cols-1 md:grid-cols-3">
-                <StatCard label="Dataset Size" value={formatNumber(comparison.a.totalSize)} />
-                <StatCard label="Group Size" value={formatNumber(comparison.a.cohortSize)} />
-                <StatCard
-                  label="Group Share"
-                  value={formatPercent(comparison.a.cohortSharePercent, 2)}
-                  note={`N = ${formatNumber(comparison.a.cohortSize)}`}
-                />
+                <StatCard label="N" value={formatNumber(comparison.a.cohortSize)} />
+                <StatCard label="Share" value={formatPercent(comparison.a.cohortSharePercent, 2)} />
+                <StatCard label="Rarity" value={formatPercent(comparison.a.cohortRarity, 2)} />
               </div>
-              {renderWarningBanner(comparison.a.cohortSize)}
+              <ConfidenceIndicator n={comparison.a.cohortSize} />
+              <CohortFingerprint points={fingerprintPoints(comparison.a.percentileCards)} labelA="Group A" size={190} />
             </div>
-            <div className="space-y-2">
-              <p className="mono-label" style={{ fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase" }}>
-                Group B
-              </p>
+
+            <div className="raised-panel space-y-3">
+              <p className="mono-label">Group B</p>
+              <p className="section-subtitle">{comparison.b.filterSummary}</p>
               <div className="stat-grid grid-cols-1 md:grid-cols-3">
-                <StatCard label="Dataset Size" value={formatNumber(comparison.b.totalSize)} />
-                <StatCard label="Group Size" value={formatNumber(comparison.b.cohortSize)} />
-                <StatCard
-                  label="Group Share"
-                  value={formatPercent(comparison.b.cohortSharePercent, 2)}
-                  note={`N = ${formatNumber(comparison.b.cohortSize)}`}
-                />
+                <StatCard label="N" value={formatNumber(comparison.b.cohortSize)} />
+                <StatCard label="Share" value={formatPercent(comparison.b.cohortSharePercent, 2)} />
+                <StatCard label="Rarity" value={formatPercent(comparison.b.cohortRarity, 2)} />
               </div>
-              {renderWarningBanner(comparison.b.cohortSize)}
+              <ConfidenceIndicator n={comparison.b.cohortSize} />
+              <CohortFingerprint points={fingerprintPoints(comparison.b.percentileCards)} labelA="Group B" size={190} />
             </div>
           </div>
 
-          {/* Percentile comparison with deltas */}
-          <div className="raised-panel space-y-3">
-            <SectionHeader number="03" title="Median Comparison" />
-            {comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30 ? (
-              <p className="alert alert--critical">
-                One or both groups have fewer than 30 people.
-              </p>
-            ) : null}
+          <section className="raised-panel space-y-3">
+            <SectionHeader
+              number="C2"
+              title="Fingerprint comparison"
+              subtitle="Percentile positions for each group"
+            />
+
+            <PercentileChart
+              data={comparisonPercentileA}
+              compareData={comparisonPercentileB}
+              groupALabel="Group A"
+              groupBLabel="Group B"
+            />
+
+            <details>
+              <summary className="editorial-button inline-flex">Show distributions</summary>
+              <div className="mt-3 space-y-2">
+                {comparison.a.distributions.map((distributionA) => {
+                  const distributionB = comparison.b.distributions.find(
+                    (candidate) => candidate.metric === distributionA.metric,
+                  );
+                  if (!distributionB) return null;
+
+                  return (
+                    <DistributionStrip
+                      key={`compare-dist-${distributionA.metric}`}
+                      label={distributionA.label}
+                      bins={distributionA.bins}
+                      compareBins={distributionB.bins}
+                      min={Math.min(distributionA.min, distributionB.min)}
+                      max={Math.max(distributionA.max, distributionB.max)}
+                      cohortMedian={distributionA.cohortMedian}
+                      cohortSD={distributionA.cohortSD}
+                      cohortN={distributionA.cohortN}
+                      globalMedian={distributionA.globalMedian}
+                      compareMedian={distributionB.cohortMedian}
+                    />
+                  );
+                })}
+              </div>
+            </details>
+          </section>
+
+          <section className="raised-panel space-y-3">
+            <SectionHeader
+              number="C3"
+              title="What's actually different"
+              subtitle="Ranked by absolute percentage-point gap"
+            />
+            <p className="section-subtitle">{comparison.topDifferenceContext}</p>
+
+            <DumbbellChart
+              rows={comparison.differences}
+              groupALabel="Group A"
+              groupBLabel="Group B"
+            />
+
+            <details>
+              <summary className="editorial-button inline-flex">Show data table</summary>
+              <div className="mt-3">
+                <DataTable
+                  rows={comparison.differences}
+                  rowKey={(row) => row.key}
+                  columns={[
+                    {
+                      id: "trait",
+                      header: "Trait",
+                      cell: (row) => (
+                        <Link
+                          to="/explore/crosstab"
+                          search={{ x: row.href.x, y: row.href.y }}
+                          className="mono-value text-[var(--accent)]"
+                        >
+                          {row.label}
+                        </Link>
+                      ),
+                    },
+                    {
+                      id: "a",
+                      header: "Group A",
+                      align: "right",
+                      cell: (row) => formatPercent(row.pctA, 2),
+                    },
+                    {
+                      id: "b",
+                      header: "Group B",
+                      align: "right",
+                      cell: (row) => formatPercent(row.pctB, 2),
+                    },
+                    {
+                      id: "delta",
+                      header: "Δ points",
+                      align: "right",
+                      cell: (row) => row.absDelta.toFixed(2),
+                    },
+                    {
+                      id: "n",
+                      header: "N",
+                      align: "right",
+                      cell: (row) => `${formatNumber(row.countA)} / ${formatNumber(row.countB)}`,
+                    },
+                  ]}
+                />
+              </div>
+            </details>
+          </section>
+
+          <section className="raised-panel space-y-3">
+            <SectionHeader number="C4" title="What they share" subtitle="Traits both groups over-index on" />
             <DataTable
-              rows={comparisonPercentileRows}
-              rowKey={(row) => row.metric}
+              rows={comparison.sharedTraits}
+              rowKey={(row) => row.key}
               columns={[
                 {
-                  id: "metric",
-                  header: "Metric",
-                  cell: (row) => {
-                    const columnMeta = columnByName.get(row.metric);
-                    const name = columnMeta ? getColumnDisplayName(columnMeta) : row.metric;
-                    if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
-                    return name;
-                  },
+                  id: "trait",
+                  header: "Shared trait",
+                  cell: (row) => (
+                    <Link
+                      to="/explore/crosstab"
+                      search={{ x: row.href.x, y: row.href.y }}
+                      className="mono-value text-[var(--accent)]"
+                    >
+                      {row.label}
+                    </Link>
+                  ),
                 },
                 {
-                  id: "medianA",
-                  header: "Group A Median",
+                  id: "a",
+                  header: "Group A ratio",
                   align: "right",
-                  cell: (row) => row.medianA == null ? "n/a" : row.medianA.toFixed(3),
+                  cell: (row) => `${row.ratioA.toFixed(2)}x`,
                 },
                 {
-                  id: "medianB",
-                  header: "Group B Median",
+                  id: "b",
+                  header: "Group B ratio",
                   align: "right",
-                  cell: (row) => row.medianB == null ? "n/a" : row.medianB.toFixed(3),
-                },
-                {
-                  id: "delta",
-                  header: "Difference",
-                  align: "right",
-                  cell: (row) => {
-                    if (comparison.a.cohortSize < 30 || comparison.b.cohortSize < 30) {
-                      return "n/a (fewer than 30 people)";
-                    }
-                    if (row.delta == null) return "n/a";
-                    const sign = row.delta > 0 ? "+" : "";
-                    return `${sign}${row.delta.toFixed(3)} (${deltaDirection(row.delta)})`;
-                  },
-                },
-                {
-                  id: "nA",
-                  header: "N (A)",
-                  align: "right",
-                  cell: () => formatNumber(comparison.a.cohortSize),
-                },
-                {
-                  id: "nB",
-                  header: "N (B)",
-                  align: "right",
-                  cell: () => formatNumber(comparison.b.cohortSize),
+                  cell: (row) => `${row.ratioB.toFixed(2)}x`,
                 },
               ]}
+              emptyMessage="No strong shared over-index traits were found for these cohorts."
             />
-          </div>
+          </section>
 
-          {/* Over-indexing side by side */}
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="raised-panel space-y-3">
-              <SectionHeader number="04a" title="What Makes Group A Different" />
-              <DataTable
-                rows={comparison.a.overIndexing}
-                rowKey={(row, index) => `a-${row.columnName}-${row.value}-${index}`}
-                columns={[
-                  {
-                    id: "column",
-                    header: "Column",
-                    cell: (row) => {
-                      const columnMeta = columnByName.get(row.columnName);
-                      const name = columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
-                      if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
-                    return name;
-                    },
-                  },
-                  {
-                    id: "value",
-                    header: "Value",
-                    cell: (row) => {
-                      const columnMeta = columnByName.get(row.columnName);
-                      return formatValueWithLabel(row.value, columnMeta?.valueLabels);
-                    },
-                  },
-                  {
-                    id: "ratio",
-                    header: "Times more likely",
-                    align: "right",
-                    cell: (row) => `${row.ratio.toFixed(2)}x`,
-                  },
-                  {
-                    id: "cohort",
-                    header: "Group % (N)",
-                    align: "right",
-                    cell: (row) =>
-                      `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
-                  },
-                ]}
-                emptyMessage="No distinctive traits found - need at least 30 people in a category to show results"
-              />
-            </div>
-            <div className="raised-panel space-y-3">
-              <SectionHeader number="04b" title="What Makes Group B Different" />
-              <DataTable
-                rows={comparison.b.overIndexing}
-                rowKey={(row, index) => `b-${row.columnName}-${row.value}-${index}`}
-                columns={[
-                  {
-                    id: "column",
-                    header: "Column",
-                    cell: (row) => {
-                      const columnMeta = columnByName.get(row.columnName);
-                      const name = columnMeta ? getColumnDisplayName(columnMeta) : row.columnName;
-                      if (columnMeta) return <ColumnNameTooltip column={columnMeta}><span>{name}</span></ColumnNameTooltip>;
-                    return name;
-                    },
-                  },
-                  {
-                    id: "value",
-                    header: "Value",
-                    cell: (row) => {
-                      const columnMeta = columnByName.get(row.columnName);
-                      return formatValueWithLabel(row.value, columnMeta?.valueLabels);
-                    },
-                  },
-                  {
-                    id: "ratio",
-                    header: "Times more likely",
-                    align: "right",
-                    cell: (row) => `${row.ratio.toFixed(2)}x`,
-                  },
-                  {
-                    id: "cohort",
-                    header: "Group % (N)",
-                    align: "right",
-                    cell: (row) =>
-                      `${formatPercent(row.cohortPct, 2)} (N=${formatNumber(row.cohortCount)})`,
-                  },
-                ]}
-                emptyMessage="No distinctive traits found - need at least 30 people in a category to show results"
-              />
-            </div>
-          </div>
+          <section className="raised-panel space-y-3">
+            <SectionHeader
+              number="C5"
+              title="Individual profiles"
+              subtitle="Each group compared to global baseline"
+            />
+
+            <details>
+              <summary className="editorial-button inline-flex">Group A profile</summary>
+              <div className="mt-3 space-y-2">
+                <OverIndexChart
+                  rows={comparison.a.topOverIndexing}
+                  cohortSize={comparison.a.cohortSize}
+                  title="More common in Group A"
+                />
+                <OverIndexChart
+                  rows={comparison.a.underIndexing}
+                  cohortSize={comparison.a.cohortSize}
+                  title="Less common in Group A"
+                />
+              </div>
+            </details>
+
+            <details>
+              <summary className="editorial-button inline-flex">Group B profile</summary>
+              <div className="mt-3 space-y-2">
+                <OverIndexChart
+                  rows={comparison.b.topOverIndexing}
+                  cohortSize={comparison.b.cohortSize}
+                  title="More common in Group B"
+                />
+                <OverIndexChart
+                  rows={comparison.b.underIndexing}
+                  cohortSize={comparison.b.cohortSize}
+                  title="Less common in Group B"
+                />
+              </div>
+            </details>
+          </section>
         </section>
       ) : null}
     </div>

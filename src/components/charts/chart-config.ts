@@ -1,3 +1,5 @@
+import { scaleLinear } from "d3-scale";
+
 /** Ink & Paper chart styling tokens */
 export const CHART_COLORS = {
   ink: "#1a1612",
@@ -16,6 +18,14 @@ export const CHART_FONT = {
   display: "'Fraunces', Georgia, serif",
   body: "'Source Serif 4', Georgia, serif",
   mono: "'JetBrains Mono', ui-monospace, monospace",
+} as const;
+
+/** Compare-mode color helpers */
+export const COMPARE_COLORS = {
+  groupA: CHART_COLORS.accent,
+  groupB: CHART_COLORS.ink,
+  groupAFill: "color-mix(in srgb, var(--accent) 22%, transparent)",
+  groupBFill: "color-mix(in srgb, var(--ink) 16%, transparent)",
 } as const;
 
 /** Common Recharts style props */
@@ -71,3 +81,12 @@ export const SERIES_COLORS = [
   CHART_COLORS.highlight,
   CHART_COLORS.rule,
 ] as const;
+
+export function createPercentScale(range: [number, number]) {
+  return scaleLinear().domain([0, 100]).range(range).clamp(true);
+}
+
+export function clampPercent(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}

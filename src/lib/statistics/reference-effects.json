@@ -1,0 +1,61 @@
+{
+  "generatedAt": "2026-02-15T01:49:21.836Z",
+  "landmarks": [
+    {
+      "id": "gender-pain-gap",
+      "title": "Gender gap on pain preference",
+      "metric": "d",
+      "effect": 0.644,
+      "percentilePointGap": 24,
+      "note": "one of the biggest in the dataset"
+    },
+    {
+      "id": "gender-dominant-arousal",
+      "title": "Gender gap on dominant arousal",
+      "metric": "d",
+      "effect": 0.556,
+      "percentilePointGap": 21,
+      "note": "one of the biggest in the dataset"
+    },
+    {
+      "id": "neuroticism-receiving-pain",
+      "title": "Neuroticism and receiving pain",
+      "metric": "r",
+      "effect": 0.16,
+      "percentilePointGap": 9,
+      "note": "noticeable"
+    },
+    {
+      "id": "politics-kink-breadth",
+      "title": "Politics and kink breadth",
+      "metric": "d",
+      "effect": 0.08,
+      "percentilePointGap": 3,
+      "note": "barely noticeable"
+    },
+    {
+      "id": "orientation-kink-breadth",
+      "title": "Gender and kink breadth",
+      "metric": "d",
+      "effect": 0.048,
+      "percentilePointGap": 2,
+      "note": "barely noticeable"
+    },
+    {
+      "id": "powerlessness-neuroticism",
+      "title": "Powerlessness and neuroticism",
+      "metric": "r",
+      "effect": 0.192,
+      "percentilePointGap": 11,
+      "note": "noticeable"
+    },
+    {
+      "id": "openness-fetish-count",
+      "title": "Openness and fetish breadth",
+      "metric": "r",
+      "effect": 0.066,
+      "percentilePointGap": 4,
+      "note": "barely noticeable"
+    }
+  ]
+}

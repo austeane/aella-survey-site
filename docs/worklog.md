@@ -327,3 +327,75 @@ Also includes schema enhancement plan (add `nullMeaning`, `displayName` fields),
 - Notes:
   - Vitest still reports the existing process shutdown warning (`close timed out after 10000ms`) after successful completion.
   - Build still emits existing chunk-size warnings; no functional regressions observed.
+
+## 2026-02-15
+
+### V5 full revamp execution completed
+
+**Plan document**: `docs/plans/active/v5-full-revamp.md`
+
+- Completed full implementation pass for the v5 revamp across schema, statistics/query foundations, chart components, and profile/relationships route architecture.
+
+- Foundation/data-layer work completed:
+  - Added `approxTopValues` support to metadata contracts/types:
+    - `src/lib/schema/types.ts`
+    - `src/lib/api/contracts.ts`
+  - Extended schema generation script to compute top categorical values (`<=120` cardinality):
+    - `scripts/profile-schema.mjs`
+  - Added profile SQL builders:
+    - `src/lib/duckdb/profile-queries.ts`
+  - Added statistical utilities:
+    - `src/lib/statistics/confidence.ts`
+    - `src/lib/statistics/effect-context.ts`
+    - `src/lib/statistics/reference-effects.json`
+  - Added reference-effect precompute script + package scripts:
+    - `scripts/precompute-reference-effects.mjs`
+    - `package.json` (`precompute-reference-effects`, `precompute-relationships` scripts)
+  - Upgraded relationship precompute pipeline (direction, pattern sentence, cluster scaffolding):
+    - `scripts/precompute-relationships.mjs`
+
+- New UI component scaffolding added:
+  - Charts:
+    - `src/components/charts/percentile-chart.tsx`
+    - `src/components/charts/over-index-chart.tsx`
+    - `src/components/charts/distribution-strip.tsx`
+    - `src/components/charts/dumbbell-chart.tsx`
+    - `src/components/charts/cohort-fingerprint.tsx`
+    - `src/components/charts/network-graph.tsx`
+    - `src/components/charts/mini-heatmap.tsx`
+  - Shared identity component:
+    - `src/components/question-identity-card.tsx`
+  - Chart config/token helpers extended for D3-driven components:
+    - `src/components/charts/chart-config.ts`
+
+- Route integration completed:
+  - `src/routes/profile.tsx` has been rewritten toward the new chart-first narrative sections and compare flow architecture.
+  - `src/routes/relationships.tsx` fully rewritten to the network/layered architecture:
+    - Layer 1 network galaxy (`NetworkGraph`) with search/selection controls
+    - Layer 2 selected-question detail using `QuestionIdentityCard` + cluster context
+    - Layer 3 relationship cards with lazy mini-heatmap previews (`MiniHeatmap`) and deep links to `/explore/crosstab`
+
+- Dependency + type completion:
+  - Added D3 runtime + type deps:
+    - `d3-scale`, `d3-shape`, `d3-force`
+    - `@types/d3-scale`, `@types/d3-shape`, `@types/d3-force`
+  - Resolved first-pass TypeScript issues in:
+    - `src/components/charts/cohort-fingerprint.tsx`
+    - `src/components/charts/distribution-strip.tsx`
+    - `src/components/charts/dumbbell-chart.tsx`
+    - `src/components/charts/network-graph.tsx`
+    - `src/routes/profile.tsx`
+
+- Artifact regeneration completed:
+  - `pnpm profile-schema` -> regenerated `src/lib/schema/columns.generated.json` (365 columns)
+  - `pnpm precompute-reference-effects` -> regenerated `src/lib/statistics/reference-effects.json` (7 landmarks)
+  - `pnpm precompute-relationships` -> regenerated `src/lib/schema/relationships.generated.json` (159 columns, 3065 relationship entries, 4 clusters)
+
+- Validation rerun (2026-02-15):
+  - `pnpm check-types` -> pass
+  - `pnpm test --run` -> pass (130 tests)
+  - `pnpm build` -> pass
+
+- Notes:
+  - Vitest still reports the pre-existing shutdown warning (`close timed out after 10000ms`) after passing tests.
+  - Build still reports large chunk warnings (including generated relationships artifact size); no functional build failures.

@@ -11,6 +11,7 @@ export interface ColumnMetadata {
   logicalType: LogicalType;
   nullRatio: number;
   approxCardinality: number;
+  approxTopValues?: string[];
   tags: CategoryTag[];
   nullMeaning?: NullMeaning;
   valueLabels?: Record<string, string>;
