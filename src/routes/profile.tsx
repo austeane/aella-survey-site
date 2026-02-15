@@ -38,7 +38,7 @@ import {
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
-import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
+import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip } from "@/lib/format-labels";
 import { addNotebookEntry } from "@/lib/notebook-store";
 import { getConfidenceStyle, reliabilityScore } from "@/lib/statistics/confidence";
 import { contextualizeDifference } from "@/lib/statistics/effect-context";
@@ -840,13 +840,17 @@ function ProfilePage() {
             const columnName = String(row[0] ?? "");
             const value = String(row[1] ?? "");
             const columnMeta = columnByName.get(columnName);
-            const label = `${columnMeta ? getColumnDisplayName(columnMeta) : columnName}: ${formatValueWithLabel(value, columnMeta?.valueLabels)}`;
+            const questionLabel = columnMeta ? getColumnTooltip(columnMeta) : columnName;
+            const answerLabel = formatValueWithLabel(value, columnMeta?.valueLabels);
+            const label = `${questionLabel}: ${answerLabel}`;
 
             const pctA = asNumber(row[4]) * 100;
             const pctB = asNumber(row[5]) * 100;
             return {
               key: `${columnName}-${value}-${index}`,
               label,
+              questionLabel,
+              answerLabel,
               columnName,
               value,
               valueA: pctA,

@@ -9,6 +9,10 @@ import { CHART_FONT } from "./chart-config";
 export interface DumbbellRow {
   key: string;
   label: string;
+  /** Optional separate question portion (displayed without truncation) */
+  questionLabel?: string;
+  /** Optional separate answer portion (displayed with subtle distinction) */
+  answerLabel?: string;
   valueA: number;
   valueB: number;
   nA: number;
@@ -58,11 +62,19 @@ export function DumbbellChart({ rows, groupALabel, groupBLabel }: DumbbellChartP
             key={row.key}
             className="grid gap-2 border-b border-[var(--rule-light)] pb-2 last:border-b-0 last:pb-0 md:grid-cols-[minmax(220px,1fr)_minmax(180px,240px)_90px]"
           >
-            <p
-              className="truncate font-['Source_Serif_4',Georgia,serif] text-[0.86rem] text-[var(--ink)]"
-              title={row.label}
-            >
-              {row.label}
+            <p className="font-['Source_Serif_4',Georgia,serif] text-[0.86rem] text-[var(--ink)]">
+              {row.questionLabel ? (
+                <>
+                  {row.questionLabel}
+                  {row.answerLabel ? (
+                    <span className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.78rem] text-[var(--ink-faded)]">
+                      {" "}{row.answerLabel}
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                row.label
+              )}
             </p>
 
             <div className="relative h-5">
