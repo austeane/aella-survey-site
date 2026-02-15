@@ -2,19 +2,10 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { SectionHeader } from "@/components/section-header";
 
-const CLAUDE_DESKTOP_MCP_CONFIG = `{
+const MCP_CONFIG = `{
   "mcpServers": {
     "bks": {
       "type": "streamable-http",
-      "url": "https://bks-mcp-server-production.up.railway.app/mcp"
-    }
-  }
-}`;
-
-const CURSOR_MCP_CONFIG = `{
-  "mcpServers": {
-    "bks": {
-      "transport": "streamable-http",
       "url": "https://bks-mcp-server-production.up.railway.app/mcp"
     }
   }
@@ -405,26 +396,15 @@ function AboutPage() {
           </p>
         </div>
 
-        <div className="space-y-4">
-          <div className="space-y-2">
-            <p className="mono-label text-[var(--ink-faded)]">
-              Claude Desktop config
-            </p>
-            <pre className="overflow-x-auto border border-[var(--rule)] bg-[var(--sidebar-bg)] p-4 text-sm leading-6 text-[var(--ink-light)]">
-              <code className="font-['JetBrains_Mono',monospace]">
-                {CLAUDE_DESKTOP_MCP_CONFIG}
-              </code>
-            </pre>
-          </div>
-
-          <div className="space-y-2">
-            <p className="mono-label text-[var(--ink-faded)]">Cursor config</p>
-            <pre className="overflow-x-auto border border-[var(--rule)] bg-[var(--sidebar-bg)] p-4 text-sm leading-6 text-[var(--ink-light)]">
-              <code className="font-['JetBrains_Mono',monospace]">
-                {CURSOR_MCP_CONFIG}
-              </code>
-            </pre>
-          </div>
+        <div className="space-y-2">
+          <p className="mono-label text-[var(--ink-faded)]">
+            MCP config (Claude Desktop, Cursor, etc.)
+          </p>
+          <pre className="overflow-x-auto border border-[var(--rule)] bg-[var(--sidebar-bg)] p-4 text-sm leading-6 text-[var(--ink-light)]">
+            <code className="font-['JetBrains_Mono',monospace]">
+              {MCP_CONFIG}
+            </code>
+          </pre>
         </div>
 
         <div className="space-y-2 border-l-2 border-[var(--rule)] pl-4">
