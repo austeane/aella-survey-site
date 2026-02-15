@@ -12,12 +12,28 @@ Add production-grade observability to BKS Explorer so we can:
 
 ## Implementation Snapshot (completed 2026-02-15)
 
-- ✅ Phase 1 — Pino structured logging added across API routes.
+- ✅ Phase 1 — Structured JSON logging across API routes (see gotchas below).
 - ✅ Phase 2 — `/api/events` ingestion + JSONL event store with daily rotation.
 - ✅ Phase 3 — client tracking (`track.ts`) wired into page views + core interaction points.
 - ✅ Phase 4 — `/api/analytics` endpoint with API-key auth + read-only bounded SQL.
 - ✅ Phase 5 — UI error boundary added and instrumented.
 - ✅ Phase 6 (optional) — MCP `query_analytics` proxy tool added.
+- ✅ Railway volume mounted at `/data/analytics` for persistent event storage.
+- ✅ Env vars set: `BKS_ANALYTICS_KEY`, `BKS_ANALYTICS_DIR=/data/analytics`.
+
+### Gotchas / Lessons Learned
+
+1. **Pino does NOT work with Nitro bundling.** Pino's worker-thread transport breaks when Nitro bundles server code. Replaced with a zero-dependency structured JSON logger (`src/lib/server/logger.ts`) that writes via `console.log`/`console.warn`/`console.error`. Railway captures stdout as structured JSON.
+
+2. **Railway CLI `volume add` often times out.** Use the GraphQL API directly:
+   ```bash
+   curl -X POST https://backboard.railway.com/graphql/v2 \
+     -H "Authorization: Bearer $TOKEN" \
+     -d '{"query":"mutation { volumeCreate(input: { projectId: \"...\", serviceId: \"...\", mountPath: \"/data/analytics\", region: \"us-west2\" }) { id name } }"}'
+   ```
+   The `region` field is required. Service/project IDs are in `~/.railway/config.json`.
+
+3. **bks-explorer may be invisible on Railway Architecture canvas.** Navigate directly via URL: `railway.com/project/{projectId}/service/{serviceId}` using IDs from `~/.railway/config.json`.
 
 ## Non-Goals (for this implementation)
 
@@ -66,7 +82,7 @@ Claude / internal tooling
    - Railway: `/data/analytics`
    - Local default: `<repo>/data/analytics`
 4. **Query access**: new `POST /api/analytics`, protected by `x-bks-analytics-key` header.
-5. **Operational logs**: Pino JSON logs to stdout for Railway log search.
+5. **Operational logs**: Lightweight JSON logs via `console.log` to stdout (NOT pino — Nitro bundling breaks pino) for Railway log search.
 6. **Privacy**: no feedback message body, no email, no raw SQL text in analytics events.
 
 ---
@@ -118,13 +134,14 @@ Constraints:
 
 ---
 
-## Phase 1 — Server-Side Structured Logging (Pino)
+## Phase 1 — Server-Side Structured Logging
+
+**Important**: Originally planned for Pino, but Pino's worker-thread transport breaks when Nitro bundles server code. Implemented as a lightweight zero-dependency JSON logger using `console.log`/`console.warn`/`console.error` instead.
 
 ### Create
-- `src/lib/server/logger.ts`
+- `src/lib/server/logger.ts` — custom structured JSON logger (no pino dependency)
 
 ### Modify
-- `package.json` (add `pino`)
 - `src/routes/api/query.ts`
 - `src/routes/api/crosstab.ts`
 - `src/routes/api/stats.$column.ts`
@@ -137,6 +154,7 @@ Constraints:
 - Each route logs exactly once on success and once on error path.
 - Include `errorCode` on failures.
 - Keep logs structured and small; avoid full request bodies.
+- Log level controlled by `BKS_LOG_LEVEL` env var (defaults to `info` in prod, `debug` in dev).
 
 ---
 
