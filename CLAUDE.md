@@ -45,6 +45,7 @@ Every commit must pass: lint-staged → type-check → tests
 - `docs/design/frontend.md` — **design system**: "Ink & Paper" aesthetic, color tokens, typography, component patterns
 - `docs/design/architecture.md` — stack decisions, technical rationale
 - `docs/design/deployment.md` — Railway config, URLs, how to deploy
+- `docs/design/observability.md` — logging, analytics tracking, `/api/analytics` query endpoint
 - `docs/design/mcps.md` — available MCP servers and how to use them
 - `docs/schema/README.md` — schema metadata and caveat generation model
 - `docs/schema/interesting-findings.md` — curated findings from `analysis/findings.json`

@@ -8,7 +8,7 @@
 - **Data engine (metadata generation)**: `@duckdb/node-api` in `scripts/profile-schema.mjs`
 - **Data engine (MCP)**: DuckDB Python bindings in `mcp-server/server.py`
 - **Deploy**: Railway (web service + optional MCP service)
-- **Observability**: Pino structured JSON logs + JSONL analytics event store on mounted volume
+- **Observability**: Structured JSON logs (console.log, NOT pino) + JSONL analytics event store on Railway volume — see `docs/design/observability.md`
 
 ## Key Technical Decisions
 
