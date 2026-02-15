@@ -49,8 +49,14 @@ export function CohortFingerprint({
   const ringLevels = [25, 50, 75, 100];
 
   return (
-    <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
-      <svg width={size} height={size} role="img" aria-label="Cohort fingerprint radar chart">
+    <div className="border border-[var(--rule)] bg-[var(--paper)] px-10 py-2">
+      <svg
+        width={size}
+        height={size}
+        role="img"
+        aria-label="Cohort fingerprint radar chart"
+        style={{ overflow: "visible" }}
+      >
         <g transform={`translate(${center}, ${center})`}>
           {ringLevels.map((level) => {
             const ringR = radialScale(level);

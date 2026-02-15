@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 import { CohortFingerprint, type FingerprintAxisPoint } from "@/components/charts/cohort-fingerprint";
 import { DistributionStrip, type DistributionBin } from "@/components/charts/distribution-strip";
@@ -13,6 +13,7 @@ import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { SectionHeader } from "@/components/section-header";
 import { StatCard } from "@/components/stat-card";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -42,54 +43,44 @@ import { addNotebookEntry } from "@/lib/notebook-store";
 import { getConfidenceStyle, reliabilityScore } from "@/lib/statistics/confidence";
 import { contextualizeDifference } from "@/lib/statistics/effect-context";
 
+type Mode = "single" | "compare";
+
+type ProfileSearchKey =
+  | `c${number}`
+  | `v${number}`
+  | `ac${number}`
+  | `av${number}`
+  | `bc${number}`
+  | `bv${number}`;
+
+type ProfileSearch = { mode?: Mode } & Partial<Record<ProfileSearchKey, string>>;
+
+const MAX_FIELDS = 8;
+const URL_SLOT_INDICES = Array.from({ length: MAX_FIELDS }, (_, index) => index);
+const PREFERRED_DEFAULTS = ["straightness", "age", "politics"] as const;
+
+function isSlotSearchKey(key: string): key is ProfileSearchKey {
+  return /^(?:c|v|ac|av|bc|bv)\d+$/.test(key);
+}
+
 export const Route = createFileRoute("/profile")({
-  validateSearch: (
-    search,
-  ): {
-    mode?: Mode;
-    c0?: string;
-    c1?: string;
-    c2?: string;
-    v0?: string;
-    v1?: string;
-    v2?: string;
-    ac0?: string;
-    ac1?: string;
-    ac2?: string;
-    av0?: string;
-    av1?: string;
-    av2?: string;
-    bc0?: string;
-    bc1?: string;
-    bc2?: string;
-    bv0?: string;
-    bv1?: string;
-    bv2?: string;
-  } => ({
-    mode: search.mode === "compare" ? "compare" : search.mode === "single" ? "single" : undefined,
-    c0: typeof search.c0 === "string" ? search.c0 : undefined,
-    c1: typeof search.c1 === "string" ? search.c1 : undefined,
-    c2: typeof search.c2 === "string" ? search.c2 : undefined,
-    v0: typeof search.v0 === "string" ? search.v0 : undefined,
-    v1: typeof search.v1 === "string" ? search.v1 : undefined,
-    v2: typeof search.v2 === "string" ? search.v2 : undefined,
-    ac0: typeof search.ac0 === "string" ? search.ac0 : undefined,
-    ac1: typeof search.ac1 === "string" ? search.ac1 : undefined,
-    ac2: typeof search.ac2 === "string" ? search.ac2 : undefined,
-    av0: typeof search.av0 === "string" ? search.av0 : undefined,
-    av1: typeof search.av1 === "string" ? search.av1 : undefined,
-    av2: typeof search.av2 === "string" ? search.av2 : undefined,
-    bc0: typeof search.bc0 === "string" ? search.bc0 : undefined,
-    bc1: typeof search.bc1 === "string" ? search.bc1 : undefined,
-    bc2: typeof search.bc2 === "string" ? search.bc2 : undefined,
-    bv0: typeof search.bv0 === "string" ? search.bv0 : undefined,
-    bv1: typeof search.bv1 === "string" ? search.bv1 : undefined,
-    bv2: typeof search.bv2 === "string" ? search.bv2 : undefined,
-  }),
+  validateSearch: (search): ProfileSearch => {
+    const output: ProfileSearch = {
+      mode: search.mode === "compare" ? "compare" : search.mode === "single" ? "single" : undefined,
+    };
+
+    Object.entries(search as Record<string, unknown>).forEach(([key, value]) => {
+      if (!isSlotSearchKey(key) || typeof value !== "string") return;
+      const indexMatch = key.match(/(\d+)$/);
+      const index = Number(indexMatch?.[1] ?? -1);
+      if (!Number.isInteger(index) || index < 0 || index >= MAX_FIELDS) return;
+      output[key] = value;
+    });
+
+    return output;
+  },
   component: ProfilePage,
 });
-
-type Mode = "single" | "compare";
 
 type RunStage = "idle" | "identity" | "percentile" | "overindex" | "distribution" | "done";
 
@@ -353,15 +344,15 @@ function ProfilePage() {
 
   const [mode, setMode] = useState<Mode>("single");
 
-  const [selectedColumns, setSelectedColumns] = useState<[string, string, string]>(["", "", ""]);
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([""]);
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>({});
   const [valueOptionsByColumn, setValueOptionsByColumn] = useState<Record<string, string[]>>({});
 
-  const [columnsA, setColumnsA] = useState<[string, string, string]>(["", "", ""]);
+  const [columnsA, setColumnsA] = useState<string[]>([""]);
   const [valuesA, setValuesA] = useState<Record<string, string>>({});
   const [valueOptionsA, setValueOptionsA] = useState<Record<string, string[]>>({});
 
-  const [columnsB, setColumnsB] = useState<[string, string, string]>(["", "", ""]);
+  const [columnsB, setColumnsB] = useState<string[]>([""]);
   const [valuesB, setValuesB] = useState<Record<string, string>>({});
   const [valueOptionsB, setValueOptionsB] = useState<Record<string, string[]>>({});
 
@@ -371,6 +362,11 @@ function ProfilePage() {
   const [running, setRunning] = useState(false);
   const [runStage, setRunStage] = useState<RunStage>("idle");
   const [notebookSaved, setNotebookSaved] = useState(false);
+  const [touchedA, setTouchedA] = useState(false);
+  const [touchedB, setTouchedB] = useState(false);
+  const [pendingCohort, setPendingCohort] = useState<Array<{ column: string; value: string }> | null>(
+    null,
+  );
 
   const availableFilterColumns = useMemo(() => {
     if (!schema) return [];
@@ -448,53 +444,62 @@ function ProfilePage() {
         const nextSchema = response.data;
         setSchema(nextSchema);
 
-        const defaults = nextSchema.columns
+        const availableColumns = new Set(nextSchema.columns.map((column) => column.name));
+        const demographicCandidates = nextSchema.columns
           .filter(
             (column) =>
               column.tags.includes("demographic") &&
               (column.logicalType === "categorical" || column.logicalType === "boolean"),
           )
-          .slice(0, 3)
           .map((column) => column.name);
 
-        const resolve = (candidate: string | undefined, fallback: string) => {
-          if (!candidate) return fallback;
-          return nextSchema.columns.some((column) => column.name === candidate) ? candidate : fallback;
+        const defaults = [...new Set([...PREFERRED_DEFAULTS, ...demographicCandidates])]
+          .filter((column) => availableColumns.has(column))
+          .slice(0, 3);
+
+        const ensureSlotList = (columns: string[]) => {
+          const trimmed = columns.filter(Boolean).slice(0, MAX_FIELDS);
+          if (trimmed.length > 0) return trimmed;
+          if (defaults.length > 0) return defaults;
+          return [""];
         };
 
-        const nextSingleColumns: [string, string, string] = [
-          resolve(initialSearch.c0, defaults[0] ?? ""),
-          resolve(initialSearch.c1, defaults[1] ?? ""),
-          resolve(initialSearch.c2, defaults[2] ?? ""),
-        ];
+        const columnsFromSearch = (prefix: "c" | "ac" | "bc") => {
+          const parsed = URL_SLOT_INDICES.map((slot) => {
+            const key = `${prefix}${slot}` as ProfileSearchKey;
+            const candidate = initialSearch[key];
+            return candidate && availableColumns.has(candidate) ? candidate : "";
+          }).filter(Boolean) as string[];
 
-        const nextColumnsA: [string, string, string] = [
-          resolve(initialSearch.ac0, defaults[0] ?? ""),
-          resolve(initialSearch.ac1, defaults[1] ?? ""),
-          resolve(initialSearch.ac2, defaults[2] ?? ""),
-        ];
+          return ensureSlotList(parsed);
+        };
 
-        const nextColumnsB: [string, string, string] = [
-          resolve(initialSearch.bc0, defaults[0] ?? ""),
-          resolve(initialSearch.bc1, defaults[1] ?? ""),
-          resolve(initialSearch.bc2, defaults[2] ?? ""),
-        ];
+        const valuesFromSearch = (
+          columns: string[],
+          columnPrefix: "c" | "ac" | "bc",
+          valuePrefix: "v" | "av" | "bv",
+        ) => {
+          const nextValues: Record<string, string> = {};
+          URL_SLOT_INDICES.forEach((slot) => {
+            const columnKey = `${columnPrefix}${slot}` as ProfileSearchKey;
+            const valueKey = `${valuePrefix}${slot}` as ProfileSearchKey;
+            const column = initialSearch[columnKey];
+            const value = initialSearch[valueKey];
+            if (!column || !value) return;
+            if (!columns.includes(column)) return;
+            nextValues[column] = value;
+          });
 
-        const nextSingleValues: Record<string, string> = {};
-        const nextValuesA: Record<string, string> = {};
-        const nextValuesB: Record<string, string> = {};
+          return nextValues;
+        };
 
-        if (nextSingleColumns[0] && initialSearch.v0) nextSingleValues[nextSingleColumns[0]] = initialSearch.v0;
-        if (nextSingleColumns[1] && initialSearch.v1) nextSingleValues[nextSingleColumns[1]] = initialSearch.v1;
-        if (nextSingleColumns[2] && initialSearch.v2) nextSingleValues[nextSingleColumns[2]] = initialSearch.v2;
+        const nextSingleColumns = columnsFromSearch("c");
+        const nextColumnsA = columnsFromSearch("ac");
+        const nextColumnsB = columnsFromSearch("bc");
 
-        if (nextColumnsA[0] && initialSearch.av0) nextValuesA[nextColumnsA[0]] = initialSearch.av0;
-        if (nextColumnsA[1] && initialSearch.av1) nextValuesA[nextColumnsA[1]] = initialSearch.av1;
-        if (nextColumnsA[2] && initialSearch.av2) nextValuesA[nextColumnsA[2]] = initialSearch.av2;
-
-        if (nextColumnsB[0] && initialSearch.bv0) nextValuesB[nextColumnsB[0]] = initialSearch.bv0;
-        if (nextColumnsB[1] && initialSearch.bv1) nextValuesB[nextColumnsB[1]] = initialSearch.bv1;
-        if (nextColumnsB[2] && initialSearch.bv2) nextValuesB[nextColumnsB[2]] = initialSearch.bv2;
+        const nextSingleValues = valuesFromSearch(nextSingleColumns, "c", "v");
+        const nextValuesA = valuesFromSearch(nextColumnsA, "ac", "av");
+        const nextValuesB = valuesFromSearch(nextColumnsB, "bc", "bv");
 
         setMode(initialSearch.mode === "compare" ? "compare" : "single");
         setSelectedColumns(nextSingleColumns);
@@ -503,6 +508,9 @@ function ProfilePage() {
         setValuesA(nextValuesA);
         setColumnsB(nextColumnsB);
         setValuesB(nextValuesB);
+        setTouchedA(false);
+        setTouchedB(false);
+        setPendingCohort(null);
         setSearchReady(true);
       })
       .catch((error: Error) => {
@@ -520,41 +528,30 @@ function ProfilePage() {
   useEffect(() => {
     if (!searchReady) return;
 
-    const singleValue0 = selectedColumns[0] ? selectedValues[selectedColumns[0]] : undefined;
-    const singleValue1 = selectedColumns[1] ? selectedValues[selectedColumns[1]] : undefined;
-    const singleValue2 = selectedColumns[2] ? selectedValues[selectedColumns[2]] : undefined;
+    const nextSearch: ProfileSearch = {
+      mode: mode === "compare" ? "compare" : undefined,
+    };
 
-    const valueA0 = columnsA[0] ? valuesA[columnsA[0]] : undefined;
-    const valueA1 = columnsA[1] ? valuesA[columnsA[1]] : undefined;
-    const valueA2 = columnsA[2] ? valuesA[columnsA[2]] : undefined;
+    URL_SLOT_INDICES.forEach((slot) => {
+      const singleColumn = mode === "single" ? selectedColumns[slot] : undefined;
+      nextSearch[`c${slot}` as ProfileSearchKey] = singleColumn || undefined;
+      nextSearch[`v${slot}` as ProfileSearchKey] =
+        mode === "single" && singleColumn ? selectedValues[singleColumn] || undefined : undefined;
 
-    const valueB0 = columnsB[0] ? valuesB[columnsB[0]] : undefined;
-    const valueB1 = columnsB[1] ? valuesB[columnsB[1]] : undefined;
-    const valueB2 = columnsB[2] ? valuesB[columnsB[2]] : undefined;
+      const columnA = mode === "compare" ? columnsA[slot] : undefined;
+      const columnB = mode === "compare" ? columnsB[slot] : undefined;
+      nextSearch[`ac${slot}` as ProfileSearchKey] = columnA || undefined;
+      nextSearch[`av${slot}` as ProfileSearchKey] =
+        mode === "compare" && columnA ? valuesA[columnA] || undefined : undefined;
+      nextSearch[`bc${slot}` as ProfileSearchKey] = columnB || undefined;
+      nextSearch[`bv${slot}` as ProfileSearchKey] =
+        mode === "compare" && columnB ? valuesB[columnB] || undefined : undefined;
+    });
 
     void navigate({
-      search: {
-        mode: mode === "compare" ? "compare" : undefined,
-        c0: mode === "single" ? selectedColumns[0] || undefined : undefined,
-        c1: mode === "single" ? selectedColumns[1] || undefined : undefined,
-        c2: mode === "single" ? selectedColumns[2] || undefined : undefined,
-        v0: mode === "single" ? singleValue0 || undefined : undefined,
-        v1: mode === "single" ? singleValue1 || undefined : undefined,
-        v2: mode === "single" ? singleValue2 || undefined : undefined,
-        ac0: mode === "compare" ? columnsA[0] || undefined : undefined,
-        ac1: mode === "compare" ? columnsA[1] || undefined : undefined,
-        ac2: mode === "compare" ? columnsA[2] || undefined : undefined,
-        av0: mode === "compare" ? valueA0 || undefined : undefined,
-        av1: mode === "compare" ? valueA1 || undefined : undefined,
-        av2: mode === "compare" ? valueA2 || undefined : undefined,
-        bc0: mode === "compare" ? columnsB[0] || undefined : undefined,
-        bc1: mode === "compare" ? columnsB[1] || undefined : undefined,
-        bc2: mode === "compare" ? columnsB[2] || undefined : undefined,
-        bv0: mode === "compare" ? valueB0 || undefined : undefined,
-        bv1: mode === "compare" ? valueB1 || undefined : undefined,
-        bv2: mode === "compare" ? valueB2 || undefined : undefined,
-      },
+      search: nextSearch,
       replace: true,
+      resetScroll: false,
     });
   }, [
     mode,
@@ -992,90 +989,281 @@ function ProfilePage() {
     setTimeout(() => setNotebookSaved(false), 1800);
   }, [mode, summary, comparison, filterPairs, filterPairsA, filterPairsB]);
 
+  const resetRunState = useCallback(() => {
+    setSummary(null);
+    setComparison(null);
+    setRunError(null);
+  }, []);
+
+  const normalizeSlotColumns = useCallback((columns: string[]) => {
+    const trimmed = columns.slice(0, MAX_FIELDS);
+    return trimmed.length > 0 ? trimmed : [""];
+  }, []);
+
+  const buildColumnStateFromFilters = useCallback(
+    (filters: Array<{ column: string; value: string }>) => {
+      const nextColumns = normalizeSlotColumns(filters.map((filter) => filter.column));
+      const nextValues: Record<string, string> = {};
+      filters.forEach((filter) => {
+        nextValues[filter.column] = filter.value;
+      });
+      return { nextColumns, nextValues };
+    },
+    [normalizeSlotColumns],
+  );
+
+  const applyCohortToGroupA = useCallback(
+    (filters: Array<{ column: string; value: string }>) => {
+      const { nextColumns, nextValues } = buildColumnStateFromFilters(filters);
+      resetRunState();
+      setColumnsA(nextColumns);
+      setValuesA(nextValues);
+      setTouchedA(true);
+      setPendingCohort(null);
+    },
+    [buildColumnStateFromFilters, resetRunState],
+  );
+
+  const applyCohortToGroupB = useCallback(
+    (filters: Array<{ column: string; value: string }>) => {
+      const { nextColumns, nextValues } = buildColumnStateFromFilters(filters);
+      resetRunState();
+      setColumnsB(nextColumns);
+      setValuesB(nextValues);
+      setTouchedB(true);
+      setPendingCohort(null);
+    },
+    [buildColumnStateFromFilters, resetRunState],
+  );
+
   const applySuggestedCohort = useCallback(
     (filters: Array<{ column: string; value: string }>) => {
       if (!schema) return;
 
       const available = new Set(schema.columns.map((column) => column.name));
-      const valid = filters.filter((filter) => available.has(filter.column)).slice(0, 3);
+      const valid = filters.filter((filter) => available.has(filter.column)).slice(0, MAX_FIELDS);
+      if (valid.length === 0) return;
 
-      const nextColumns: [string, string, string] = ["", "", ""];
-      const nextValues: Record<string, string> = {};
+      if (mode === "single") {
+        const { nextColumns, nextValues } = buildColumnStateFromFilters(valid);
+        setMode("single");
+        resetRunState();
+        setPendingCohort(null);
+        setSelectedColumns(nextColumns);
+        setSelectedValues(nextValues);
+        return;
+      }
 
-      valid.forEach((filter, index) => {
-        nextColumns[index] = filter.column;
-        nextValues[filter.column] = filter.value;
-      });
+      if (!touchedA && !touchedB) {
+        applyCohortToGroupA(valid);
+        return;
+      }
 
-      setMode("single");
-      setSummary(null);
-      setComparison(null);
-      setRunError(null);
-      setSelectedColumns(nextColumns);
-      setSelectedValues(nextValues);
+      if (touchedA && !touchedB) {
+        applyCohortToGroupB(valid);
+        return;
+      }
+
+      if (!touchedA && touchedB) {
+        applyCohortToGroupA(valid);
+        return;
+      }
+
+      setPendingCohort(valid);
     },
-    [schema],
+    [
+      schema,
+      mode,
+      touchedA,
+      touchedB,
+      buildColumnStateFromFilters,
+      resetRunState,
+      applyCohortToGroupA,
+      applyCohortToGroupB,
+    ],
   );
+
+  const renderSingleSlot = (
+    slot: number,
+    columns: string[],
+    setColumns: Dispatch<SetStateAction<string[]>>,
+    values: Record<string, string>,
+    setValues: Dispatch<SetStateAction<Record<string, string>>>,
+    valueOptions: Record<string, string[]>,
+    onTouched?: () => void,
+  ) => {
+    const column = columns[slot] ?? "";
+    const options = valueOptions[column] ?? [];
+    const columnMeta = columnByName.get(column);
+
+    return (
+      <div key={`slot-${slot}`} className="space-y-2 border border-[var(--rule)] bg-[var(--paper)] p-3">
+        <div className="flex items-start justify-between gap-2">
+          <label className="editorial-label flex-1">
+            Field {slot + 1}
+            <ColumnCombobox
+              columns={availableFilterColumns}
+              value={column}
+              includeNoneOption
+              noneOptionLabel="None"
+              onValueChange={(value) => {
+                onTouched?.();
+                setColumns((current) => {
+                  const next = [...current];
+                  next[slot] = value;
+                  return next;
+                });
+              }}
+            />
+          </label>
+
+          {columns.length > 1 ? (
+            <button
+              type="button"
+              className="mt-5 h-9 w-9 border border-[var(--rule)] bg-[var(--paper)] text-[1rem] leading-none text-[var(--ink)] transition-colors hover:border-[var(--accent-hover)] hover:text-[var(--accent-hover)]"
+              onClick={() => {
+                onTouched?.();
+                setColumns((current) => {
+                  if (current.length <= 1) return current;
+                  const next = current.filter((_, index) => index !== slot);
+                  return next.length > 0 ? next : [""];
+                });
+              }}
+              aria-label={`Remove field ${slot + 1}`}
+            >
+              ×
+            </button>
+          ) : null}
+        </div>
+
+        <label className="editorial-label">
+          Value
+          <Select
+            value={values[column] || NONE}
+            onValueChange={(value) => {
+              onTouched?.();
+              setValues((current) => ({ ...current, [column]: value === NONE ? "" : value }));
+            }}
+            disabled={!column || options.length === 0}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select value" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={NONE}>None</SelectItem>
+              {options.map((option) => (
+                <SelectItem key={option} value={option}>
+                  {formatValueWithLabel(option, columnMeta?.valueLabels)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </label>
+      </div>
+    );
+  };
 
   const renderFilterSlots = (
-    columns: [string, string, string],
-    setColumns: (next: [string, string, string]) => void,
+    columns: string[],
+    setColumns: Dispatch<SetStateAction<string[]>>,
     values: Record<string, string>,
-    setValues: (next: Record<string, string>) => void,
+    setValues: Dispatch<SetStateAction<Record<string, string>>>,
     valueOptions: Record<string, string[]>,
-    layout: "grid" | "stack" = "grid",
+    onTouched?: () => void,
   ) => (
-    <div className={layout === "stack" ? "flex flex-col gap-3" : "grid gap-4 md:grid-cols-3"}>
-      {[0, 1, 2].map((slot) => {
-        const column = columns[slot] ?? "";
-        const options = valueOptions[column] ?? [];
-        const columnMeta = availableFilterColumns.find((candidate) => candidate.name === column);
+    <div className="space-y-3">
+      <div className="grid gap-4 md:grid-cols-3">
+        {columns.map((_, slot) =>
+          renderSingleSlot(slot, columns, setColumns, values, setValues, valueOptions, onTouched),
+        )}
+      </div>
 
-        return (
-          <div key={`slot-${slot}`} className="space-y-2 border border-[var(--rule)] bg-[var(--paper)] p-3">
-            <label className="editorial-label">
-              Field {slot + 1}
-              <ColumnCombobox
-                columns={availableFilterColumns}
-                value={column}
-                includeNoneOption
-                noneOptionLabel="None"
-                onValueChange={(value) => {
-                  const next = [...columns] as [string, string, string];
-                  next[slot] = value;
-                  setColumns(next);
-                }}
-              />
-            </label>
-
-            <label className="editorial-label">
-              Value
-              <Select
-                value={values[column] || NONE}
-                onValueChange={(value) => {
-                  const next = { ...values, [column]: value === NONE ? "" : value };
-                  setValues(next);
-                }}
-                disabled={!column || options.length === 0}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select value" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={NONE}>None</SelectItem>
-                  {options.map((option) => (
-                    <SelectItem key={option} value={option}>
-                      {formatValueWithLabel(option, columnMeta?.valueLabels)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </label>
-          </div>
-        );
-      })}
+      {columns.length < MAX_FIELDS ? (
+        <button
+          type="button"
+          className="editorial-button"
+          onClick={() => {
+            onTouched?.();
+            setColumns((current) =>
+              current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
+            );
+          }}
+        >
+          + Add field
+        </button>
+      ) : null}
     </div>
   );
+
+  const renderComparePlaceholder = (groupLabel: "Group A" | "Group B", slot: number) => (
+    <div
+      key={`${groupLabel}-placeholder-${slot}`}
+      className="space-y-2 border border-dashed border-[var(--rule-light)] bg-[var(--paper)] p-3"
+    >
+      <p className="editorial-label">Field {slot + 1}</p>
+      <p className="mono-value text-[0.68rem] text-[var(--ink-faded)]">
+        {groupLabel} has no field in this row.
+      </p>
+    </div>
+  );
+
+  const renderCompareSlots = () => {
+    const totalRows = Math.max(columnsA.length, columnsB.length);
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: totalRows }, (_, slot) => (
+          <div key={`compare-row-${slot}`} className="grid grid-cols-2 gap-6">
+            {slot < columnsA.length
+              ? renderSingleSlot(slot, columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA, () => {
+                  setTouchedA(true);
+                })
+              : renderComparePlaceholder("Group A", slot)}
+
+            {slot < columnsB.length
+              ? renderSingleSlot(slot, columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB, () => {
+                  setTouchedB(true);
+                })
+              : renderComparePlaceholder("Group B", slot)}
+          </div>
+        ))}
+
+        <div className="grid grid-cols-2 gap-6">
+          <div>
+            {columnsA.length < MAX_FIELDS ? (
+              <button
+                type="button"
+                className="editorial-button"
+                onClick={() => {
+                  setTouchedA(true);
+                  setColumnsA((current) =>
+                    current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
+                  );
+                }}
+              >
+                + Add field (Group A)
+              </button>
+            ) : null}
+          </div>
+          <div>
+            {columnsB.length < MAX_FIELDS ? (
+              <button
+                type="button"
+                className="editorial-button"
+                onClick={() => {
+                  setTouchedB(true);
+                  setColumnsB((current) =>
+                    current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
+                  );
+                }}
+              >
+                + Add field (Group B)
+              </button>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const stageLabel =
     runStage === "identity"
@@ -1155,6 +1343,7 @@ function ProfilePage() {
                 setMode("single");
                 setComparison(null);
                 setRunError(null);
+                setPendingCohort(null);
               }}
             >
               One Group
@@ -1170,6 +1359,7 @@ function ProfilePage() {
                 setMode("compare");
                 setSummary(null);
                 setRunError(null);
+                setPendingCohort(null);
               }}
             >
               Compare Two Groups
@@ -1179,36 +1369,18 @@ function ProfilePage() {
           {mode === "single" ? (
             renderFilterSlots(
               selectedColumns,
-              (next) => setSelectedColumns(next),
+              setSelectedColumns,
               selectedValues,
-              (next) => setSelectedValues(next),
+              setSelectedValues,
               valueOptionsByColumn,
             )
           ) : (
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="space-y-3 border border-[var(--rule)] bg-[var(--paper)] p-4">
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-6">
                 <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group A</p>
-                {renderFilterSlots(
-                  columnsA,
-                  (next) => setColumnsA(next),
-                  valuesA,
-                  (next) => setValuesA(next),
-                  valueOptionsA,
-                  "stack",
-                )}
-              </div>
-
-              <div className="space-y-3 border border-[var(--rule)] bg-[var(--paper)] p-4">
                 <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group B</p>
-                {renderFilterSlots(
-                  columnsB,
-                  (next) => setColumnsB(next),
-                  valuesB,
-                  (next) => setValuesB(next),
-                  valueOptionsB,
-                  "stack",
-                )}
               </div>
+              {renderCompareSlots()}
             </div>
           )}
 
@@ -1240,6 +1412,55 @@ function ProfilePage() {
           </div>
 
           {runError ? <p className="alert alert--error">{runError}</p> : null}
+
+          <Dialog
+            open={pendingCohort != null}
+            onOpenChange={(open) => {
+              if (!open) setPendingCohort(null);
+            }}
+          >
+            <DialogContent>
+              <div className="space-y-4">
+                <DialogTitle>Replace Group A or Group B?</DialogTitle>
+                <p className="text-[0.82rem] leading-relaxed text-[var(--ink-faded)]">
+                  Both groups already have selections. Choose which group this preset should replace.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => {
+                      if (!pendingCohort) return;
+                      applyCohortToGroupA(pendingCohort);
+                      setPendingCohort(null);
+                    }}
+                  >
+                    Replace A
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="default"
+                    onClick={() => {
+                      if (!pendingCohort) return;
+                      applyCohortToGroupB(pendingCohort);
+                      setPendingCohort(null);
+                    }}
+                  >
+                    Replace B
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={() => {
+                      setPendingCohort(null);
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </section>
       ) : (
         <section className="editorial-panel">

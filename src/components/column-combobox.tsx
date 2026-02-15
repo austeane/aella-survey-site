@@ -118,7 +118,7 @@ export function ColumnCombobox({
       <button
         type="button"
         disabled={disabled}
-        className="flex h-9 w-full items-center justify-between border border-[var(--rule)] bg-[var(--paper)] px-2.5 py-2 text-[0.8rem] font-['JetBrains_Mono',ui-monospace,monospace] leading-[1.4] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-50"
+        className="flex min-h-9 w-full items-center justify-between border border-[var(--rule)] bg-[var(--paper)] px-2.5 py-2 text-[0.8rem] font-['JetBrains_Mono',ui-monospace,monospace] leading-[1.4] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] disabled:cursor-not-allowed disabled:opacity-50"
         onClick={() => (open ? closeMenu() : openMenu())}
         onKeyDown={(event) => {
           if (event.key === "ArrowDown" || event.key === "Enter" || event.key === " ") {
@@ -184,12 +184,12 @@ export function ColumnCombobox({
                       onMouseEnter={() => setHighlightedIndex(index)}
                       onClick={() => pick(option.value)}
                     >
-                      <p className="truncate text-[0.8rem] font-['Source_Serif_4',Georgia,serif] text-[var(--ink)]">
+                      <p className="text-[0.8rem] font-['Source_Serif_4',Georgia,serif] text-[var(--ink)]">
                         {option.displayName}
                         {selected ? "  *" : ""}
                       </p>
                       {option.secondary ? (
-                        <p className="truncate font-['JetBrains_Mono',ui-monospace,monospace] text-[0.68rem] text-[var(--ink-faded)]">
+                        <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.68rem] text-[var(--ink-faded)]">
                           {option.secondary}
                         </p>
                       ) : null}
