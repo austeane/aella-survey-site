@@ -1208,75 +1208,62 @@ function ProfilePage() {
     </div>
   );
 
-  const renderComparePlaceholder = (groupLabel: "Group A" | "Group B", slot: number) => (
-    <div
-      key={`${groupLabel}-placeholder-${slot}`}
-      className="space-y-2 border border-dashed border-[var(--rule-light)] bg-[var(--paper)] p-3"
-    >
-      <p className="editorial-label">Field {slot + 1}</p>
-      <p className="mono-value text-[0.68rem] text-[var(--ink-faded)]">
-        {groupLabel} has no field in this row.
-      </p>
+  const renderCompareSlots = () => (
+    <div className="grid gap-6 md:grid-cols-2">
+      {/* Group A */}
+      <div className="space-y-3">
+        <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group A</p>
+        <div className="space-y-3">
+          {columnsA.map((_, slot) =>
+            renderSingleSlot(slot, columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA, () => {
+              setTouchedA(true);
+            }),
+          )}
+        </div>
+        {columnsA.length < MAX_FIELDS ? (
+          <button
+            type="button"
+            className="editorial-button"
+            aria-label="Add field to Group A"
+            onClick={() => {
+              setTouchedA(true);
+              setColumnsA((current) =>
+                current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
+              );
+            }}
+          >
+            + Add field
+          </button>
+        ) : null}
+      </div>
+      {/* Group B */}
+      <div className="space-y-3 border-t border-[var(--rule)] pt-4 md:border-t-0 md:pt-0">
+        <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group B</p>
+        <div className="space-y-3">
+          {columnsB.map((_, slot) =>
+            renderSingleSlot(slot, columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB, () => {
+              setTouchedB(true);
+            }),
+          )}
+        </div>
+        {columnsB.length < MAX_FIELDS ? (
+          <button
+            type="button"
+            className="editorial-button"
+            aria-label="Add field to Group B"
+            onClick={() => {
+              setTouchedB(true);
+              setColumnsB((current) =>
+                current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
+              );
+            }}
+          >
+            + Add field
+          </button>
+        ) : null}
+      </div>
     </div>
   );
-
-  const renderCompareSlots = () => {
-    const totalRows = Math.max(columnsA.length, columnsB.length);
-    return (
-      <div className="space-y-3">
-        {Array.from({ length: totalRows }, (_, slot) => (
-          <div key={`compare-row-${slot}`} className="grid grid-cols-2 gap-6">
-            {slot < columnsA.length
-              ? renderSingleSlot(slot, columnsA, setColumnsA, valuesA, setValuesA, valueOptionsA, () => {
-                  setTouchedA(true);
-                })
-              : renderComparePlaceholder("Group A", slot)}
-
-            {slot < columnsB.length
-              ? renderSingleSlot(slot, columnsB, setColumnsB, valuesB, setValuesB, valueOptionsB, () => {
-                  setTouchedB(true);
-                })
-              : renderComparePlaceholder("Group B", slot)}
-          </div>
-        ))}
-
-        <div className="grid grid-cols-2 gap-6">
-          <div>
-            {columnsA.length < MAX_FIELDS ? (
-              <button
-                type="button"
-                className="editorial-button"
-                onClick={() => {
-                  setTouchedA(true);
-                  setColumnsA((current) =>
-                    current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
-                  );
-                }}
-              >
-                + Add field (Group A)
-              </button>
-            ) : null}
-          </div>
-          <div>
-            {columnsB.length < MAX_FIELDS ? (
-              <button
-                type="button"
-                className="editorial-button"
-                onClick={() => {
-                  setTouchedB(true);
-                  setColumnsB((current) =>
-                    current.length >= MAX_FIELDS ? current : normalizeSlotColumns([...current, ""]),
-                  );
-                }}
-              >
-                + Add field (Group B)
-              </button>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const stageLabel =
     runStage === "identity"
@@ -1388,13 +1375,7 @@ function ProfilePage() {
               valueOptionsByColumn,
             )
           ) : (
-            <div className="space-y-2">
-              <div className="grid grid-cols-2 gap-6">
-                <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group A</p>
-                <p className="mono-label text-[0.75rem] uppercase tracking-[0.08em]">Group B</p>
-              </div>
-              {renderCompareSlots()}
-            </div>
+            renderCompareSlots()
           )}
 
           <div className="flex flex-wrap items-center gap-3">
