@@ -66,7 +66,7 @@
       "title": "Does childhood spanking predict adult S/M interest?",
       "shortTitle": "Childhood -> Kinks?",
       "question": "Do people who were spanked more as kids show different sadomasochism interest as adults?",
-      "caption": "People who report more childhood spanking also report higher sadomasochism interest as adults.",
+      "caption": "People spanked as children report slightly higher S/M interest as adults, though the difference is small.",
       "sql": "SELECT\n          \"From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)\" AS name,\n          round(avg(\"sadomasochism\")::DOUBLE, 2) AS value,\n          CASE \"From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)\"\n            WHEN 'Never' THEN 1\n            WHEN 'Sometimes' THEN 2\n            WHEN 'Often' THEN 3\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)\" IS NOT NULL\n          AND \"sadomasochism\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 3,
       "outputColumns": [
@@ -172,7 +172,7 @@
       "title": "Could you stop being aroused by a kink?",
       "shortTitle": "How fixed are kinks?",
       "question": "Do people whose kinks feel more permanent have a wider variety of interests?",
-      "caption": "People who report that changing arousal is impossible show the broadest kink repertoires.",
+      "caption": "People who say they couldn't stop being into a kink — even if they tried — have the widest range of interests.",
       "sql": "SELECT\n          CASE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n            WHEN 'With little effort, yes' THEN 'Little effort'\n            WHEN 'With some effort, yes' THEN 'Some effort'\n            WHEN 'With a lot of effort, yes' THEN 'Lots of effort'\n            WHEN 'With an extreme amount of effort, maybe' THEN 'Extreme effort'\n            WHEN 'Impossible' THEN 'Impossible'\n            ELSE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n          END AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" AS VARCHAR)\n            WHEN 'With little effort, yes' THEN 1\n            WHEN 'With some effort, yes' THEN 2\n            WHEN 'With a lot of effort, yes' THEN 3\n            WHEN 'With an extreme amount of effort, maybe' THEN 4\n            WHEN 'Impossible' THEN 5\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 5,
       "outputColumns": [
@@ -210,7 +210,7 @@
       "exploreX": "If you tried very hard, could you stop being aroused by something you're into? (7lgg41e)",
       "exploreY": "totalfetishcategory",
       "chartType": "bar",
-      "xLabel": "Self-reported arousal fixity",
+      "xLabel": "Could you stop being into a kink if you tried?",
       "yLabel": "Average number of kink categories",
       "status": "validated",
       "generatedAt": "2026-02-14T10:26:34.551985+00:00",
@@ -444,7 +444,7 @@
       "title": "How much does current arousal state shift responses?",
       "shortTitle": "Mood & Arousal",
       "question": "Does being horny right now change the number of kinks someone reports?",
-      "caption": "Being horny right now noticeably shifts how many kinks people report (based on a smaller group who saw this question).",
+      "caption": "People who were hornier while taking the survey reported more kinks.",
       "sql": "SELECT\n          cast(\"How horny are you right now? (1jtj2nx)\" AS VARCHAR) AS name,\n          round(avg(\"totalfetishcategory\")::DOUBLE, 2) AS value,\n          CASE cast(\"How horny are you right now? (1jtj2nx)\" AS VARCHAR)\n            WHEN 'Not horny at all' THEN 1\n            WHEN 'A little horny' THEN 2\n            WHEN 'Moderately horny' THEN 3\n            WHEN 'Real horny' THEN 4\n            ELSE 99\n          END AS sort_order\n        FROM data\n        WHERE \"How horny are you right now? (1jtj2nx)\" IS NOT NULL\n          AND \"totalfetishcategory\" IS NOT NULL\n        GROUP BY 1, 3\n        ORDER BY sort_order",
       "rowCount": 4,
       "outputColumns": [
@@ -581,7 +581,7 @@
       "presetId": "dom-sub-quadrants"
     },
     {
-      "prompt": "How fixed are people's arousal patterns over time?",
+      "prompt": "Can people stop being into their kinks if they try?",
       "presetId": "fixity-breadth"
     },
     {
