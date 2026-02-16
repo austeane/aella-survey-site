@@ -7,7 +7,13 @@ import { ColumnNameTooltip } from "@/components/column-name-tooltip";
 import { SectionHeader } from "@/components/section-header";
 import { Button } from "@/components/ui/button";
 import { MiniHeatmap, type MiniHeatmapCell } from "@/components/charts/mini-heatmap";
-import { NetworkGraph, type NetworkEdge, type NetworkNode } from "@/components/charts/network-graph";
+import {
+  NetworkGraph,
+  filterNetworkEdges,
+  type NetworkEdge,
+  type NetworkNode,
+  type NetworkViewMode,
+} from "@/components/charts/network-graph";
 import { QuestionIdentityCard } from "@/components/question-identity-card";
 import { track } from "@/lib/client/track";
 import { useDuckDB } from "@/lib/duckdb/provider";
@@ -16,6 +22,7 @@ import { asNumber, formatNumber, formatPercent } from "@/lib/format";
 import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
 import relationshipData from "@/lib/schema/relationships.generated.json";
 import schemaMetadata from "@/lib/schema/columns.generated.json";
+import { getValueLabels } from "@/lib/schema/value-labels";
 
 export const Route = createFileRoute("/relationships")({
   validateSearch: (search): { column?: string } => ({
@@ -42,6 +49,14 @@ interface SchemaMetadata {
   columns: ColumnSummary[];
 }
 
+interface TopPatternValues {
+  sourceVal: string;
+  targetVal: string;
+  sourceColumn: string;
+  targetColumn: string;
+  lift: number;
+}
+
 interface Relationship {
   column: string;
   metric: "cramers_v" | "correlation";
@@ -49,6 +64,7 @@ interface Relationship {
   n: number;
   direction?: "positive" | "negative";
   topPattern?: string;
+  topPatternValues?: TopPatternValues;
 }
 
 interface RelationshipCluster {
@@ -91,13 +107,121 @@ function shortText(value: string, max = 34): string {
   return `${value.slice(0, max - 1)}…`;
 }
 
+function resolveColumnValueLabels(
+  column: Pick<ColumnSummary, "name" | "valueLabels"> | undefined,
+): Record<string, string> | undefined {
+  if (!column) return undefined;
+  return column.valueLabels ?? getValueLabels(column.name) ?? undefined;
+}
+
+const SHORT_DISPLAY_OVERRIDES: Record<string, string> = {
+  '"I can get aroused by a partner doing what I like, even if I know they aren\'t aroused by it themselves" (aw1a1ss)':
+    "Aroused despite partner disinterest",
+  '"If my partner is aroused by something, I can also be aroused by it, even if I don\'t normally find it erotic" (j5yb5lu)':
+    "Aroused by partner arousal",
+  "In general, it's most erotic when _____ wears the clothing you find erotic (eowvxbs)":
+    "Who wears erotic clothing",
+  "My erotic fantasies involving toys typically involve ____ using the toys":
+    "Who uses toys",
+  '"In general, I prefer scenarios where receiver of the pain is:" (8r5zld8)':
+    "Preferred pain recipient",
+  '"In general, I prefer scenarios where the intensity of the pain is:" (m73c3q1)':
+    "Preferred pain intensity",
+  '"In general, on average, the optimal amount of consent in my preferred erotic scenarios is:" (b0ukpvo)':
+    "Preferred consent level",
+  "Which of the following categories contains things you find erotic?":
+    "Most erotic category",
+  "Compared to other people of your same gender and age range, you are (yh6d44s)":
+    "Self-rated attractiveness",
+};
+
+const SHORT_LABEL_STOPWORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "be",
+  "by",
+  "do",
+  "for",
+  "from",
+  "how",
+  "i",
+  "in",
+  "is",
+  "it",
+  "my",
+  "of",
+  "on",
+  "or",
+  "the",
+  "to",
+  "was",
+  "were",
+  "when",
+  "where",
+  "which",
+  "who",
+  "with",
+  "you",
+  "your",
+]);
+
+function shortQuestionDisplay(columnName: string, displayName: string): string {
+  const override = SHORT_DISPLAY_OVERRIDES[columnName];
+  if (override) return override;
+
+  let short = displayName
+    .replace(/^"(.+)"$/, "$1")
+    .replace(/\s+\.\.\.$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  short = short
+    .replace(
+      /^How old were you when you first experienced sexual interest in /i,
+      "First interest age: ",
+    )
+    .replace(
+      /^How old were you when you first experienced interest in /i,
+      "First interest age: ",
+    )
+    .replace(/^At what age did you first begin \(at least semiregularly\) /i, "Age began ")
+    .replace(/^At what age did you begin /i, "Age began ")
+    .replace(/^Of these options, which one is the most erotic\?/i, "Most erotic option")
+    .replace(/^In scenarios you find erotic, you tend to identify with \(or imagine being\):/i, "Erotic role identity")
+    .replace(/^The type of erotic content you prefer tends to be/i, "Erotic content tends to be")
+    .replace(/^Have you ever had a sexual experience with someone else who did not want the experience\?/i, "Non-consensual experience history")
+    .replace(/^I find the thought of existing \(in \*nonsexual\* situations\) as a biological \*female\* to be erotic/i, "Erotic as biological female")
+    .replace(/^I find the thought of existing \(in \*nonsexual\* situations\) as a biological \*male\* to be erotic/i, "Erotic as biological male")
+    .replace(/^I find the thought of masturbating alone as a biological female, to be erotic/i, "Erotic as solo biological female")
+    .replace(/^I find the thought of masturbating alone as a biological male, to be erotic/i, "Erotic as solo biological male");
+
+  if (short.length <= 42) return short;
+
+  const keywordOnly = short
+    .split(/\s+/)
+    .filter((word) => !SHORT_LABEL_STOPWORDS.has(word.toLowerCase()))
+    .slice(0, 7)
+    .join(" ");
+
+  if (keywordOnly.length >= 16) {
+    return keywordOnly.length <= 42 ? keywordOnly : `${keywordOnly.slice(0, 41)}…`;
+  }
+
+  return `${short.slice(0, 41)}…`;
+}
+
 function topValuesSubtitle(column: ColumnSummary | undefined, limit = 3): string | null {
   if (!column?.approxTopValues || column.approxTopValues.length === 0) {
     return null;
   }
+  const valueLabels = resolveColumnValueLabels(column);
   return column.approxTopValues
     .slice(0, limit)
-    .map((value) => formatValueWithLabel(value, column.valueLabels))
+    .map((value) => formatValueWithLabel(value, valueLabels))
     .join(" · ");
 }
 
@@ -143,6 +267,23 @@ function fallbackPattern(
   return `${sourceLabel} and ${targetLabel} show a ${strengthDetail(relationship.value).label.toLowerCase()} association.`;
 }
 
+function resolveTopPattern(
+  relationship: Relationship,
+  columnByName: Map<string, ColumnSummary>,
+): string | undefined {
+  const vals = relationship.topPatternValues;
+  if (!vals) return relationship.topPattern;
+
+  const sourceCol = columnByName.get(vals.sourceColumn);
+  const targetCol = columnByName.get(vals.targetColumn);
+  const sourceLabels = resolveColumnValueLabels(sourceCol);
+  const targetLabels = resolveColumnValueLabels(targetCol);
+  const sourceLabel = formatValueWithLabel(vals.sourceVal, sourceLabels);
+  const targetLabel = formatValueWithLabel(vals.targetVal, targetLabels);
+
+  return `People who chose ${sourceLabel} were ${vals.lift}x more likely to also choose ${targetLabel}.`;
+}
+
 function rankBuckets(totals: Map<string, number>): string[] {
   return [...totals.entries()]
     .sort((left, right) => {
@@ -167,6 +308,8 @@ function RelationshipMiniHeatmap({ db, xColumn, yColumn }: RelationshipMiniHeatm
   const [xLabels, setXLabels] = useState<string[]>([]);
   const [yLabels, setYLabels] = useState<string[]>([]);
   const [cells, setCells] = useState<MiniHeatmapCell[]>([]);
+  const xValueLabels = resolveColumnValueLabels(xColumn);
+  const yValueLabels = resolveColumnValueLabels(yColumn);
 
   useEffect(() => {
     if (shouldLoad) return;
@@ -287,12 +430,12 @@ function RelationshipMiniHeatmap({ db, xColumn, yColumn }: RelationshipMiniHeatm
         if (!cancelled) {
           setXLabels(
             xRawOrder.map((value) =>
-              value === "Other" ? value : formatValueWithLabel(value, xColumn.valueLabels),
+              value === "Other" ? value : formatValueWithLabel(value, xValueLabels),
             ),
           );
           setYLabels(
             yRawOrder.map((value) =>
-              value === "Other" ? value : formatValueWithLabel(value, yColumn.valueLabels),
+              value === "Other" ? value : formatValueWithLabel(value, yValueLabels),
             ),
           );
           setCells(nextCells);
@@ -313,7 +456,7 @@ function RelationshipMiniHeatmap({ db, xColumn, yColumn }: RelationshipMiniHeatm
     return () => {
       cancelled = true;
     };
-  }, [db, shouldLoad, xColumn.name, xColumn.valueLabels, yColumn.name, yColumn.valueLabels]);
+  }, [db, shouldLoad, xColumn.name, yColumn.name, xValueLabels, yValueLabels]);
 
   return (
     <div ref={containerRef} className="space-y-1">
@@ -358,6 +501,9 @@ const allRelationshipColumns = (() => {
   return [...names];
 })();
 
+const DEFAULT_NETWORK_EDGE_MIN = 0.14;
+const STRONG_NETWORK_EDGE_MIN = 0.2;
+
 function RelationshipsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/relationships" });
@@ -367,6 +513,8 @@ function RelationshipsPage() {
     search.column && allRelationshipColumns.includes(search.column) ? search.column : "",
   );
   const [expandedRelationship, setExpandedRelationship] = useState<string | null>(null);
+  const [networkEdgeMin, setNetworkEdgeMin] = useState(DEFAULT_NETWORK_EDGE_MIN);
+  const [networkViewMode, setNetworkViewMode] = useState<NetworkViewMode>("strong");
 
   const handleSelectColumn = useCallback(
     (column: string, action: string) => {
@@ -397,12 +545,19 @@ function RelationshipsPage() {
     void navigate({
       search: { column: nextSearchValue },
       replace: true,
+      resetScroll: false,
     });
   }, [navigate, search.column, selectedColumn]);
 
   useEffect(() => {
     setExpandedRelationship(null);
   }, [selectedColumn]);
+
+  useEffect(() => {
+    if (!selectedColumn && networkViewMode === "focused") {
+      setNetworkViewMode("strong");
+    }
+  }, [selectedColumn, networkViewMode]);
 
   const columnOptions = useMemo(
     () =>
@@ -458,17 +613,19 @@ function RelationshipsPage() {
     const computedNodes: NetworkNode[] = allRelationshipColumns.map((name) => {
       const column = columnByName.get(name);
       const display = column ? getColumnDisplayName(column) : name;
+      const shortDisplay = shortQuestionDisplay(name, display);
       const duplicateName = (displayNameCounts.get(display) ?? 0) > 1;
       const subtitle = topValuesSubtitle(column, 2);
       const disambiguator = subtitle?.split(" · ").slice(0, 2).join(" / ");
       const label =
         duplicateName && disambiguator
-          ? `${shortText(display, 22)} · ${shortText(disambiguator, 16)}`
-          : shortText(display, 34);
+          ? `${shortText(shortDisplay, 22)} · ${shortText(disambiguator, 16)}`
+          : shortText(shortDisplay, 34);
 
       return {
         id: name,
         label,
+        fullLabel: display,
         subtitle: subtitle ?? undefined,
         tag: pickTag(column?.tags),
         degree: degreeByNode.get(name) ?? 0,
@@ -478,6 +635,104 @@ function RelationshipsPage() {
 
     return { nodes: computedNodes, edges: computedEdges };
   }, []);
+
+  const visibleNetworkEdges = useMemo(
+    () =>
+      filterNetworkEdges({
+        edges,
+        selectedId: selectedColumn || null,
+        edgeMinValue: networkEdgeMin,
+        viewMode: networkViewMode,
+        strongEdgeValue: STRONG_NETWORK_EDGE_MIN,
+      }),
+    [edges, selectedColumn, networkEdgeMin, networkViewMode],
+  );
+
+  const visibleNetworkNodeIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const edge of visibleNetworkEdges) {
+      ids.add(edge.source);
+      ids.add(edge.target);
+    }
+    if (selectedColumn) {
+      ids.add(selectedColumn);
+    }
+    return ids;
+  }, [visibleNetworkEdges, selectedColumn]);
+
+  const visibleNetworkNodeCount = visibleNetworkNodeIds.size;
+
+  const clusterLabelsById = useMemo(
+    () =>
+      Object.fromEntries(
+        (relationshipsPayload.clusters ?? []).map((cluster) => [cluster.id, cluster.label]),
+      ),
+    [],
+  );
+
+  const nodeById = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
+
+  const mobileClusterSummaries = useMemo(() => {
+    const clusters = relationshipsPayload.clusters ?? [];
+    const shouldFilterToVisible = visibleNetworkNodeIds.size > 0;
+
+    return clusters
+      .map((cluster) => {
+        const members = cluster.members
+          .filter((member) => !shouldFilterToVisible || visibleNetworkNodeIds.has(member))
+          .map((member) => {
+            const node = nodeById.get(member);
+            const metadata = columnByName.get(member) ?? { name: member };
+            const display = getColumnDisplayName(metadata);
+            return {
+              id: member,
+              label: shortQuestionDisplay(member, display),
+              degree: node?.degree ?? 0,
+            };
+          })
+          .sort((left, right) => right.degree - left.degree)
+          .slice(0, 6);
+
+        if (members.length === 0) {
+          return null;
+        }
+
+        return {
+          id: cluster.id,
+          label: cluster.label,
+          memberCount: cluster.members.length,
+          visibleMemberCount: members.length,
+          members,
+        };
+      })
+      .filter(
+        (
+          cluster,
+        ): cluster is {
+          id: string;
+          label: string;
+          memberCount: number;
+          visibleMemberCount: number;
+          members: Array<{ id: string; label: string; degree: number }>;
+        } => cluster !== null,
+      )
+      .sort((left, right) => right.visibleMemberCount - left.visibleMemberCount);
+  }, [nodeById, visibleNetworkNodeIds]);
+
+  const mobileFallbackNodes = useMemo(() => {
+    const candidateNodes =
+      visibleNetworkNodeIds.size > 0
+        ? nodes.filter((node) => visibleNetworkNodeIds.has(node.id))
+        : nodes;
+
+    return [...candidateNodes]
+      .sort((left, right) => (right.degree ?? 0) - (left.degree ?? 0))
+      .slice(0, 14)
+      .map((node) => ({
+        id: node.id,
+        label: node.fullLabel ? shortQuestionDisplay(node.id, node.fullLabel) : node.label,
+      }));
+  }, [nodes, visibleNetworkNodeIds]);
 
   const selectedColumnMeta = selectedColumn ? columnByName.get(selectedColumn) : undefined;
   const selectedDisplayName = selectedColumnMeta
@@ -530,7 +785,7 @@ function RelationshipsPage() {
         <SectionHeader
           number="01"
           title="Network galaxy"
-          subtitle="Click a node in the graph or pick a question by name."
+          subtitle="Drag to pan, scroll to zoom, then focus a question and follow its strongest neighborhood."
         />
 
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
@@ -559,13 +814,145 @@ function RelationshipsPage() {
           ) : null}
         </div>
 
-        <NetworkGraph
-          nodes={nodes}
-          edges={edges}
-          selectedId={selectedColumn || null}
-          onSelect={(value) => handleSelectColumn(value, "select_network_node")}
-          compact={Boolean(selectedColumn)}
-        />
+        <div className="grid gap-3 border border-[var(--rule)] bg-[var(--paper-warm)] p-3 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
+          <div>
+            <p className="mono-label">network view</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <Button
+                type="button"
+                variant={networkViewMode === "all" ? "accent" : "ghost"}
+                size="sm"
+                onClick={() => setNetworkViewMode("all")}
+              >
+                All links
+              </Button>
+              <Button
+                type="button"
+                variant={networkViewMode === "strong" ? "accent" : "ghost"}
+                size="sm"
+                onClick={() => setNetworkViewMode("strong")}
+              >
+                Strong links
+              </Button>
+              <Button
+                type="button"
+                variant={networkViewMode === "focused" ? "accent" : "ghost"}
+                size="sm"
+                onClick={() => setNetworkViewMode("focused")}
+                disabled={!selectedColumn}
+              >
+                Selected + 1 hop
+              </Button>
+            </div>
+          </div>
+
+          <label className="editorial-label">
+            Minimum link strength: {formatPercent(networkEdgeMin * 100, 0)}
+            <input
+              type="range"
+              min={0.05}
+              max={0.35}
+              step={0.01}
+              value={networkEdgeMin}
+              onChange={(event) => setNetworkEdgeMin(Number(event.target.value))}
+              className="mt-1 w-full accent-[var(--accent)]"
+            />
+            <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
+              Showing {formatNumber(visibleNetworkEdges.length)} links across{" "}
+              {formatNumber(visibleNetworkNodeCount)} questions.
+            </p>
+          </label>
+        </div>
+
+        <div className="hidden sm:block">
+          <NetworkGraph
+            nodes={nodes}
+            edges={edges}
+            selectedId={selectedColumn || null}
+            onSelect={(value) => handleSelectColumn(value, "select_network_node")}
+            onClearSelection={() => handleSelectColumn("", "clear_network_selection")}
+            compact={Boolean(selectedColumn)}
+            edgeMinValue={networkEdgeMin}
+            viewMode={networkViewMode}
+            strongEdgeValue={STRONG_NETWORK_EDGE_MIN}
+            clusterLabelsById={clusterLabelsById}
+          />
+        </div>
+
+        <div className="space-y-2 sm:hidden">
+          <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
+            <p className="mono-label">mobile network view</p>
+            <p className="mono-value text-[0.68rem] text-[var(--ink-faded)]">
+              Cluster-first list for small screens. Pick any question to open relationship cards below.
+            </p>
+          </div>
+
+          {mobileClusterSummaries.length > 0 ? (
+            <div className="grid gap-2">
+              {mobileClusterSummaries.map((cluster) => (
+                <article
+                  key={cluster.id}
+                  className="space-y-2 border border-[var(--rule)] bg-[var(--paper)] p-2"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="font-['Source_Serif_4',Georgia,serif] text-[0.82rem] text-[var(--ink)]">
+                      {cluster.label}
+                    </p>
+                    <span className="mono-value text-[0.62rem] text-[var(--ink-faded)]">
+                      {formatNumber(cluster.visibleMemberCount)}
+                      {cluster.visibleMemberCount !== cluster.memberCount
+                        ? ` / ${formatNumber(cluster.memberCount)}`
+                        : ""}{" "}
+                      nodes
+                    </span>
+                  </div>
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {cluster.members.map((member) => {
+                      const isActive = member.id === selectedColumn;
+                      return (
+                        <button
+                          key={member.id}
+                          type="button"
+                          onClick={() =>
+                            handleSelectColumn(member.id, "select_mobile_cluster_member")
+                          }
+                          className="null-badge"
+                          style={
+                            isActive
+                              ? {
+                                  borderColor: "var(--accent)",
+                                  color: "var(--accent)",
+                                }
+                              : undefined
+                          }
+                        >
+                          {shortText(member.label, 26)}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
+              <p className="mono-label">top connected questions</p>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                {mobileFallbackNodes.map((node) => (
+                  <button
+                    key={node.id}
+                    type="button"
+                    onClick={() => handleSelectColumn(node.id, "select_mobile_top_node")}
+                    className="null-badge"
+                  >
+                    {shortText(node.label, 26)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="grid gap-2 sm:grid-cols-3">
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
@@ -575,9 +962,9 @@ function RelationshipsPage() {
             </p>
           </div>
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
-            <p className="mono-label">edges</p>
+            <p className="mono-label">visible edges</p>
             <p className="mono-value text-[0.86rem] text-[var(--ink)]">
-              {formatNumber(edges.length)}
+              {formatNumber(visibleNetworkEdges.length)} / {formatNumber(edges.length)}
             </p>
           </div>
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
@@ -595,6 +982,7 @@ function RelationshipsPage() {
             <QuestionIdentityCard
               column={selectedColumnMeta ?? { name: selectedColumn }}
               datasetRowCount={schema.dataset?.rowCount}
+              valueLabels={resolveColumnValueLabels(selectedColumnMeta)}
             />
 
             <aside className="space-y-3 border border-[var(--rule)] bg-[var(--paper)] p-3">
@@ -628,7 +1016,10 @@ function RelationshipsPage() {
                                 : undefined
                             }
                           >
-                            {shortText(getColumnDisplayName(memberMeta), 28)}
+                            {shortText(
+                              shortQuestionDisplay(member, getColumnDisplayName(memberMeta)),
+                              28,
+                            )}
                           </button>
                         );
                       })}
@@ -679,7 +1070,7 @@ function RelationshipsPage() {
                     : 0;
                 const isExpanded = expandedRelationship === relationship.column;
                 const pattern =
-                  relationship.topPattern ??
+                  resolveTopPattern(relationship, columnByName) ??
                   fallbackPattern(selectedDisplayName, relatedLabel, relationship);
 
                 return (

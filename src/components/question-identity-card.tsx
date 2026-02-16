@@ -15,12 +15,14 @@ interface QuestionIdentityCardProps {
   column: QuestionLike;
   datasetRowCount?: number;
   responseCount?: number;
+  valueLabels?: Record<string, string>;
 }
 
 export function QuestionIdentityCard({
   column,
   datasetRowCount,
   responseCount,
+  valueLabels,
 }: QuestionIdentityCardProps) {
   const estimatedResponses =
     responseCount ??
@@ -57,7 +59,7 @@ export function QuestionIdentityCard({
           <p className="mono-label">Top answers</p>
           <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.72rem] text-[var(--ink-faded)]">
             {topValues
-              .map((value) => formatValueWithLabel(value, column.valueLabels))
+              .map((value) => formatValueWithLabel(value, valueLabels ?? column.valueLabels))
               .join(" · ")}
           </p>
         </div>

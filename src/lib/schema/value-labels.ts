@@ -158,6 +158,93 @@ const CUSTOM_VALUE_LABELS: Record<string, ValueLabels> = {
   },
 };
 
+// Ordinal value orders: arrays define the correct sort order for non-numeric categorical columns.
+// Values not listed will appear at the end, sorted alphabetically.
+const VALUE_ORDERS: Record<string, string[]> = {
+  age: ["14-17", "18-20", "21-24", "25-28", "29-32"],
+  sexcount: ["0", "1-2", "3-7", "8-20", "21+"],
+  politics: ["Liberal", "Moderate", "Conservative"],
+  childhood_gender_tolerance: ["Intolerant", "Medium", "Tolerant"],
+  'At what age did you first begin (at least semiregularly) masturbating?': [
+    "7 or younger", "8-9", "10-11", "12-13", "14-15", "16-17", "18+", "Never",
+  ],
+  'At what age did you begin watching porn or reading erotic content at least semiregularly? (ugf1hyy)': [
+    ">6yo", "7-8yo", "9-10yo", "11-12yo", "13-14yo", "15-16yo", "17-18yo", "19-25yo", "26yo+",
+  ],
+  'From the ages of 0-14, how often were you spanked as a form of discipline? (p957nyk)': [
+    "Never", "Sometimes", "Often",
+  ],
+  'How "sexually liberated" was your upbringing? (fs700v2)': [
+    "Repressed", "Neutral", "Liberated",
+  ],
+  'How horny are you right now? (1jtj2nx)': [
+    "Not horny at all", "A little horny", "Moderately horny", "Real horny",
+  ],
+  'How horny have you been in the last 24 hours? (2hyrmvh)': [
+    "Not horny at all", "A little horny", "Moderately horny", "Real horny",
+  ],
+  'Compared to other people of your same gender and age range, you are (yh6d44s)': [
+    "Significantly less attractive", "Moderately less attractive", "Slightly less attractive",
+    "About average attractiveness",
+    "Slightly more attractive", "Moderately more attractive", "Significantly more attractive",
+  ],
+  'Your sexual interests feel (44qhm16)': [
+    "Very narrow", "Somewhat narrow", "A little narrow",
+    "Equally narrow and broad",
+    "A little broad", "Somewhat broad", "Very broad",
+  ],
+  '"In general, on average, the optimal amount of consent in my preferred erotic scenarios is:" (b0ukpvo)': [
+    "Full nonconsent", "Mostly nonconsenting, slightly consenting",
+    "Equally consenting and nonconsenting",
+    "Mostly consenting, slightly nonconsenting", "Full, enthusiastic consent",
+  ],
+  '"In general, I prefer scenarios where receiver of the pain is:" (8r5zld8)': [
+    "Very upset/doesn't want it", "Moderately upset/doesn't want it", "Slightly upset/doesn't want it",
+    "Slightly eager/wants it", "Moderately eager/wants it", "Very eager/wants it",
+  ],
+  '"In general, I prefer scenarios where the intensity of the pain is:" (m73c3q1)': [
+    "Very mild", "Moderately mild", "Slightly mild",
+    "Equally mild and severe",
+    "Slightly severe", "Moderately severe", "Very severe",
+  ],
+  '"In general, casual sexual hookups have been a ___ experience for me" (ytp3gfm)': [
+    "Really bad", "Kinda bad", "Neutral", "Kinda good", "Really good", "I haven't hooked up",
+  ],
+  '"I usually don\'t leave romantic relationships unless there\'s a very serious violation" (b7gzhvz)': [
+    "Strongly disagree", "Disagree", "Neutral", "Agree", "Strongly agree",
+    "I haven't had a relationship end",
+  ],
+  'Have you ever had a sexual experience with someone else who did not want the experience? (2zafc2j)': [
+    "No", "Yes, slightly", "Yes, significantly", "Yes, extremely",
+  ],
+  'Do you get mood-based PMS symptoms during your menstrual cycle?': [
+    "No", "Yes, maybe/slightly", "Yes, moderately", "Yes, severely",
+    "I don't menstruate/I don't know",
+  ],
+  'Are you currently experiencing PMS symptoms? (g953661)': [
+    "No", "Uncertain", "Yes",
+  ],
+};
+
+/**
+ * Sort dropdown values by their ordinal order if one is defined for the column.
+ * Values not in the order map are appended at the end, sorted alphabetically.
+ */
+export function sortByOrdinalOrder(columnName: string, values: string[]): string[] {
+  const order = VALUE_ORDERS[columnName];
+  if (!order) return values;
+
+  const orderIndex = new Map(order.map((v, i) => [v, i]));
+  return [...values].sort((a, b) => {
+    const ai = orderIndex.get(a);
+    const bi = orderIndex.get(b);
+    if (ai != null && bi != null) return ai - bi;
+    if (ai != null) return -1;
+    if (bi != null) return 1;
+    return a.localeCompare(b);
+  });
+}
+
 export function getValueLabels(columnName: string): ValueLabels | null {
   if (VANILLA_COLUMNS.has(columnName)) {
     return VANILLA_AROUSAL_NEGATED;

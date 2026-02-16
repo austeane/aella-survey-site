@@ -98,6 +98,7 @@ async function main() {
     n,
     direction,
     topPattern,
+    topPatternValues,
   }) {
     if (!Number.isFinite(value) || Math.abs(value) <= 0.05) return;
 
@@ -113,6 +114,7 @@ async function main() {
         ...(metric === "correlation" ? { direction: value >= 0 ? "positive" : "negative" } : {}),
         n,
         ...(topPattern ? { topPattern } : {}),
+        ...(topPatternValues ? { topPatternValues } : {}),
       });
     }
   }
@@ -276,6 +278,16 @@ async function main() {
           ? `People who chose ${shortValueLabel(bestPattern.aVal)} were ${bestPattern.lift.toFixed(1)}x more likely to also choose ${shortValueLabel(bestPattern.bVal)}.`
           : undefined;
 
+        const topPatternValues = bestPattern
+          ? {
+              sourceVal: String(bestPattern.aVal),
+              targetVal: String(bestPattern.bVal),
+              sourceColumn: colA.name,
+              targetColumn: colB.name,
+              lift: Math.round(bestPattern.lift * 10) / 10,
+            }
+          : undefined;
+
         addRelationship({
           colA: colA.name,
           colB: colB.name,
@@ -283,6 +295,7 @@ async function main() {
           value: cramersV,
           n: total,
           topPattern,
+          topPatternValues,
         });
 
         catPairsComputed += 1;

@@ -25,6 +25,7 @@ import { track } from "@/lib/client/track";
 import { DEFAULTS_BY_PAGE } from "@/lib/chart-presets";
 
 import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
+import { sortByOrdinalOrder } from "@/lib/schema/value-labels";
 import { addNotebookEntry } from "@/lib/notebook-store";
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { buildWhereClause, quoteIdentifier, quoteLiteral } from "@/lib/duckdb/sql-helpers";
@@ -291,11 +292,15 @@ function ExplorePage() {
 
   const filterOptions = useMemo(() => {
     if (!filterOptionsQuery.data) return [];
-    return filterOptionsQuery.data.rows.map((r) => ({
+    const options = filterOptionsQuery.data.rows.map((r) => ({
       value: String(r[0] ?? "NULL"),
       count: asNumber(r[1]),
     }));
-  }, [filterOptionsQuery.data]);
+    if (!filterColumn) return options;
+    const sortedValues = sortByOrdinalOrder(filterColumn, options.map((o) => o.value));
+    const byValue = new Map(options.map((o) => [o.value, o]));
+    return sortedValues.map((v) => byValue.get(v)!);
+  }, [filterOptionsQuery.data, filterColumn]);
 
   const queryFilters = useMemo(() => {
     if (!filterColumn || selectedFilterValues.length === 0) return undefined;

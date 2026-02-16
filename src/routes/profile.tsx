@@ -40,6 +40,7 @@ import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
 import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip } from "@/lib/format-labels";
+import { sortByOrdinalOrder } from "@/lib/schema/value-labels";
 import { addNotebookEntry } from "@/lib/notebook-store";
 import { getConfidenceStyle, reliabilityScore } from "@/lib/statistics/confidence";
 import { contextualizeDifference } from "@/lib/statistics/effect-context";
@@ -425,7 +426,8 @@ function ProfilePage() {
 
           const result = await conn.query(sql);
           const rows = toRows(result);
-          output[column] = rows.map((row) => String(row[0] ?? "NULL"));
+          const values = rows.map((row) => String(row[0] ?? "NULL"));
+          output[column] = sortByOrdinalOrder(column, values);
         }
 
         return output;
