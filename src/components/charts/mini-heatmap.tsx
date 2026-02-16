@@ -38,7 +38,14 @@ export function MiniHeatmap({ xLabels, yLabels, cells, width = 160, height = 110
     const cols = Math.max(1, xLabels.length);
     const rows = Math.max(1, yLabels.length);
 
-    const leftPad = 30;
+    const labelFont = "9px 'JetBrains Mono', ui-monospace";
+    ctx.font = labelFont;
+
+    const maxYLabelWidth = Math.max(
+      20,
+      ...yLabels.map((l) => ctx.measureText(l.length > 12 ? `${l.slice(0, 11)}…` : l).width),
+    );
+    const leftPad = Math.min(Math.ceil(maxYLabelWidth) + 4, Math.floor(width * 0.4));
     const bottomPad = 18;
     const usableW = width - leftPad - 2;
     const usableH = height - bottomPad - 2;
@@ -78,14 +85,17 @@ export function MiniHeatmap({ xLabels, yLabels, cells, width = 160, height = 110
     }
 
     ctx.fillStyle = CHART_COLORS.inkFaded;
-    ctx.font = "9px 'JetBrains Mono', ui-monospace";
+    ctx.font = labelFont;
 
+    const maxYChars = Math.max(4, Math.floor((leftPad - 4) / 5.4));
     yLabels.slice(0, rows).forEach((label, index) => {
-      ctx.fillText(label, 2, index * cellH + Math.min(cellH - 2, 10));
+      const text = label.length > maxYChars ? `${label.slice(0, maxYChars - 1)}…` : label;
+      ctx.fillText(text, 2, index * cellH + Math.min(cellH - 2, 10));
     });
 
+    const maxXChars = Math.max(3, Math.floor(cellW / 5.4));
     xLabels.slice(0, cols).forEach((label, index) => {
-      const text = label.length > 8 ? `${label.slice(0, 7)}…` : label;
+      const text = label.length > maxXChars ? `${label.slice(0, maxXChars - 1)}…` : label;
       ctx.fillText(text, leftPad + index * cellW + 1, usableH + 10);
     });
   }, [cells, height, width, xLabels, yLabels]);

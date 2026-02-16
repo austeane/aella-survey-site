@@ -19,7 +19,7 @@ import { track } from "@/lib/client/track";
 import { useDuckDB } from "@/lib/duckdb/provider";
 import { quoteIdentifier } from "@/lib/duckdb/sql-helpers";
 import { asNumber, formatNumber, formatPercent } from "@/lib/format";
-import { formatValueWithLabel, getColumnDisplayName } from "@/lib/format-labels";
+import { formatValueWithLabel, getColumnDisplayName, getColumnTooltip } from "@/lib/format-labels";
 import relationshipData from "@/lib/schema/relationships.generated.json";
 import schemaMetadata from "@/lib/schema/columns.generated.json";
 import { getValueLabels } from "@/lib/schema/value-labels";
@@ -467,11 +467,11 @@ function RelationshipMiniHeatmap({ db, xColumn, yColumn }: RelationshipMiniHeatm
       ) : null}
 
       {db && (status === "idle" || status === "loading") ? (
-        <div className="h-[130px] w-[190px] animate-pulse border border-[var(--rule-light)] bg-[var(--paper-warm)]" />
+        <div className="h-[140px] w-[260px] animate-pulse border border-[var(--rule-light)] bg-[var(--paper-warm)]" />
       ) : null}
 
       {db && status === "ready" && cells.length > 0 ? (
-        <MiniHeatmap xLabels={xLabels} yLabels={yLabels} cells={cells} width={190} height={130} />
+        <MiniHeatmap xLabels={xLabels} yLabels={yLabels} cells={cells} width={260} height={140} />
       ) : null}
 
       {db && status === "ready" && cells.length === 0 ? (
@@ -736,7 +736,7 @@ function RelationshipsPage() {
 
   const selectedColumnMeta = selectedColumn ? columnByName.get(selectedColumn) : undefined;
   const selectedDisplayName = selectedColumnMeta
-    ? getColumnDisplayName(selectedColumnMeta)
+    ? getColumnTooltip(selectedColumnMeta)
     : selectedColumn;
 
   const selectedRelationships = useMemo(
@@ -1061,7 +1061,7 @@ function RelationshipsPage() {
             <div className="grid gap-3 lg:grid-cols-2">
               {selectedRelationships.map((relationship) => {
                 const relatedColumn = columnByName.get(relationship.column) ?? { name: relationship.column };
-                const relatedLabel = getColumnDisplayName(relatedColumn);
+                const relatedLabel = getColumnTooltip(relatedColumn);
                 const subtitle = topValuesSubtitle(relatedColumn, 3);
                 const detail = strengthDetail(relationship.value);
                 const width =
@@ -1084,7 +1084,7 @@ function RelationshipsPage() {
                           <Link
                             to="/explore/crosstab"
                             search={{ x: selectedColumn, y: relationship.column }}
-                            className="block truncate font-['Source_Serif_4',Georgia,serif] text-[0.9rem] text-[var(--accent)]"
+                            className="block font-['Source_Serif_4',Georgia,serif] text-[0.9rem] leading-snug text-[var(--accent)]"
                           >
                             {relatedLabel}
                           </Link>
