@@ -10,6 +10,7 @@ import { MiniHeatmap, type MiniHeatmapCell } from "@/components/charts/mini-heat
 import {
   NetworkGraph,
   filterNetworkEdges,
+  getEffectiveNetworkEdgeCutoff,
   type NetworkEdge,
   type NetworkNode,
   type NetworkViewMode,
@@ -232,6 +233,117 @@ function pickTag(tags: string[] | undefined): NetworkNode["tag"] {
   if (tags.includes("ocean")) return "ocean";
   if (tags.includes("derived")) return "derived";
   return "other";
+}
+
+type RelationshipNodeType = "question" | "derived_scale" | "aggregate_total";
+type RelationshipNetworkScope = "core" | "derived" | "bridges" | "full";
+
+interface NetworkComponentSummary {
+  id: string;
+  nodeIds: Set<string>;
+  size: number;
+  edgeCount: number;
+}
+
+function isAggregateTotalColumn(name: string, column: ColumnSummary | undefined): boolean {
+  const displayName = column?.displayName?.trim() ?? "";
+  return name.startsWith("Total") || displayName.startsWith("Total:");
+}
+
+function classifyRelationshipNodeType(
+  name: string,
+  column: ColumnSummary | undefined,
+): RelationshipNodeType {
+  if (isAggregateTotalColumn(name, column)) {
+    return "aggregate_total";
+  }
+
+  const tags = column?.tags ?? [];
+  if (tags.includes("derived") || tags.includes("ocean")) {
+    return "derived_scale";
+  }
+  return "question";
+}
+
+function edgeMatchesScope(
+  sourceId: string,
+  targetId: string,
+  scope: RelationshipNetworkScope,
+  nodeTypeById: Map<string, RelationshipNodeType>,
+): boolean {
+  const sourceType = nodeTypeById.get(sourceId) ?? "question";
+  const targetType = nodeTypeById.get(targetId) ?? "question";
+
+  if (scope === "full") return true;
+  if (scope === "core") {
+    return sourceType === "question" && targetType === "question";
+  }
+  if (scope === "derived") {
+    return sourceType !== "question" && targetType !== "question";
+  }
+  return (sourceType === "question") !== (targetType === "question");
+}
+
+function computeNetworkComponents(
+  nodeIds: Set<string>,
+  edges: NetworkEdge[],
+): NetworkComponentSummary[] {
+  if (nodeIds.size === 0) return [];
+
+  const adjacency = new Map<string, Set<string>>();
+  for (const nodeId of nodeIds) {
+    adjacency.set(nodeId, new Set());
+  }
+
+  for (const edge of edges) {
+    if (!nodeIds.has(edge.source) || !nodeIds.has(edge.target)) continue;
+    adjacency.get(edge.source)?.add(edge.target);
+    adjacency.get(edge.target)?.add(edge.source);
+  }
+
+  const visited = new Set<string>();
+  const components: Array<{ nodeIds: Set<string>; edgeCount: number }> = [];
+
+  for (const start of nodeIds) {
+    if (visited.has(start)) continue;
+
+    const queue = [start];
+    const members = new Set<string>([start]);
+    visited.add(start);
+
+    for (let index = 0; index < queue.length; index += 1) {
+      const current = queue[index]!;
+      for (const neighbor of adjacency.get(current) ?? []) {
+        if (visited.has(neighbor)) continue;
+        visited.add(neighbor);
+        members.add(neighbor);
+        queue.push(neighbor);
+      }
+    }
+
+    let edgeCount = 0;
+    for (const member of members) {
+      edgeCount += [...(adjacency.get(member) ?? [])].filter((neighbor) =>
+        members.has(neighbor)
+      ).length;
+    }
+
+    components.push({ nodeIds: members, edgeCount: edgeCount / 2 });
+  }
+
+  const ordered = components.sort((left, right) => {
+    if (right.nodeIds.size !== left.nodeIds.size) {
+      return right.nodeIds.size - left.nodeIds.size;
+    }
+    return right.edgeCount - left.edgeCount;
+  });
+
+  return ordered.map((component, index) => ({
+    id: `component-${index + 1}`,
+    nodeIds: component.nodeIds,
+    size: component.nodeIds.size,
+    edgeCount: component.edgeCount,
+  }));
 }
 
 function strengthDetail(value: number): { label: string; detail: string } {
@@ -503,6 +615,34 @@ const allRelationshipColumns = (() => {
 
 const DEFAULT_NETWORK_EDGE_MIN = 0.14;
 const STRONG_NETWORK_EDGE_MIN = 0.2;
+const DEFAULT_NETWORK_SCOPE: RelationshipNetworkScope = "core";
+
+const NETWORK_SCOPE_OPTIONS: Array<{
+  id: RelationshipNetworkScope;
+  label: string;
+  subtitle: string;
+}> = [
+  {
+    id: "core",
+    label: "Core questions",
+    subtitle: "Question-level map without derived totals/scales.",
+  },
+  {
+    id: "derived",
+    label: "Derived + totals",
+    subtitle: "Constructed variables and aggregate totals only.",
+  },
+  {
+    id: "bridges",
+    label: "Bridge explorer",
+    subtitle: "Cross-layer links between questions and derived signals.",
+  },
+  {
+    id: "full",
+    label: "Full graph",
+    subtitle: "All nodes and all relationship types.",
+  },
+];
 
 function RelationshipsPage() {
   const search = Route.useSearch();
@@ -512,9 +652,13 @@ function RelationshipsPage() {
   const [selectedColumn, setSelectedColumn] = useState(() =>
     search.column && allRelationshipColumns.includes(search.column) ? search.column : "",
   );
-  const [expandedRelationship, setExpandedRelationship] = useState<string | null>(null);
   const [networkEdgeMin, setNetworkEdgeMin] = useState(DEFAULT_NETWORK_EDGE_MIN);
   const [networkViewMode, setNetworkViewMode] = useState<NetworkViewMode>("strong");
+  const [networkScope, setNetworkScope] = useState<RelationshipNetworkScope>(
+    DEFAULT_NETWORK_SCOPE,
+  );
+  const [showIsolates, setShowIsolates] = useState(false);
+  const [focusedComponentId, setFocusedComponentId] = useState<string | null>(null);
 
   const handleSelectColumn = useCallback(
     (column: string, action: string) => {
@@ -548,16 +692,6 @@ function RelationshipsPage() {
       resetScroll: false,
     });
   }, [navigate, search.column, selectedColumn]);
-
-  useEffect(() => {
-    setExpandedRelationship(null);
-  }, [selectedColumn]);
-
-  useEffect(() => {
-    if (!selectedColumn && networkViewMode === "focused") {
-      setNetworkViewMode("strong");
-    }
-  }, [selectedColumn, networkViewMode]);
 
   const columnOptions = useMemo(
     () =>
@@ -636,31 +770,175 @@ function RelationshipsPage() {
     return { nodes: computedNodes, edges: computedEdges };
   }, []);
 
-  const visibleNetworkEdges = useMemo(
+  const nodeById = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
+
+  const nodeTypeById = useMemo(
     () =>
-      filterNetworkEdges({
-        edges,
-        selectedId: selectedColumn || null,
+      new Map(
+        nodes.map((node) => [
+          node.id,
+          classifyRelationshipNodeType(node.id, columnByName.get(node.id)),
+        ]),
+      ),
+    [nodes],
+  );
+
+  const allNodeIds = useMemo(() => new Set(nodes.map((node) => node.id)), [nodes]);
+
+  const scopedNodeIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const node of nodes) {
+      const nodeType = nodeTypeById.get(node.id) ?? "question";
+      if (networkScope === "core" && nodeType !== "question") continue;
+      if (networkScope === "derived" && nodeType === "question") continue;
+      ids.add(node.id);
+    }
+    return ids;
+  }, [nodes, nodeTypeById, networkScope]);
+
+  useEffect(() => {
+    if (selectedColumn && !scopedNodeIds.has(selectedColumn)) {
+      setSelectedColumn("");
+    }
+  }, [selectedColumn, scopedNodeIds]);
+
+  const scopedSelectedId = selectedColumn && scopedNodeIds.has(selectedColumn)
+    ? selectedColumn
+    : null;
+
+  useEffect(() => {
+    if (!scopedSelectedId && networkViewMode === "focused") {
+      setNetworkViewMode("strong");
+    }
+  }, [scopedSelectedId, networkViewMode]);
+
+  const scopedEdges = useMemo(
+    () =>
+      edges.filter((edge) =>
+        edgeMatchesScope(edge.source, edge.target, networkScope, nodeTypeById)
+      ),
+    [edges, networkScope, nodeTypeById],
+  );
+
+  const effectiveEdgeCutoff = useMemo(
+    () =>
+      getEffectiveNetworkEdgeCutoff({
         edgeMinValue: networkEdgeMin,
         viewMode: networkViewMode,
         strongEdgeValue: STRONG_NETWORK_EDGE_MIN,
       }),
-    [edges, selectedColumn, networkEdgeMin, networkViewMode],
+    [networkEdgeMin, networkViewMode],
   );
 
-  const visibleNetworkNodeIds = useMemo(() => {
+  const filteredScopeEdges = useMemo(
+    () =>
+      filterNetworkEdges({
+        edges: scopedEdges,
+        selectedId: scopedSelectedId,
+        edgeMinValue: networkEdgeMin,
+        viewMode: networkViewMode,
+        strongEdgeValue: STRONG_NETWORK_EDGE_MIN,
+      }),
+    [networkEdgeMin, networkViewMode, scopedEdges, scopedSelectedId],
+  );
+
+  const connectedScopeNodeIds = useMemo(() => {
     const ids = new Set<string>();
-    for (const edge of visibleNetworkEdges) {
+    for (const edge of filteredScopeEdges) {
       ids.add(edge.source);
       ids.add(edge.target);
     }
-    if (selectedColumn) {
-      ids.add(selectedColumn);
+    if (scopedSelectedId) {
+      ids.add(scopedSelectedId);
     }
     return ids;
-  }, [visibleNetworkEdges, selectedColumn]);
+  }, [filteredScopeEdges, scopedSelectedId]);
+
+  const isolatedScopedNodeIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const nodeId of scopedNodeIds) {
+      if (!connectedScopeNodeIds.has(nodeId)) {
+        ids.add(nodeId);
+      }
+    }
+    return ids;
+  }, [scopedNodeIds, connectedScopeNodeIds]);
+
+  const preComponentNodeIds = useMemo(() => {
+    const ids = showIsolates
+      ? new Set(scopedNodeIds)
+      : new Set(connectedScopeNodeIds);
+    if (scopedSelectedId) {
+      ids.add(scopedSelectedId);
+    }
+    return ids;
+  }, [showIsolates, scopedNodeIds, connectedScopeNodeIds, scopedSelectedId]);
+
+  const preComponentEdges = useMemo(
+    () =>
+      filteredScopeEdges.filter(
+        (edge) => preComponentNodeIds.has(edge.source) && preComponentNodeIds.has(edge.target),
+      ),
+    [filteredScopeEdges, preComponentNodeIds],
+  );
+
+  const networkComponents = useMemo(
+    () => computeNetworkComponents(preComponentNodeIds, preComponentEdges),
+    [preComponentNodeIds, preComponentEdges],
+  );
+
+  const componentById = useMemo(
+    () => new Map(networkComponents.map((component) => [component.id, component])),
+    [networkComponents],
+  );
+
+  useEffect(() => {
+    if (!focusedComponentId) return;
+    const focusedComponent = componentById.get(focusedComponentId);
+    if (!focusedComponent) {
+      setFocusedComponentId(null);
+      return;
+    }
+
+    if (scopedSelectedId && !focusedComponent.nodeIds.has(scopedSelectedId)) {
+      setFocusedComponentId(null);
+    }
+  }, [focusedComponentId, componentById, scopedSelectedId]);
+
+  const activeComponent = focusedComponentId
+    ? componentById.get(focusedComponentId)
+    : undefined;
+
+  const visibleNetworkNodeIds = useMemo(() => {
+    if (!activeComponent) return preComponentNodeIds;
+    return new Set(activeComponent.nodeIds);
+  }, [activeComponent, preComponentNodeIds]);
+
+  const visibleNetworkEdges = useMemo(
+    () =>
+      preComponentEdges.filter(
+        (edge) => visibleNetworkNodeIds.has(edge.source) && visibleNetworkNodeIds.has(edge.target),
+      ),
+    [preComponentEdges, visibleNetworkNodeIds],
+  );
 
   const visibleNetworkNodeCount = visibleNetworkNodeIds.size;
+  const hiddenByScopeCount = Math.max(0, allNodeIds.size - scopedNodeIds.size);
+  const hiddenWithinScopeCount = Math.max(0, scopedNodeIds.size - visibleNetworkNodeCount);
+  const hiddenNodeCount = Math.max(0, allNodeIds.size - visibleNetworkNodeCount);
+  const hiddenOutsideFocusedComponentCount = focusedComponentId
+    ? Math.max(0, preComponentNodeIds.size - visibleNetworkNodeCount)
+    : 0;
+  const hiddenByFiltersCount = Math.max(
+    0,
+    hiddenWithinScopeCount - hiddenOutsideFocusedComponentCount,
+  );
+  const isolatedScopeNodeCount = isolatedScopedNodeIds.size;
+
+  const graphNodes = useMemo(
+    () => nodes.filter((node) => visibleNetworkNodeIds.has(node.id)),
+    [nodes, visibleNetworkNodeIds],
+  );
 
   const clusterLabelsById = useMemo(
     () =>
@@ -670,7 +948,30 @@ function RelationshipsPage() {
     [],
   );
 
-  const nodeById = useMemo(() => new Map(nodes.map((node) => [node.id, node])), [nodes]);
+  const scopedColumnOptions = useMemo(
+    () => columnOptions.filter((option) => scopedNodeIds.has(option.name)),
+    [columnOptions, scopedNodeIds],
+  );
+
+  const componentChipData = useMemo(() => {
+    const MAX_COMPONENT_CHIPS = 12;
+    const chips = networkComponents.slice(0, MAX_COMPONENT_CHIPS).map((component, index) => {
+      const alphaIndex = index % 26;
+      const alphaLabel = String.fromCharCode(65 + alphaIndex);
+      const cycle = index >= 26 ? Math.floor(index / 26) + 1 : null;
+      const componentLabel = cycle ? `${alphaLabel}${cycle}` : alphaLabel;
+      return {
+        id: component.id,
+        label: `Component ${componentLabel}`,
+        size: component.size,
+      };
+    });
+
+    return {
+      chips,
+      hiddenCount: Math.max(0, networkComponents.length - chips.length),
+    };
+  }, [networkComponents]);
 
   const mobileClusterSummaries = useMemo(() => {
     const clusters = relationshipsPayload.clusters ?? [];
@@ -734,15 +1035,19 @@ function RelationshipsPage() {
       }));
   }, [nodes, visibleNetworkNodeIds]);
 
-  const selectedColumnMeta = selectedColumn ? columnByName.get(selectedColumn) : undefined;
+  const selectedColumnMeta = scopedSelectedId ? columnByName.get(scopedSelectedId) : undefined;
   const selectedDisplayName = selectedColumnMeta
     ? getColumnTooltip(selectedColumnMeta)
-    : selectedColumn;
+    : (scopedSelectedId ?? "");
 
-  const selectedRelationships = useMemo(
-    () => (selectedColumn ? relationshipsPayload.relationships[selectedColumn] ?? [] : []),
-    [selectedColumn],
-  );
+  const selectedRelationships = useMemo(() => {
+    if (!scopedSelectedId) return [];
+
+    return (relationshipsPayload.relationships[scopedSelectedId] ?? []).filter((relationship) =>
+      relationship.value >= effectiveEdgeCutoff &&
+      edgeMatchesScope(scopedSelectedId, relationship.column, networkScope, nodeTypeById)
+    );
+  }, [scopedSelectedId, effectiveEdgeCutoff, networkScope, nodeTypeById]);
 
   const maxRelationshipValue = useMemo(
     () =>
@@ -758,8 +1063,8 @@ function RelationshipsPage() {
     [],
   );
 
-  const selectedClusterId = selectedColumn
-    ? relationshipsPayload.clusterByColumn?.[selectedColumn]
+  const selectedClusterId = scopedSelectedId
+    ? relationshipsPayload.clusterByColumn?.[scopedSelectedId]
     : undefined;
   const selectedCluster = selectedClusterId ? clusterById.get(selectedClusterId) : undefined;
   const bridgeClusters =
@@ -770,9 +1075,9 @@ function RelationshipsPage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Relationship Galaxy</h1>
+        <h1 className="page-title">Relationship Atlas</h1>
         <p className="page-subtitle">
-          Explore how questions connect: start with the map, then zoom into one question and inspect relationship cards.
+          Explore one lens at a time. Defaults prioritize interpretable question-level structure, with derived and bridge views available when needed.
         </p>
         <p className="dateline">
           {formatNumber(relationshipsPayload.columnCount)} questions &middot;{" "}
@@ -784,24 +1089,24 @@ function RelationshipsPage() {
       <section className="raised-panel space-y-4">
         <SectionHeader
           number="01"
-          title="Network galaxy"
-          subtitle="Drag to pan, scroll to zoom, then focus a question and follow its strongest neighborhood."
+          title="Atlas network lens"
+          subtitle="Choose a scope, then tune link strength. Hidden nodes are removed from rendering (not ghosted)."
         />
 
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
           <label className="editorial-label">
             Focus question
             <ColumnCombobox
-              columns={columnOptions}
-              value={selectedColumn}
+              columns={scopedColumnOptions}
+              value={scopedSelectedId ?? ""}
               onValueChange={(value) => handleSelectColumn(value, "select_relationship_column")}
               includeNoneOption
-              noneOptionLabel="Network overview"
-              placeholder="Search for a question"
+              noneOptionLabel="Scope overview"
+              placeholder="Search for a question in this scope"
             />
           </label>
 
-          {selectedColumn ? (
+          {scopedSelectedId ? (
             <Button
               type="button"
               variant="ghost"
@@ -814,68 +1119,170 @@ function RelationshipsPage() {
           ) : null}
         </div>
 
-        <div className="grid gap-3 border border-[var(--rule)] bg-[var(--paper-warm)] p-3 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
+        <div className="space-y-3 border border-[var(--rule)] bg-[var(--paper-warm)] p-3">
           <div>
-            <p className="mono-label">network view</p>
+            <p className="mono-label">scope</p>
             <div className="mt-1 flex flex-wrap gap-1.5">
-              <Button
-                type="button"
-                variant={networkViewMode === "all" ? "accent" : "ghost"}
-                size="sm"
-                onClick={() => setNetworkViewMode("all")}
-              >
-                All links
-              </Button>
-              <Button
-                type="button"
-                variant={networkViewMode === "strong" ? "accent" : "ghost"}
-                size="sm"
-                onClick={() => setNetworkViewMode("strong")}
-              >
-                Strong links
-              </Button>
-              <Button
-                type="button"
-                variant={networkViewMode === "focused" ? "accent" : "ghost"}
-                size="sm"
-                onClick={() => setNetworkViewMode("focused")}
-                disabled={!selectedColumn}
-              >
-                Selected + 1 hop
-              </Button>
+              {NETWORK_SCOPE_OPTIONS.map((option) => (
+                <Button
+                  key={option.id}
+                  type="button"
+                  variant={networkScope === option.id ? "accent" : "ghost"}
+                  size="sm"
+                  onClick={() => {
+                    setNetworkScope(option.id);
+                    setFocusedComponentId(null);
+                  }}
+                >
+                  {option.label}
+                </Button>
+              ))}
             </div>
+            <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
+              {NETWORK_SCOPE_OPTIONS.find((option) => option.id === networkScope)?.subtitle}
+            </p>
           </div>
 
-          <label className="editorial-label">
-            Minimum link strength: {formatPercent(networkEdgeMin * 100, 0)}
-            <input
-              type="range"
-              min={0.05}
-              max={0.35}
-              step={0.01}
-              value={networkEdgeMin}
-              onChange={(event) => setNetworkEdgeMin(Number(event.target.value))}
-              className="mt-1 w-full accent-[var(--accent)]"
-            />
-            <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
-              Showing {formatNumber(visibleNetworkEdges.length)} links across{" "}
-              {formatNumber(visibleNetworkNodeCount)} questions.
+          <div className="grid gap-3 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
+            <div>
+              <p className="mono-label">network view</p>
+              <div className="mt-1 flex flex-wrap gap-1.5">
+                <Button
+                  type="button"
+                  variant={networkViewMode === "all" ? "accent" : "ghost"}
+                  size="sm"
+                  onClick={() => setNetworkViewMode("all")}
+                >
+                  All links
+                </Button>
+                <Button
+                  type="button"
+                  variant={networkViewMode === "strong" ? "accent" : "ghost"}
+                  size="sm"
+                  onClick={() => setNetworkViewMode("strong")}
+                >
+                  Strong links
+                </Button>
+                <Button
+                  type="button"
+                  variant={networkViewMode === "focused" ? "accent" : "ghost"}
+                  size="sm"
+                  onClick={() => setNetworkViewMode("focused")}
+                  disabled={!scopedSelectedId}
+                >
+                  Selected + 1 hop
+                </Button>
+              </div>
+            </div>
+
+            <label className="editorial-label">
+              Minimum link strength: {formatPercent(networkEdgeMin * 100, 0)}
+              <input
+                type="range"
+                min={0.05}
+                max={0.35}
+                step={0.01}
+                value={networkEdgeMin}
+                onChange={(event) => {
+                  setNetworkEdgeMin(Number(event.target.value));
+                  setFocusedComponentId(null);
+                }}
+                className="mt-1 w-full accent-[var(--accent)]"
+              />
+              <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
+                Effective cutoff: {formatPercent(effectiveEdgeCutoff * 100, 0)}
+                {networkViewMode === "strong"
+                  ? ` (strong floor ${formatPercent(STRONG_NETWORK_EDGE_MIN * 100, 0)})`
+                  : ""}
+              </p>
+              <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
+                Showing {formatNumber(visibleNetworkEdges.length)} links across{" "}
+                {formatNumber(visibleNetworkNodeCount)} nodes
+                {hiddenNodeCount > 0
+                  ? ` · ${formatNumber(hiddenNodeCount)} hidden by scope/filters${focusedComponentId ? "/component focus" : ""}`
+                  : ""}.
+              </p>
+            </label>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant={showIsolates ? "accent" : "ghost"}
+              size="sm"
+              onClick={() => {
+                setShowIsolates((current) => !current);
+                setFocusedComponentId(null);
+              }}
+            >
+              {showIsolates ? "Hide isolates" : "Show isolates"}
+            </Button>
+            <p className="mono-value text-[0.64rem] text-[var(--ink-faded)]">
+              {formatNumber(isolatedScopeNodeCount)} isolated nodes in this scope
+              {showIsolates
+                ? " are currently rendered."
+                : " are hidden by default for clarity."}
             </p>
-          </label>
+          </div>
+
+          {componentChipData.chips.length > 1 ? (
+            <div className="space-y-1">
+              <p className="mono-label">connected components</p>
+              <div className="flex flex-wrap gap-1.5">
+                {componentChipData.chips.map((component) => {
+                  const isActive = focusedComponentId === component.id;
+                  return (
+                    <button
+                      key={component.id}
+                      type="button"
+                      className="null-badge"
+                      onClick={() => {
+                        setFocusedComponentId((current) =>
+                          current === component.id ? null : component.id,
+                        );
+                      }}
+                      style={
+                        isActive
+                          ? {
+                              borderColor: "var(--accent)",
+                              color: "var(--accent)",
+                            }
+                          : undefined
+                      }
+                    >
+                      {component.label} · {formatNumber(component.size)}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="mono-value text-[0.64rem] text-[var(--ink-faded)]">
+                Click a component chip to focus it. {focusedComponentId && hiddenOutsideFocusedComponentCount > 0
+                  ? `${formatNumber(hiddenOutsideFocusedComponentCount)} nodes are hidden outside the focused component.`
+                  : hiddenByFiltersCount > 0
+                    ? `${formatNumber(hiddenByFiltersCount)} scoped nodes are hidden by threshold/isolate filters.`
+                    : "All scoped nodes are visible."}
+                {componentChipData.hiddenCount > 0
+                  ? ` ${formatNumber(componentChipData.hiddenCount)} smaller components are omitted from chips.`
+                  : ""}
+              </p>
+            </div>
+          ) : null}
         </div>
 
         <div className="hidden sm:block">
+          {/* Graph receives pre-filtered nodes/edges from atlas scope + threshold logic above. */}
           <NetworkGraph
-            nodes={nodes}
-            edges={edges}
-            selectedId={selectedColumn || null}
+            nodes={graphNodes}
+            edges={visibleNetworkEdges}
+            selectedId={scopedSelectedId}
             onSelect={(value) => handleSelectColumn(value, "select_network_node")}
             onClearSelection={() => handleSelectColumn("", "clear_network_selection")}
-            compact={Boolean(selectedColumn)}
-            edgeMinValue={networkEdgeMin}
-            viewMode={networkViewMode}
-            strongEdgeValue={STRONG_NETWORK_EDGE_MIN}
+            compact={Boolean(scopedSelectedId)}
+            edgeMinValue={0}
+            viewMode="all"
+            strongEdgeValue={0}
             clusterLabelsById={clusterLabelsById}
+            showIsolates={showIsolates}
           />
         </div>
 
@@ -909,7 +1316,7 @@ function RelationshipsPage() {
 
                   <div className="flex flex-wrap gap-1.5">
                     {cluster.members.map((member) => {
-                      const isActive = member.id === selectedColumn;
+                      const isActive = member.id === scopedSelectedId;
                       return (
                         <button
                           key={member.id}
@@ -954,17 +1361,23 @@ function RelationshipsPage() {
           )}
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-4">
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
-            <p className="mono-label">nodes</p>
+            <p className="mono-label">scope nodes</p>
             <p className="mono-value text-[0.86rem] text-[var(--ink)]">
-              {formatNumber(nodes.length)}
+              {formatNumber(visibleNetworkNodeCount)} / {formatNumber(scopedNodeIds.size)}
+            </p>
+          </div>
+          <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
+            <p className="mono-label">hidden by scope</p>
+            <p className="mono-value text-[0.86rem] text-[var(--ink)]">
+              {formatNumber(hiddenByScopeCount)}
             </p>
           </div>
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
             <p className="mono-label">visible edges</p>
             <p className="mono-value text-[0.86rem] text-[var(--ink)]">
-              {formatNumber(visibleNetworkEdges.length)} / {formatNumber(edges.length)}
+              {formatNumber(visibleNetworkEdges.length)} / {formatNumber(scopedEdges.length)}
             </p>
           </div>
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
@@ -974,13 +1387,13 @@ function RelationshipsPage() {
         </div>
       </section>
 
-      {selectedColumn ? (
+      {scopedSelectedId ? (
         <section className="raised-panel space-y-4">
           <SectionHeader number="02" title="Selected question detail" />
 
           <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,320px)]">
             <QuestionIdentityCard
-              column={selectedColumnMeta ?? { name: selectedColumn }}
+              column={selectedColumnMeta ?? { name: scopedSelectedId }}
               datasetRowCount={schema.dataset?.rowCount}
               valueLabels={resolveColumnValueLabels(selectedColumnMeta)}
             />
@@ -1000,7 +1413,7 @@ function RelationshipsPage() {
                     <div className="mt-1 flex flex-wrap gap-1.5">
                       {selectedCluster.members.slice(0, 14).map((member) => {
                         const memberMeta = columnByName.get(member) ?? { name: member };
-                        const isActive = member === selectedColumn;
+                        const isActive = member === scopedSelectedId;
                         return (
                           <button
                             key={member}
@@ -1050,13 +1463,13 @@ function RelationshipsPage() {
           number="03"
           title="Relationship cards"
           subtitle={
-            selectedColumn
+            scopedSelectedId
               ? `${selectedRelationships.length} strongest links for "${selectedDisplayName}"`
               : "Select a node to open relationship cards with mini heatmaps."
           }
         />
 
-        {selectedColumn ? (
+        {scopedSelectedId ? (
           selectedRelationships.length > 0 ? (
             <div className="grid gap-3 lg:grid-cols-2">
               {selectedRelationships.map((relationship) => {
@@ -1068,7 +1481,6 @@ function RelationshipsPage() {
                   maxRelationshipValue > 0
                     ? (relationship.value / maxRelationshipValue) * 100
                     : 0;
-                const isExpanded = expandedRelationship === relationship.column;
                 const pattern =
                   resolveTopPattern(relationship, columnByName) ??
                   fallbackPattern(selectedDisplayName, relatedLabel, relationship);
@@ -1083,7 +1495,7 @@ function RelationshipsPage() {
                         <ColumnNameTooltip column={relatedColumn}>
                           <Link
                             to="/explore/crosstab"
-                            search={{ x: selectedColumn, y: relationship.column }}
+                            search={{ x: scopedSelectedId, y: relationship.column }}
                             className="block font-['Source_Serif_4',Georgia,serif] text-[0.9rem] leading-snug text-[var(--accent)]"
                           >
                             {relatedLabel}
@@ -1117,55 +1529,32 @@ function RelationshipsPage() {
 
                     <RelationshipMiniHeatmap
                       db={db}
-                      xColumn={selectedColumnMeta ?? { name: selectedColumn }}
+                      xColumn={selectedColumnMeta ?? { name: scopedSelectedId }}
                       yColumn={relatedColumn}
                     />
 
                     <p className="section-subtitle text-[0.73rem]">{pattern}</p>
 
-                    <div className="flex items-center justify-between gap-2 pt-1">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() =>
-                          setExpandedRelationship((current) =>
-                            current === relationship.column ? null : relationship.column,
-                          )
-                        }
-                      >
-                        {isExpanded ? "Hide detail" : "Expand detail"}
-                      </Button>
-
+                    <div className="flex justify-end pt-1">
                       <Button asChild variant="accent" size="sm">
                         <Link
                           to="/explore/crosstab"
-                          search={{ x: selectedColumn, y: relationship.column }}
+                          search={{ x: scopedSelectedId, y: relationship.column }}
                         >
                           Open in Explore
                         </Link>
                       </Button>
                     </div>
-
-                    {isExpanded ? (
-                      <div className="space-y-1 border-t border-[var(--rule-light)] pt-2">
-                        <p className="mono-value text-[0.64rem] text-[var(--ink-faded)]">
-                          Interpreted as {detail.detail}; compare this card against nearby links in the network map for context.
-                        </p>
-                        {selectedColumnMeta?.nullRatio != null ? (
-                          <p className="mono-value text-[0.64rem] text-[var(--ink-faded)]">
-                            Estimated non-null response coverage:{" "}
-                            {formatPercent((1 - selectedColumnMeta.nullRatio) * 100, 1)}
-                          </p>
-                        ) : null}
-                      </div>
-                    ) : null}
                   </article>
                 );
               })}
             </div>
           ) : (
-            <p className="section-subtitle">No relationships found for this question.</p>
+            <p className="section-subtitle">
+              {networkScope === "bridges"
+                ? "No cross-layer links for this selection at the current threshold."
+                : "No relationships found for this question in the current scope + threshold."}
+            </p>
           )
         ) : (
           <p className="section-subtitle">

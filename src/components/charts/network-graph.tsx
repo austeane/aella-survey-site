@@ -50,6 +50,12 @@ interface FilterNetworkEdgesArgs {
   strongEdgeValue: number;
 }
 
+interface EffectiveCutoffArgs {
+  edgeMinValue: number;
+  viewMode: NetworkViewMode;
+  strongEdgeValue: number;
+}
+
 interface WorldBounds {
   minX: number;
   minY: number;
@@ -68,9 +74,11 @@ export function filterNetworkEdges({
   viewMode,
   strongEdgeValue,
 }: FilterNetworkEdgesArgs): NetworkEdge[] {
-  const cutoff = viewMode === "strong"
-    ? Math.max(edgeMinValue, strongEdgeValue)
-    : edgeMinValue;
+  const cutoff = getEffectiveNetworkEdgeCutoff({
+    edgeMinValue,
+    viewMode,
+    strongEdgeValue,
+  });
 
   const thresholded = edges.filter((edge) => edge.value >= cutoff);
   if (viewMode !== "focused" || !selectedId) {
@@ -90,6 +98,16 @@ export function filterNetworkEdges({
   );
 }
 
+export function getEffectiveNetworkEdgeCutoff({
+  edgeMinValue,
+  viewMode,
+  strongEdgeValue,
+}: EffectiveCutoffArgs): number {
+  return viewMode === "strong"
+    ? Math.max(edgeMinValue, strongEdgeValue)
+    : edgeMinValue;
+}
+
 function isSimNode(value: SimNode | string | number): value is SimNode {
   return typeof value === "object" && value !== null && "id" in value;
 }
@@ -105,6 +123,7 @@ interface NetworkGraphProps {
   viewMode?: NetworkViewMode;
   strongEdgeValue?: number;
   clusterLabelsById?: Record<string, string>;
+  showIsolates?: boolean;
 }
 
 function nodeColor(tag: NetworkNode["tag"]): string {
@@ -191,6 +210,7 @@ export function NetworkGraph({
   viewMode = "all",
   strongEdgeValue = 0.2,
   clusterLabelsById,
+  showIsolates = false,
 }: NetworkGraphProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -260,6 +280,14 @@ export function NetworkGraph({
   );
 
   const visibleNodeIds = useMemo(() => {
+    if (showIsolates) {
+      const ids = new Set(nodes.map((node) => node.id));
+      if (selectedId) {
+        ids.add(selectedId);
+      }
+      return ids;
+    }
+
     const ids = new Set<string>();
     for (const edge of visibleEdges) {
       ids.add(edge.source);
@@ -269,7 +297,7 @@ export function NetworkGraph({
       ids.add(selectedId);
     }
     return ids;
-  }, [visibleEdges, selectedId]);
+  }, [nodes, showIsolates, visibleEdges, selectedId]);
 
   const neighbors = useMemo(() => {
     const map = new Map<string, Set<string>>();
@@ -357,18 +385,20 @@ export function NetworkGraph({
   }, [effectiveCompact, isFullscreen]);
 
   useEffect(() => {
-    const simNodes: SimNode[] = nodes.map((node) => {
-      const cached = layoutCacheRef.current.get(node.id);
-      return {
-        ...node,
-        x: cached?.x,
-        y: cached?.y,
-      };
-    });
+    const simNodes: SimNode[] = nodes
+      .filter((node) => visibleNodeIds.has(node.id))
+      .map((node) => {
+        const cached = layoutCacheRef.current.get(node.id);
+        return {
+          ...node,
+          x: cached?.x,
+          y: cached?.y,
+        };
+      });
 
     const simNodeById = new Map(simNodes.map((node) => [node.id, node]));
 
-    const simLinks: SimLink[] = edges.flatMap((edge) => {
+    const simLinks: SimLink[] = visibleEdges.flatMap((edge) => {
       const source = simNodeById.get(edge.source);
       const target = simNodeById.get(edge.target);
       if (!source || !target) return [];
@@ -383,6 +413,15 @@ export function NetworkGraph({
       ];
     });
 
+    if (simNodes.length === 0) {
+      simNodesRef.current = [];
+      simLinksRef.current = [];
+      setWorldBounds(null);
+      setLayoutVersion((current) => current + 1);
+      requestRedraw();
+      return;
+    }
+
     const simulation = forceSimulation<SimNode>(simNodes)
       .force(
         "link",
@@ -395,13 +434,13 @@ export function NetworkGraph({
       .force("collide", forceCollide<SimNode>((d) => 5 + Math.sqrt(d.degree ?? 1) * 1.2))
       .stop();
 
-    const hasCachedLayout = layoutCacheRef.current.size > 0;
+    const hasCachedLayout = simNodes.some((node) => layoutCacheRef.current.has(node.id));
     const ticks = hasCachedLayout ? 72 : effectiveCompact ? 130 : 220;
     for (let i = 0; i < ticks; i += 1) {
       simulation.tick();
     }
 
-    const nextCache = new Map<string, { x: number; y: number }>();
+    const nextCache = new Map(layoutCacheRef.current);
     let minX = Number.POSITIVE_INFINITY;
     let minY = Number.POSITIVE_INFINITY;
     let maxX = Number.NEGATIVE_INFINITY;
@@ -437,7 +476,15 @@ export function NetworkGraph({
     simulation.stop();
     setLayoutVersion((current) => current + 1);
     requestRedraw();
-  }, [nodes, edges, size.width, size.height, effectiveCompact, requestRedraw]);
+  }, [
+    nodes,
+    visibleEdges,
+    visibleNodeIds,
+    size.width,
+    size.height,
+    effectiveCompact,
+    requestRedraw,
+  ]);
 
   const animateTransformTo = useCallback(
     (target: ZoomTransform, duration = 320) => {
@@ -845,14 +892,12 @@ export function NetworkGraph({
       const radius = nodeRadius(degree);
       const isActive = node.id === activeId;
       const isNeighbor = activeId ? neighbors.get(activeId)?.has(node.id) : false;
-      const inVisibleGraph = visibleNodeIds.has(node.id);
-      const filteredOut = visibleEdgeKeySet.size > 0 && !inVisibleGraph;
       const fadedByInteraction = Boolean(activeId && !isActive && !isNeighbor);
 
       context.beginPath();
       context.arc(node.x ?? 0, node.y ?? 0, radius, 0, Math.PI * 2);
       context.fillStyle = nodeColor(node.tag);
-      context.globalAlpha = filteredOut ? 0.08 : fadedByInteraction ? 0.2 : 0.96;
+      context.globalAlpha = fadedByInteraction ? 0.2 : 0.96;
       context.fill();
 
       if (node.id === selectedId) {
@@ -860,13 +905,12 @@ export function NetworkGraph({
         context.arc(node.x ?? 0, node.y ?? 0, radius + 2.6, 0, Math.PI * 2);
         context.strokeStyle = CHART_COLORS.ink;
         context.lineWidth = Math.max(0.8, 1.2 / Math.sqrt(zoomScale));
-        context.globalAlpha = filteredOut ? 0.2 : 0.95;
+        context.globalAlpha = 0.95;
         context.stroke();
       }
 
       const showLabel =
         !effectiveCompact &&
-        !filteredOut &&
         ((node.degree ?? 0) >= adaptiveLabelThreshold || node.id === activeId || node.id === selectedId);
       if (showLabel) {
         const worldFontSize = Math.max(6, 9 / Math.max(zoomScale, 1));
