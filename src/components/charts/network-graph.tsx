@@ -663,7 +663,13 @@ export function NetworkGraph({
       .filter((event) => {
         if (event.type === "dblclick") return false;
         if (event.type === "wheel") {
+          // In fullscreen: plain scroll pans (handled separately), only ctrl/pinch zooms
           if (isFullscreenRef.current && !event.ctrlKey && !event.metaKey) {
+            return false;
+          }
+          // In normal (embedded) mode: plain scroll should scroll the page,
+          // only ctrl/pinch-to-zoom should zoom the canvas
+          if (!isFullscreenRef.current && !event.ctrlKey && !event.metaKey) {
             return false;
           }
           if ("preventDefault" in event) {
@@ -1170,6 +1176,74 @@ export function NetworkGraph({
       <p className="pointer-events-none absolute bottom-2 left-2 z-30 border border-[var(--rule)] bg-[var(--paper)] px-1.5 py-0.5 font-['JetBrains_Mono',ui-monospace,monospace] text-[0.54rem] uppercase tracking-[0.08em] text-[var(--ink-faded)]">
         0 reset{selectedId ? " · F focus · Esc clear" : ""}
       </p>
+
+      {isFullscreen ? (
+        <div className="pointer-events-none absolute bottom-3 left-3 z-30 space-y-2 border border-[var(--rule)] bg-[var(--paper)] px-3 py-2.5 opacity-80">
+          <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.56rem] font-semibold uppercase tracking-[0.12em] text-[var(--ink)]">
+            Legend
+          </p>
+
+          <div className="space-y-1">
+            <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.5rem] uppercase tracking-[0.08em] text-[var(--ink-faded)]">
+              Nodes
+            </p>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+              {([
+                ["fetish", "Fetish / kink", CHART_COLORS.accent],
+                ["demographic", "Demographic", CHART_COLORS.ink],
+                ["ocean", "Personality", CHART_COLORS.highlight],
+                ["derived", "Derived score", CHART_COLORS.inkLight],
+                ["other", "Other", CHART_COLORS.rule],
+              ] as const).map(([key, label, color]) => (
+                <span key={key} className="flex items-center gap-1">
+                  <span
+                    className="inline-block h-[7px] w-[7px] rounded-full"
+                    style={{ backgroundColor: color }}
+                  />
+                  <span className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.52rem] text-[var(--ink-faded)]">
+                    {label}
+                  </span>
+                </span>
+              ))}
+            </div>
+            <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.48rem] text-[var(--ink-faded)]">
+              Size = number of connections
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.5rem] uppercase tracking-[0.08em] text-[var(--ink-faded)]">
+              Links
+            </p>
+            <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+              <span className="flex items-center gap-1">
+                <span className="inline-block h-0 w-4 border-t border-dashed" style={{ borderColor: CHART_COLORS.inkLight }} />
+                <span className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.52rem] text-[var(--ink-faded)]">
+                  Correlation
+                </span>
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="inline-block h-0 w-4 border-t" style={{ borderColor: CHART_COLORS.accent }} />
+                <span className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.52rem] text-[var(--ink-faded)]">
+                  Association
+                </span>
+              </span>
+            </div>
+            <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.48rem] text-[var(--ink-faded)]">
+              Thicker = stronger relationship
+            </p>
+          </div>
+
+          <div className="space-y-1">
+            <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.5rem] uppercase tracking-[0.08em] text-[var(--ink-faded)]">
+              Shaded regions
+            </p>
+            <p className="font-['JetBrains_Mono',ui-monospace,monospace] text-[0.52rem] text-[var(--ink-faded)]">
+              Clusters of related questions (convex hull)
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       <div className="pointer-events-none absolute right-2 top-2 z-40 flex items-center gap-1.5">
         <span className="border border-[var(--rule)] bg-[var(--paper)] px-1.5 py-0.5 font-['JetBrains_Mono',ui-monospace,monospace] text-[0.58rem] text-[var(--ink-faded)]">

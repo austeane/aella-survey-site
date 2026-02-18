@@ -657,7 +657,7 @@ function RelationshipsPage() {
   const [networkScope, setNetworkScope] = useState<RelationshipNetworkScope>(
     DEFAULT_NETWORK_SCOPE,
   );
-  const [showIsolates, setShowIsolates] = useState(false);
+  const showIsolates = false;
   const [focusedComponentId, setFocusedComponentId] = useState<string | null>(null);
 
   const handleSelectColumn = useCallback(
@@ -854,15 +854,6 @@ function RelationshipsPage() {
     return ids;
   }, [filteredScopeEdges, scopedSelectedId]);
 
-  const isolatedScopedNodeIds = useMemo(() => {
-    const ids = new Set<string>();
-    for (const nodeId of scopedNodeIds) {
-      if (!connectedScopeNodeIds.has(nodeId)) {
-        ids.add(nodeId);
-      }
-    }
-    return ids;
-  }, [scopedNodeIds, connectedScopeNodeIds]);
 
   const preComponentNodeIds = useMemo(() => {
     const ids = showIsolates
@@ -923,17 +914,7 @@ function RelationshipsPage() {
   );
 
   const visibleNetworkNodeCount = visibleNetworkNodeIds.size;
-  const hiddenByScopeCount = Math.max(0, allNodeIds.size - scopedNodeIds.size);
-  const hiddenWithinScopeCount = Math.max(0, scopedNodeIds.size - visibleNetworkNodeCount);
   const hiddenNodeCount = Math.max(0, allNodeIds.size - visibleNetworkNodeCount);
-  const hiddenOutsideFocusedComponentCount = focusedComponentId
-    ? Math.max(0, preComponentNodeIds.size - visibleNetworkNodeCount)
-    : 0;
-  const hiddenByFiltersCount = Math.max(
-    0,
-    hiddenWithinScopeCount - hiddenOutsideFocusedComponentCount,
-  );
-  const isolatedScopeNodeCount = isolatedScopedNodeIds.size;
 
   const graphNodes = useMemo(
     () => nodes.filter((node) => visibleNetworkNodeIds.has(node.id)),
@@ -952,26 +933,6 @@ function RelationshipsPage() {
     () => columnOptions.filter((option) => scopedNodeIds.has(option.name)),
     [columnOptions, scopedNodeIds],
   );
-
-  const componentChipData = useMemo(() => {
-    const MAX_COMPONENT_CHIPS = 12;
-    const chips = networkComponents.slice(0, MAX_COMPONENT_CHIPS).map((component, index) => {
-      const alphaIndex = index % 26;
-      const alphaLabel = String.fromCharCode(65 + alphaIndex);
-      const cycle = index >= 26 ? Math.floor(index / 26) + 1 : null;
-      const componentLabel = cycle ? `${alphaLabel}${cycle}` : alphaLabel;
-      return {
-        id: component.id,
-        label: `Component ${componentLabel}`,
-        size: component.size,
-      };
-    });
-
-    return {
-      chips,
-      hiddenCount: Math.max(0, networkComponents.length - chips.length),
-    };
-  }, [networkComponents]);
 
   const mobileClusterSummaries = useMemo(() => {
     const clusters = relationshipsPayload.clusters ?? [];
@@ -1075,9 +1036,9 @@ function RelationshipsPage() {
   return (
     <div className="page">
       <header className="page-header">
-        <h1 className="page-title">Relationship Atlas</h1>
+        <h1 className="page-title">Relationship Galaxy</h1>
         <p className="page-subtitle">
-          Explore one lens at a time. Defaults prioritize interpretable question-level structure, with derived and bridge views available when needed.
+          Explore how questions connect: start with the map, then zoom into one question and inspect relationship cards.
         </p>
         <p className="dateline">
           {formatNumber(relationshipsPayload.columnCount)} questions &middot;{" "}
@@ -1089,8 +1050,8 @@ function RelationshipsPage() {
       <section className="raised-panel space-y-4">
         <SectionHeader
           number="01"
-          title="Atlas network lens"
-          subtitle="Choose a scope, then tune link strength. Hidden nodes are removed from rendering (not ghosted)."
+          title={<>Network galaxy <span className="null-badge ml-1 align-middle text-[0.55rem]">Under development</span></>}
+          subtitle="Drag to pan, pinch to zoom, then click a node to inspect its relationships."
         />
 
         <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
@@ -1101,8 +1062,8 @@ function RelationshipsPage() {
               value={scopedSelectedId ?? ""}
               onValueChange={(value) => handleSelectColumn(value, "select_relationship_column")}
               includeNoneOption
-              noneOptionLabel="Scope overview"
-              placeholder="Search for a question in this scope"
+              noneOptionLabel="Network overview"
+              placeholder="Search for a question"
             />
           </label>
 
@@ -1119,7 +1080,7 @@ function RelationshipsPage() {
           ) : null}
         </div>
 
-        <div className="space-y-3 border border-[var(--rule)] bg-[var(--paper-warm)] p-3">
+        <div className="grid gap-3 border border-[var(--rule)] bg-[var(--paper-warm)] p-3 md:grid-cols-[auto_auto_minmax(0,1fr)] md:items-end">
           <div>
             <p className="mono-label">scope</p>
             <div className="mt-1 flex flex-wrap gap-1.5">
@@ -1138,135 +1099,61 @@ function RelationshipsPage() {
                 </Button>
               ))}
             </div>
-            <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
-              {NETWORK_SCOPE_OPTIONS.find((option) => option.id === networkScope)?.subtitle}
-            </p>
           </div>
 
-          <div className="grid gap-3 md:grid-cols-[auto_minmax(0,1fr)] md:items-end">
-            <div>
-              <p className="mono-label">network view</p>
-              <div className="mt-1 flex flex-wrap gap-1.5">
-                <Button
-                  type="button"
-                  variant={networkViewMode === "all" ? "accent" : "ghost"}
-                  size="sm"
-                  onClick={() => setNetworkViewMode("all")}
-                >
-                  All links
-                </Button>
-                <Button
-                  type="button"
-                  variant={networkViewMode === "strong" ? "accent" : "ghost"}
-                  size="sm"
-                  onClick={() => setNetworkViewMode("strong")}
-                >
-                  Strong links
-                </Button>
-                <Button
-                  type="button"
-                  variant={networkViewMode === "focused" ? "accent" : "ghost"}
-                  size="sm"
-                  onClick={() => setNetworkViewMode("focused")}
-                  disabled={!scopedSelectedId}
-                >
-                  Selected + 1 hop
-                </Button>
-              </div>
+          <div>
+            <p className="mono-label">links</p>
+            <div className="mt-1 flex flex-wrap gap-1.5">
+              <Button
+                type="button"
+                variant={networkViewMode === "all" ? "accent" : "ghost"}
+                size="sm"
+                onClick={() => setNetworkViewMode("all")}
+              >
+                All
+              </Button>
+              <Button
+                type="button"
+                variant={networkViewMode === "strong" ? "accent" : "ghost"}
+                size="sm"
+                onClick={() => setNetworkViewMode("strong")}
+              >
+                Strong
+              </Button>
+              <Button
+                type="button"
+                variant={networkViewMode === "focused" ? "accent" : "ghost"}
+                size="sm"
+                onClick={() => setNetworkViewMode("focused")}
+                disabled={!scopedSelectedId}
+              >
+                1-hop
+              </Button>
             </div>
-
-            <label className="editorial-label">
-              Minimum link strength: {formatPercent(networkEdgeMin * 100, 0)}
-              <input
-                type="range"
-                min={0.05}
-                max={0.35}
-                step={0.01}
-                value={networkEdgeMin}
-                onChange={(event) => {
-                  setNetworkEdgeMin(Number(event.target.value));
-                  setFocusedComponentId(null);
-                }}
-                className="mt-1 w-full accent-[var(--accent)]"
-              />
-              <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
-                Effective cutoff: {formatPercent(effectiveEdgeCutoff * 100, 0)}
-                {networkViewMode === "strong"
-                  ? ` (strong floor ${formatPercent(STRONG_NETWORK_EDGE_MIN * 100, 0)})`
-                  : ""}
-              </p>
-              <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
-                Showing {formatNumber(visibleNetworkEdges.length)} links across{" "}
-                {formatNumber(visibleNetworkNodeCount)} nodes
-                {hiddenNodeCount > 0
-                  ? ` · ${formatNumber(hiddenNodeCount)} hidden by scope/filters${focusedComponentId ? "/component focus" : ""}`
-                  : ""}.
-              </p>
-            </label>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant={showIsolates ? "accent" : "ghost"}
-              size="sm"
-              onClick={() => {
-                setShowIsolates((current) => !current);
+          <label className="editorial-label">
+            Strength &ge; {formatPercent(networkEdgeMin * 100, 0)}
+            <input
+              type="range"
+              min={0.05}
+              max={0.35}
+              step={0.01}
+              value={networkEdgeMin}
+              onChange={(event) => {
+                setNetworkEdgeMin(Number(event.target.value));
                 setFocusedComponentId(null);
               }}
-            >
-              {showIsolates ? "Hide isolates" : "Show isolates"}
-            </Button>
-            <p className="mono-value text-[0.64rem] text-[var(--ink-faded)]">
-              {formatNumber(isolatedScopeNodeCount)} isolated nodes in this scope
-              {showIsolates
-                ? " are currently rendered."
-                : " are hidden by default for clarity."}
+              className="mt-1 w-full accent-[var(--accent)]"
+            />
+            <p className="mono-value mt-1 text-[0.66rem] text-[var(--ink-faded)]">
+              {formatNumber(visibleNetworkEdges.length)} links across{" "}
+              {formatNumber(visibleNetworkNodeCount)} nodes
+              {hiddenNodeCount > 0
+                ? ` · ${formatNumber(hiddenNodeCount)} hidden`
+                : ""}
             </p>
-          </div>
-
-          {componentChipData.chips.length > 1 ? (
-            <div className="space-y-1">
-              <p className="mono-label">connected components</p>
-              <div className="flex flex-wrap gap-1.5">
-                {componentChipData.chips.map((component) => {
-                  const isActive = focusedComponentId === component.id;
-                  return (
-                    <button
-                      key={component.id}
-                      type="button"
-                      className="null-badge"
-                      onClick={() => {
-                        setFocusedComponentId((current) =>
-                          current === component.id ? null : component.id,
-                        );
-                      }}
-                      style={
-                        isActive
-                          ? {
-                              borderColor: "var(--accent)",
-                              color: "var(--accent)",
-                            }
-                          : undefined
-                      }
-                    >
-                      {component.label} · {formatNumber(component.size)}
-                    </button>
-                  );
-                })}
-              </div>
-              <p className="mono-value text-[0.64rem] text-[var(--ink-faded)]">
-                Click a component chip to focus it. {focusedComponentId && hiddenOutsideFocusedComponentCount > 0
-                  ? `${formatNumber(hiddenOutsideFocusedComponentCount)} nodes are hidden outside the focused component.`
-                  : hiddenByFiltersCount > 0
-                    ? `${formatNumber(hiddenByFiltersCount)} scoped nodes are hidden by threshold/isolate filters.`
-                    : "All scoped nodes are visible."}
-                {componentChipData.hiddenCount > 0
-                  ? ` ${formatNumber(componentChipData.hiddenCount)} smaller components are omitted from chips.`
-                  : ""}
-              </p>
-            </div>
-          ) : null}
+          </label>
         </div>
 
         <div className="hidden sm:block">
@@ -1361,17 +1248,11 @@ function RelationshipsPage() {
           )}
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-4">
+        <div className="grid gap-2 sm:grid-cols-3">
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
-            <p className="mono-label">scope nodes</p>
+            <p className="mono-label">nodes</p>
             <p className="mono-value text-[0.86rem] text-[var(--ink)]">
-              {formatNumber(visibleNetworkNodeCount)} / {formatNumber(scopedNodeIds.size)}
-            </p>
-          </div>
-          <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
-            <p className="mono-label">hidden by scope</p>
-            <p className="mono-value text-[0.86rem] text-[var(--ink)]">
-              {formatNumber(hiddenByScopeCount)}
+              {formatNumber(visibleNetworkNodeCount)}
             </p>
           </div>
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
@@ -1381,7 +1262,7 @@ function RelationshipsPage() {
             </p>
           </div>
           <div className="border border-[var(--rule)] bg-[var(--paper)] p-2">
-            <p className="mono-label">duckdb phase</p>
+            <p className="mono-label">duckdb</p>
             <p className="mono-value text-[0.86rem] text-[var(--ink)]">{phase}</p>
           </div>
         </div>
