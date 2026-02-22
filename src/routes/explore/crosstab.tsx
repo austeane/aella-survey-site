@@ -95,6 +95,66 @@ function isCategoricalType(logicalType: string): boolean {
   return logicalType === "categorical" || logicalType === "boolean";
 }
 
+function allNumeric(values: string[]): boolean {
+  return values.length > 0 && values.every((v) => v !== "NULL" && Number.isFinite(Number(v)));
+}
+
+function computeSpearmanR(rows: Array<{ x: string; y: string; count: number }>): { value: number; nUsed: number } | null {
+  const xValues = [...new Set(rows.map((r) => r.x))];
+  const yValues = [...new Set(rows.map((r) => r.y))];
+  if (!allNumeric(xValues) || !allNumeric(yValues)) return null;
+
+  // Expand weighted pairs into parallel arrays
+  let n = 0;
+  const xNums: number[] = [];
+  const yNums: number[] = [];
+  for (const row of rows) {
+    for (let i = 0; i < row.count; i++) {
+      xNums.push(Number(row.x));
+      yNums.push(Number(row.y));
+      n++;
+    }
+  }
+  if (n < 3) return null;
+
+  // Assign ranks (average rank for ties)
+  function rankArray(arr: number[]): number[] {
+    const indexed = arr.map((v, i) => ({ v, i }));
+    indexed.sort((a, b) => a.v - b.v);
+    const ranks = new Array<number>(arr.length);
+    let i = 0;
+    while (i < indexed.length) {
+      let j = i;
+      while (j < indexed.length && indexed[j].v === indexed[i].v) j++;
+      const avgRank = (i + j + 1) / 2; // 1-based average
+      for (let k = i; k < j; k++) ranks[indexed[k].i] = avgRank;
+      i = j;
+    }
+    return ranks;
+  }
+
+  const xRanks = rankArray(xNums);
+  const yRanks = rankArray(yNums);
+
+  const meanX = xRanks.reduce((s, v) => s + v, 0) / n;
+  const meanY = yRanks.reduce((s, v) => s + v, 0) / n;
+
+  let num = 0;
+  let denomX = 0;
+  let denomY = 0;
+  for (let idx = 0; idx < n; idx++) {
+    const dx = xRanks[idx] - meanX;
+    const dy = yRanks[idx] - meanY;
+    num += dx * dy;
+    denomX += dx * dx;
+    denomY += dy * dy;
+  }
+
+  const denom = Math.sqrt(denomX * denomY);
+  if (denom === 0) return { value: 0, nUsed: n };
+  return { value: num / denom, nUsed: n };
+}
+
 function computeCramersV(rows: Array<{ x: string; y: string; count: number }>): { value: number; nUsed: number } {
   if (rows.length === 0) {
     return { value: 0, nUsed: 0 };
@@ -163,6 +223,7 @@ function ExplorePage() {
 
   const [filterColumn, setFilterColumn] = useState("");
   const [selectedFilterValues, setSelectedFilterValues] = useState<string[]>([]);
+  const [heatmap, setHeatmap] = useState(true);
   const [selectedCell, setSelectedCell] = useState<PivotCellDetail | null>(null);
   const lastCrosstabTrackKey = useRef<string | null>(null);
 
@@ -464,14 +525,18 @@ function ExplorePage() {
     return isCategoricalType(xMeta.logicalType) ? yMeta : xMeta;
   }, [xMeta, yMeta, isMixedCategoricalNumeric]);
 
-  const mixedChartData = useMemo(
-    () =>
-      mixedChartRows.map((row) => ({
-        name: formatValueWithLabel(row.name, mixedCategoryMeta?.valueLabels),
-        value: row.value,
-      })),
-    [mixedChartRows, mixedCategoryMeta],
-  );
+  const mixedChartData = useMemo(() => {
+    const categoryColumnName = mixedCategoryMeta?.name ?? "";
+    const sortedNames = sortByOrdinalOrder(
+      categoryColumnName,
+      mixedChartRows.map((r) => r.name),
+    );
+    const byName = new Map(mixedChartRows.map((r) => [r.name, r]));
+    return sortedNames.map((name) => ({
+      name: formatValueWithLabel(name, mixedCategoryMeta?.valueLabels),
+      value: byName.get(name)?.value ?? 0,
+    }));
+  }, [mixedChartRows, mixedCategoryMeta]);
 
   const sampleSizes = useMemo(() => {
     const row = sampleSizeQuery.data?.rows[0];
@@ -495,6 +560,11 @@ function ExplorePage() {
   const association = useMemo(() => {
     if (!isPivotable) return null;
     return computeCramersV(rows);
+  }, [rows, isPivotable]);
+
+  const spearman = useMemo(() => {
+    if (!isPivotable) return null;
+    return computeSpearmanR(rows);
   }, [rows, isPivotable]);
 
   const demographicColumns = useMemo(() => {
@@ -622,8 +692,11 @@ LIMIT 250
                 rows={rows}
                 topN={topN}
                 normalization={normalization}
+                xColumnName={xColumn}
+                yColumnName={yColumn}
                 xValueLabels={xMeta?.valueLabels}
                 yValueLabels={yMeta?.valueLabels}
+                heatmap={heatmap}
                 onCellClick={setSelectedCell}
               />
             ) : isMixedCategoricalNumeric ? (
@@ -712,7 +785,17 @@ LIMIT 250
 
           {association ? (
             <p className="mono-value">
-              How related: {associationLabel(association.value)} ({association.value.toFixed(2)}) - based on {formatNumber(association.nUsed)} responses
+              {"Association (Cramer's V): "}
+              {associationLabel(association.value)} ({association.value.toFixed(3)})
+              {" \u2014 "}{formatNumber(association.nUsed)} responses
+            </p>
+          ) : null}
+
+          {spearman ? (
+            <p className="mono-value">
+              {"Correlation (Spearman \u03C1): "}
+              {spearman.value.toFixed(3)}
+              {" \u2014 "}{formatNumber(spearman.nUsed)} responses
             </p>
           ) : null}
 
@@ -865,6 +948,14 @@ LIMIT 250
                         setTopN(Math.max(3, Math.min(30, Number(event.target.value) || 3)))
                       }
                     />
+                  </label>
+
+                  <label className="editorial-label flex items-center gap-2">
+                    <Checkbox
+                      checked={heatmap}
+                      onCheckedChange={(checked) => setHeatmap(checked === true)}
+                    />
+                    <span>Show heatmap coloring</span>
                   </label>
                 </>
               ) : null}

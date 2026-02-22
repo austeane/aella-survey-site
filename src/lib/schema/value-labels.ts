@@ -227,22 +227,36 @@ const VALUE_ORDERS: Record<string, string[]> = {
 };
 
 /**
- * Sort dropdown values by their ordinal order if one is defined for the column.
- * Values not in the order map are appended at the end, sorted alphabetically.
+ * Sort values by their ordinal order if one is defined for the column,
+ * then by numeric value if all values are numeric, then alphabetically.
  */
 export function sortByOrdinalOrder(columnName: string, values: string[]): string[] {
   const order = VALUE_ORDERS[columnName];
-  if (!order) return values;
+  if (order) {
+    const orderIndex = new Map(order.map((v, i) => [v, i]));
+    return [...values].sort((a, b) => {
+      const ai = orderIndex.get(a);
+      const bi = orderIndex.get(b);
+      if (ai != null && bi != null) return ai - bi;
+      if (ai != null) return -1;
+      if (bi != null) return 1;
+      return a.localeCompare(b);
+    });
+  }
 
-  const orderIndex = new Map(order.map((v, i) => [v, i]));
-  return [...values].sort((a, b) => {
-    const ai = orderIndex.get(a);
-    const bi = orderIndex.get(b);
-    if (ai != null && bi != null) return ai - bi;
-    if (ai != null) return -1;
-    if (bi != null) return 1;
-    return a.localeCompare(b);
-  });
+  return smartNumericSort(values);
+}
+
+/**
+ * Sort string values numerically if all of them parse as finite numbers,
+ * otherwise fall back to locale-aware alphabetical sort.
+ */
+export function smartNumericSort(values: string[]): string[] {
+  const allNumeric = values.length > 0 && values.every((v) => v !== "NULL" && Number.isFinite(Number(v)));
+  if (allNumeric) {
+    return [...values].sort((a, b) => Number(a) - Number(b));
+  }
+  return values;
 }
 
 export function getValueLabels(columnName: string): ValueLabels | null {

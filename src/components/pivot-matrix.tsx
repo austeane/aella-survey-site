@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import { formatNumber, formatPercent } from "@/lib/format";
 import { formatValueWithLabel } from "@/lib/format-labels";
+import { sortByOrdinalOrder } from "@/lib/schema/value-labels";
 
 type PrimitiveValue = string | number | boolean | null;
 
@@ -33,8 +34,11 @@ interface PivotMatrixProps {
   rows: PivotInputRow[];
   topN: number;
   normalization: PivotNormalization;
+  xColumnName?: string;
+  yColumnName?: string;
   xValueLabels?: Record<string, string>;
   yValueLabels?: Record<string, string>;
+  heatmap?: boolean;
   onCellClick?: (detail: PivotCellDetail) => void;
 }
 
@@ -42,11 +46,26 @@ function label(value: PrimitiveValue): string {
   return value == null ? "NULL" : String(value);
 }
 
-function sortedTopKeys(totals: Map<string, number>, topN: number): string[] {
-  return [...totals.entries()]
+/** Pick the top N keys by count, then sort them in ordinal/numeric order. */
+function sortedTopKeys(totals: Map<string, number>, topN: number, columnName?: string): string[] {
+  const topByCount = [...totals.entries()]
     .sort((left, right) => right[1] - left[1])
     .slice(0, topN)
     .map(([key]) => key);
+
+  return sortByOrdinalOrder(columnName ?? "", topByCount);
+}
+
+/** Interpolate between paper cream and accent red for heatmap cells. */
+function heatmapBg(intensity: number): string {
+  // intensity 0..1 → cream to soft red
+  const t = Math.max(0, Math.min(1, intensity));
+  if (t < 0.01) return "transparent";
+  // Paper: #f5f0e8 → Accent light: mix toward #b8432f
+  const r = Math.round(245 + (184 - 245) * t);
+  const g = Math.round(240 + (67 - 240) * t);
+  const b = Math.round(232 + (47 - 232) * t);
+  return `rgba(${r}, ${g}, ${b}, ${0.15 + t * 0.55})`;
 }
 
 function displayCellValue(
@@ -75,8 +94,11 @@ export function PivotMatrix({
   rows,
   topN,
   normalization,
+  xColumnName,
+  yColumnName,
   xValueLabels,
   yValueLabels,
+  heatmap,
   onCellClick,
 }: PivotMatrixProps) {
   const matrix = useMemo(() => {
@@ -90,8 +112,8 @@ export function PivotMatrix({
       yTotals.set(yValue, (yTotals.get(yValue) ?? 0) + row.count);
     }
 
-    const topX = sortedTopKeys(xTotals, topN);
-    const topY = sortedTopKeys(yTotals, topN);
+    const topX = sortedTopKeys(xTotals, topN, xColumnName);
+    const topY = sortedTopKeys(yTotals, topN, yColumnName);
 
     const topXSet = new Set(topX);
     const topYSet = new Set(topY);
@@ -136,6 +158,11 @@ export function PivotMatrix({
 
     const grandTotal = [...rowTotals.values()].reduce((sum, value) => sum + value, 0);
 
+    let maxCount = 0;
+    for (const count of cellCounts.values()) {
+      if (count > maxCount) maxCount = count;
+    }
+
     return {
       xLabels,
       yLabels,
@@ -145,8 +172,9 @@ export function PivotMatrix({
       rowTotals,
       columnTotals,
       grandTotal,
+      maxCount,
     };
-  }, [rows, topN]);
+  }, [rows, topN, xColumnName, yColumnName]);
 
   if (matrix.grandTotal === 0) {
     return <p className="section-subtitle">No non-null rows are available for this pivot.</p>;
@@ -192,8 +220,16 @@ export function PivotMatrix({
                     grandTotal: matrix.grandTotal,
                   };
 
+                  const cellBg = heatmap && matrix.maxCount > 0
+                    ? heatmapBg(count / matrix.maxCount)
+                    : undefined;
+
                   return (
-                    <td key={`${yValue}-${xValue}`} className="numeric">
+                    <td
+                      key={`${yValue}-${xValue}`}
+                      className="numeric"
+                      style={cellBg ? { backgroundColor: cellBg } : undefined}
+                    >
                       <button
                         type="button"
                         className="mono-value cursor-pointer border-0 bg-transparent p-0 text-right hover:text-[var(--accent)]"
